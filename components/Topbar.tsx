@@ -3,9 +3,12 @@ import { ShoppingCart, Sparkles, Clock, Gift, User, UserCheck } from "lucide-rea
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
-interface TopbarProps {}
+interface TopbarProps {
+  onGoToCheckout?: () => void;
+  hasItemsInCart?: boolean;
+}
 
-export function Topbar({}: TopbarProps = {}) {
+export function Topbar({ onGoToCheckout, hasItemsInCart = false }: TopbarProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { isAuthenticated, profile, loading } = useAuth();
@@ -22,7 +25,11 @@ export function Topbar({}: TopbarProps = {}) {
   }, [lastScrollY]);
 
   const scrollToReservation = () => {
-    document.getElementById('reservation')?.scrollIntoView({ behavior: 'smooth' });
+    if (hasItemsInCart && onGoToCheckout) {
+      onGoToCheckout();
+    } else {
+      document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -80,7 +87,7 @@ export function Topbar({}: TopbarProps = {}) {
               className="group bg-white/90 hover:bg-white text-[var(--color-cookite-blue)] hover:text-[var(--color-cookite-blue-hover)] rounded-xl text-xs md:text-sm px-4 py-2 hidden sm:flex font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
             >
               <ShoppingCart size={16} className="mr-2 group-hover:scale-110 transition-transform duration-200" />
-              Fazer Reserva
+{hasItemsInCart ? 'Ir ao Checkout' : 'Ver Produtos'}
             </Button>
             <Button 
               onClick={scrollToReservation}

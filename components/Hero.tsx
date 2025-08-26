@@ -96,7 +96,7 @@ export function Hero({ onGoToCheckout, hasItemsInCart = false }: HeroProps) {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center lg:justify-start">
+            <div className="flex justify-center lg:justify-start">
               <Button 
                 onClick={scrollToReservation}
                 size="lg"
@@ -107,17 +107,6 @@ export function Hero({ onGoToCheckout, hasItemsInCart = false }: HeroProps) {
                 </div>
                 <span>{hasItemsInCart ? 'Ir para Checkout' : 'Escolher Produtos'}</span>
                 <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">🚀</div>
-              </Button>
-              <Button 
-                onClick={scrollToProducts}
-                variant="outline"
-                size="lg"
-                className="group bg-white/90 backdrop-blur-sm border-3 border-[var(--color-cookite-yellow)] text-gray-800 hover:bg-[var(--color-cookite-yellow)] hover:text-white rounded-2xl py-4 sm:py-5 md:py-6 px-8 text-lg sm:text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
-              >
-                <div className="w-6 h-6 sm:w-7 sm:h-7 bg-[var(--color-cookite-yellow)] rounded-full flex items-center justify-center mr-3 group-hover:animate-bounce">
-                  <ArrowDown size={20} className="sm:w-6 sm:h-6 text-white group-hover:translate-y-1 transition-transform duration-300" />
-                </div>
-                <span>Ver Produtos</span>
               </Button>
             </div>
           </div>
