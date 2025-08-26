@@ -82,7 +82,7 @@ interface CheckoutPageProps {
 }
 
 export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: CheckoutPageProps) {
-  const { isAuthenticated, user, profile, updateProfile } = useAuth();
+  const { isAuthenticated, user, profile, updateProfile, loading: authLoading } = useAuth();
   const { addOrder } = useOrders();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [customerInfo, setCustomerInfo] = useState({
@@ -103,7 +103,6 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: Check
   
   // Sistema de Autenticação
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const { isAuthenticated, user, profile, loading: authLoading } = useAuth();
   
   const { createReservation, isLoading, updatePaymentStatus } = useReservations();
   const { formatPhone, validateWithServer, isValidEmail, isValidBrazilianPhone, isValidating } = useValidation();
