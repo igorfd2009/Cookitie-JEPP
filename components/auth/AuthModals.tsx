@@ -46,6 +46,17 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Validações básicas
+    if (!loginForm.email.trim()) {
+      toast.error('Email é obrigatório')
+      return
+    }
+
+    if (!loginForm.password.trim()) {
+      toast.error('Senha é obrigatória')
+      return
+    }
+
     // Verificar rate limit
     if (!loginRateLimit.canExecute()) {
       if (loginRateLimit.isBlocked) {
@@ -60,24 +71,22 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     setLoading(true)
 
     try {
-      const result = await loginRateLimit.executeWithRateLimit(
-        () => signIn(loginForm.email, loginForm.password),
-        (_success) => {
-          toast.success('Login realizado com sucesso!')
-          onClose()
-          setLoginForm({ email: '', password: '' })
-        },
-        (error) => {
-          toast.error(error.message || 'Erro ao fazer login')
-        }
-      )
+      console.log('🔑 Tentando fazer login...', { email: loginForm.email })
+
+      const result = await signIn(loginForm.email, loginForm.password)
       
-      if (!result) {
-        // Rate limit bloqueou a execução
-        return
+      console.log('📋 Resultado do login:', result)
+
+      if (result.error) {
+        toast.error(result.error.message || 'Erro ao fazer login')
+      } else {
+        toast.success('Login realizado com sucesso!')
+        onClose()
+        setLoginForm({ email: '', password: '' })
       }
       
     } catch (error) {
+      console.error('❌ Erro no login:', error)
       toast.error('Erro interno ao fazer login')
     } finally {
       setLoading(false)
@@ -87,14 +96,14 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Verificar rate limit
-    if (!signupRateLimit.canExecute()) {
-      if (signupRateLimit.isBlocked) {
-        const timeRemaining = signupRateLimit.getBlockedTimeFormatted()
-        toast.error(`Muitas tentativas. Tente novamente em ${timeRemaining}`)
-      } else {
-        toast.error('Limite de tentativas excedido')
-      }
+    // Validações básicas
+    if (!signupForm.email.trim()) {
+      toast.error('Email é obrigatório')
+      return
+    }
+
+    if (!signupForm.password.trim()) {
+      toast.error('Senha é obrigatória')
       return
     }
 
@@ -108,40 +117,58 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
       return
     }
 
+    if (!signupForm.fullName.trim()) {
+      toast.error('Nome é obrigatório')
+      return
+    }
+
+    // Verificar rate limit
+    if (!signupRateLimit.canExecute()) {
+      if (signupRateLimit.isBlocked) {
+        const timeRemaining = signupRateLimit.getBlockedTimeFormatted()
+        toast.error(`Muitas tentativas. Tente novamente em ${timeRemaining}`)
+      } else {
+        toast.error('Limite de tentativas excedido')
+      }
+      return
+    }
+
     setLoading(true)
 
     try {
-      const result = await signupRateLimit.executeWithRateLimit(
-        () => signUp(
-          signupForm.email, 
-          signupForm.password, 
-          {
-            full_name: signupForm.fullName,
-            phone: signupForm.phone
-          }
-        ),
-        (_success) => {
-          toast.success('Cadastro realizado com sucesso! Verifique seu email para confirmar.')
-          onClose()
-          setSignupForm({
-            email: '',
-            password: '',
-            confirmPassword: '',
-            fullName: '',
-            phone: ''
-          })
-        },
-        (error) => {
-          toast.error(error.message || 'Erro ao fazer cadastro')
+      console.log('🚀 Iniciando cadastro...', {
+        email: signupForm.email,
+        fullName: signupForm.fullName,
+        phone: signupForm.phone
+      })
+
+      const result = await signUp(
+        signupForm.email, 
+        signupForm.password, 
+        {
+          full_name: signupForm.fullName,
+          phone: signupForm.phone
         }
       )
       
-      if (!result) {
-        // Rate limit bloqueou a execução
-        return
+      console.log('📋 Resultado do cadastro:', result)
+
+      if (result.error) {
+        toast.error(result.error.message || 'Erro ao fazer cadastro')
+      } else {
+        toast.success('Cadastro realizado com sucesso!')
+        onClose()
+        setSignupForm({
+          email: '',
+          password: '',
+          confirmPassword: '',
+          fullName: '',
+          phone: ''
+        })
       }
       
     } catch (error) {
+      console.error('❌ Erro no cadastro:', error)
       toast.error('Erro interno ao fazer cadastro')
     } finally {
       setLoading(false)

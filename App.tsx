@@ -19,6 +19,7 @@ import { useState, useCallback } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { AuthDebug } from './components/AuthDebug';
 import { LoginStatus } from './components/LoginStatus';
+import { AuthTester } from './components/AuthTester';
 
 interface CartItem {
   id: string;
@@ -169,10 +170,14 @@ export default function App() {
           </div>
         </ClientProvider>
 
-        {/* Debug do Sistema de Autenticação */}
+        {/* Teste de Autenticação */}
         <ClientProvider>
-          <AuthDebug />
+          <div className="container mx-auto px-4 py-6">
+            <AuthTester />
+          </div>
         </ClientProvider>
+
+
 
         {/* Admin Dashboard */}
         <ClientProvider>
