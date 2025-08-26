@@ -1,3 +1,4 @@
+import './styles/theme.css';
 import { Topbar } from './components/Topbar';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -20,11 +21,11 @@ import { useState, useCallback, useEffect } from 'react';
 
 // Sistema de Autenticação
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { AuthDebug } from './components/AuthDebug';
-import { LoginStatus } from './components/LoginStatus';
+import { AppStateProvider } from './contexts/AppStateContext';
 import { LoginTest } from './components/LoginTest';
 import { MyOrders } from './components/orders/MyOrders';
 import { AuthModals } from './components/auth/AuthModals';
+import { NotificationSystem } from './components/ui/NotificationSystem';
 
 interface CartItem {
   id: string;
@@ -201,19 +202,14 @@ function AppContent() {
           <StickyMobileCTA currentPage={currentPage} onGoToCheckout={handleGoToCheckout} />
         </ClientProvider>
 
-        {/* Status de Login */}
-        <ClientProvider>
-          <div className="container mx-auto px-4 py-6">
-            <LoginStatus />
-          </div>
-        </ClientProvider>
-
-        {/* Teste de Autenticação */}
-        <ClientProvider>
-          <div className="container mx-auto px-4 py-6">
-            <LoginTest />
-          </div>
-        </ClientProvider>
+        {/* Debug da Autenticação - Remover em produção */}
+        {process.env.NODE_ENV === 'development' && (
+          <ClientProvider>
+            <div className="container mx-auto px-4 py-6">
+              <LoginTest />
+            </div>
+          </ClientProvider>
+        )}
 
 
 
@@ -262,7 +258,10 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <AppStateProvider>
+        <AppContent />
+        <NotificationSystem />
+      </AppStateProvider>
     </AuthProvider>
   );
 }

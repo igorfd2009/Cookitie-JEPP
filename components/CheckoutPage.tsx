@@ -33,7 +33,7 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { toast } from "sonner";
 import { useReservations } from "../hooks/useReservations";
 import { useValidation } from "../hooks/useValidation";
-import { PixPaymentPremium } from "./PixPaymentPremium";
+import { PaymentModal } from "./PaymentModal";
 import { pixSystem } from "../utils/pixAdvanced";
 import { emailSystem } from "../utils/emailAdvanced";
 
@@ -526,54 +526,97 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: Check
           </Card>
 
           {/* Modal de pagamento PIX */}
-          <PixPaymentPremium
+          <PaymentModal
             isOpen={true}
             onClose={handlePaymentClose}
             paymentData={{
               amount: paymentData.amount,
-              description: `Reserva Cookite JEPP - ${pendingReservationDetails.products.map(p => p.name).join(', ')}`,
-              orderId: pendingReservationDetails.id,
-              customer: {
-                name: pendingReservationDetails.name,
-                email: pendingReservationDetails.email,
-                phone: pendingReservationDetails.phone
-              }
+              pixCode: paymentData.pixCode,
+              qrCode: paymentData.qrCode,
+              transactionId: paymentData.transactionId,
+              expiresAt: paymentData.expiresAt
             }}
             onPaymentConfirmed={(transactionId: string) => {
               // Confirmar pedido e enviar email
               if (pendingReservationDetails) {
-                setConfirmedOrderDetails({
+                const confirmedOrder = {
                   ...pendingReservationDetails,
-                  paymentStatus: 'paid'
-                });
+                  paymentStatus: 'paid' as const,
+                  transactionId
+                };
+                
+                setConfirmedOrderDetails(confirmedOrder);
+                
                 // Persistir status de pagamento
                 updatePaymentStatus(pendingReservationDetails.id, 'paid', transactionId);
                 
-                // Enviar email de confirmação
-                emailSystem.sendPaymentConfirmation({
-                  customer: {
-                    name: pendingReservationDetails.name,
-                    email: pendingReservationDetails.email,
-                    phone: pendingReservationDetails.phone
-                  },
-                  transaction: {
-                    id: transactionId,
-                    amount: paymentData.amount,
-                    status: 'paid',
-                    orderId: pendingReservationDetails.id
-                  },
-                  products: pendingReservationDetails.products,
-                  pickupCode: `CKJP${Date.now().toString().slice(-6)}`,
-                  eventInfo: {
-                    name: 'JEPP 2025',
-                    date: '12/09/2025',
-                    location: 'Escola Estadual Exemplo - Ginásio / Stand B'
-                  }
-                });
+                // Salvar pedido no localStorage para "Meus Pedidos"
+                try {
+                  const existingOrders = JSON.parse(localStorage.getItem('user_orders') || '[]');
+                  const orderForStorage = {
+                    id: pendingReservationDetails.id,
+                    status: 'delivered',
+                    items: pendingReservationDetails.products.map(p => ({
+                      id: p.id,
+                      name: p.name,
+                      quantity: p.quantity,
+                      price: p.price,
+                      image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=100&h=100&fit=crop'
+                    })),
+                    total: pendingReservationDetails.totalAmount,
+                    created_at: pendingReservationDetails.createdAt,
+                    pickup_date: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 horas a partir de agora
+                    pickup_location: 'Stand JEPP - Sebrae',
+                    payment_method: 'PIX',
+                    payment_status: 'paid',
+                    customer: {
+                      name: pendingReservationDetails.name,
+                      email: pendingReservationDetails.email,
+                      phone: pendingReservationDetails.phone
+                    },
+                    notes: pendingReservationDetails.notes,
+                    transactionId
+                  };
+                  
+                  existingOrders.unshift(orderForStorage);
+                  localStorage.setItem('user_orders', JSON.stringify(existingOrders));
+                } catch (error) {
+                  console.error('Erro ao salvar pedido:', error);
+                }
+                
+                // Enviar email de confirmação (simulado)
+                try {
+                  console.log('📧 Enviando email de confirmação...');
+                  emailSystem.sendPaymentConfirmation({
+                    customer: {
+                      name: pendingReservationDetails.name,
+                      email: pendingReservationDetails.email,
+                      phone: pendingReservationDetails.phone
+                    },
+                    transaction: {
+                      id: transactionId,
+                      amount: paymentData.amount,
+                      status: 'paid',
+                      orderId: pendingReservationDetails.id
+                    },
+                    products: pendingReservationDetails.products,
+                    pickupCode: `CKJP${Date.now().toString().slice(-6)}`,
+                    eventInfo: {
+                      name: 'JEPP 2025',
+                      date: '12/09/2025',
+                      location: 'Stand JEPP - Sebrae'
+                    }
+                  });
+                } catch (error) {
+                  console.warn('Email não configurado, mas pedido foi salvo:', error);
+                }
+                
+                // Limpar carrinho após confirmação
+                onClearCart();
               }
               
               setShowPayment(false);
-              toast.success('Pagamento confirmado! Email enviado! 🎉');
+              toast.success('🎉 Pagamento confirmado! Pedido salvo em "Meus Pedidos"');
             }}
           />
           

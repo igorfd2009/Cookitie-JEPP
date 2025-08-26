@@ -1,57 +1,48 @@
-import { useState, useEffect } from 'react';
-import { Button } from "./ui/button";
-import { ShoppingCart, Clock } from "lucide-react";
+import React from 'react'
+import { Button } from './ui/button'
+import { ShoppingCart, Package, ChefHat } from 'lucide-react'
 
 interface StickyMobileCTAProps {
-  currentPage?: string;
-  onGoToCheckout: () => void;
+  currentPage: string
+  onGoToCheckout: () => void
 }
 
-export function StickyMobileCTA({ currentPage = 'products', onGoToCheckout }: StickyMobileCTAProps) {
-  const [isVisible, setIsVisible] = useState(false);
+export const StickyMobileCTA: React.FC<StickyMobileCTAProps> = ({
+  currentPage,
+  onGoToCheckout
+}) => {
+  // Só mostrar na página de produtos
+  if (currentPage !== 'products') {
+    return null
+  }
 
-  // Não mostrar em páginas onde não faz sentido
-  const shouldHide = currentPage === 'checkout' || currentPage === 'pix-dashboard';
-  
-  useEffect(() => {
-    if (shouldHide) {
-      setIsVisible(false);
-      return;
+  const scrollToProducts = () => {
+    const productsElement = document.getElementById('products')
+    if (productsElement) {
+      productsElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
-
-    const handleScroll = () => {
-      // Mostrar o CTA quando o usuário rolar para baixo (após o hero)
-      const scrolled = window.scrollY > 400;
-      setIsVisible(scrolled);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [shouldHide]);
-
-  const scrollToReservation = () => {
-    // Ir para a página de checkout
-    onGoToCheckout();
-  };
-
-  if (!isVisible || shouldHide) return null;
+  }
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 p-3 bg-white border-t-2 border-[var(--color-cookite-blue)] shadow-lg">
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-center gap-2 text-xs text-gray-600 mb-1">
-          <Clock size={14} className="text-[var(--color-cookite-blue)]" />
-          <span>20% OFF até 10/09 - Reserve já!</span>
-        </div>
-        <Button 
-          onClick={scrollToReservation}
-          size="lg"
-          className="w-full bg-[var(--color-cookite-blue)] hover:bg-[var(--color-cookite-blue-hover)] text-white rounded-2xl py-3 text-base animate-pulse-glow"
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+      <div className="flex p-4 gap-3">
+        <Button
+          onClick={scrollToProducts}
+          variant="outline"
+          className="flex-1 h-12 text-sm font-medium"
         >
-          <ShoppingCart size={20} className="mr-2" />
-          Fazer Reserva Online
+          <Package className="w-4 h-4 mr-2" />
+          Ver Produtos
+        </Button>
+        
+        <Button
+          onClick={onGoToCheckout}
+          className="flex-1 h-12 text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+        >
+          <ShoppingCart className="w-4 h-4 mr-2" />
+          Finalizar Pedido
         </Button>
       </div>
     </div>
-  );
+  )
 }

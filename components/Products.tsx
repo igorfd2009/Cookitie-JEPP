@@ -88,7 +88,13 @@ export function Products({ onAddToCart, onOpenCart, onGoToCheckout, cartItemCoun
     await new Promise(resolve => setTimeout(resolve, 500));
     
     onAddToCart(product);
-    toast.success(`${product.name} adicionado ao carrinho!`);
+    toast.success(`🛒 ${product.name} adicionado ao carrinho!`, {
+      duration: 2000,
+      action: {
+        label: "Ver Carrinho",
+        onClick: () => onOpenCart(),
+      },
+    });
     setAddingToCart(null);
   };
 

@@ -229,14 +229,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         // Validação de senha
         if (!password || password.length < 6) {
-          return { error: { message: 'Senha inválida' } as AuthError }
+          return { error: { message: 'Senha deve ter pelo menos 6 caracteres' } as AuthError }
         }
 
         const existingUsers = JSON.parse(localStorage.getItem('offline_users') || '[]')
         const user = existingUsers.find((u: any) => u.email === email)
         
         if (!user) {
-          return { error: { message: 'Email não encontrado' } as AuthError }
+          return { error: { message: 'Usuário não encontrado. Faça o cadastro primeiro.' } as AuthError }
         }
         
         // Simular sessão
@@ -247,6 +247,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         return { error: null }
       } catch (error) {
+        console.error('Erro no login offline:', error)
         return { error: { message: 'Erro ao fazer login offline' } as AuthError }
       }
     }

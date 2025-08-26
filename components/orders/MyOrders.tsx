@@ -102,32 +102,21 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Carregar reservas do storage/hook e mapear para Order
-      const mapped: Order[] = reservations.map((r) => ({
-        id: r.id,
-        status: r.paymentStatus === 'paid' ? 'delivered' : 'pending',
-        items: r.products.map(p => ({
-          id: p.id,
-          name: p.name,
-          quantity: p.quantity,
-          price: p.price,
-          image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=100&h=100&fit=crop'
-        })),
-        total: r.totalAmount,
-        created_at: r.createdAt,
-        pickup_date: r.createdAt,
-        pickup_location: 'Stand JEPP - Sebrae',
-        payment_method: 'PIX',
-        payment_status: r.paymentStatus,
-        notes: r.notes
-      }));
-      setOrders(mapped);
-      setLoading(ordersLoading);
+      // Carregar pedidos do localStorage
+      try {
+        const userOrders = JSON.parse(localStorage.getItem('user_orders') || '[]');
+        setOrders(userOrders);
+        setLoading(false);
+      } catch (error) {
+        console.error('Erro ao carregar pedidos:', error);
+        setOrders([]);
+        setLoading(false);
+      }
     } else {
       setOrders([]);
       setLoading(false);
     }
-  }, [isAuthenticated, reservations, ordersLoading]);
+  }, [isAuthenticated]);
 
   const getStatusInfo = (status: Order['status']) => {
     const statusMap = {
