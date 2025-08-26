@@ -99,32 +99,51 @@ export function Products({ onAddToCart, onOpenCart, onGoToCheckout, cartItemCoun
   };
 
   return (
-    <section id="products" className="py-16 md:py-20 px-4 bg-gradient-to-b from-white to-[var(--color-cookite-gray)]">
-      <div className="max-w-6xl mx-auto">
+    <section id="products" className="py-20 md:py-24 px-4 bg-gradient-to-b from-white via-[var(--color-cookite-gray)]/30 to-white relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-[var(--color-cookite-blue)]/5 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-20 right-10 w-40 h-40 bg-[var(--color-cookite-yellow)]/5 rounded-full blur-2xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-purple-500/3 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto relative">
         <div className="text-center mb-12 md:mb-16">
-          <div className="inline-flex items-center gap-2 bg-[var(--color-cookite-yellow)] text-gray-800 px-4 py-2 rounded-full mb-6 shadow-md">
-            <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-              <TrendingUp className="w-3 h-3 text-gray-800" />
+          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[var(--color-cookite-yellow)] to-yellow-400 text-gray-800 px-6 py-3 rounded-full mb-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-yellow-300">
+            <div className="w-6 h-6 bg-white/30 rounded-full flex items-center justify-center animate-pulse">
+              <TrendingUp className="w-4 h-4 text-gray-800" />
             </div>
-            <span className="text-sm font-medium">Mais Vendidos</span>
+            <span className="text-sm font-bold">🔥 Mais Vendidos</span>
           </div>
-          <h2 className="mb-4 md:mb-6 text-gray-800 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
-            Nossos <span className="bg-gradient-to-r from-[var(--color-cookite-blue)] to-[var(--color-cookite-yellow)] bg-clip-text text-transparent">Doces Artesanais</span>
+          <h2 className="mb-6 md:mb-8 text-gray-800 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
+            Nossos{' '}
+            <span className="relative">
+              <span className="bg-gradient-to-r from-[var(--color-cookite-blue)] via-purple-500 to-[var(--color-cookite-yellow)] bg-clip-text text-transparent">
+                Doces Artesanais
+              </span>
+              <div className="absolute -inset-1 bg-gradient-to-r from-[var(--color-cookite-blue)] to-[var(--color-cookite-yellow)] rounded-lg blur opacity-10 animate-pulse"></div>
+            </span>
           </h2>
-          <p className="text-gray-600 max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed">
-            Cada produto é feito com muito carinho e ingredientes selecionados. 
-            <span className="font-semibold text-[var(--color-cookite-blue)]"> Reserve já o seu favorito!</span>
+          <p className="text-gray-600 max-w-4xl mx-auto text-lg sm:text-xl md:text-2xl leading-relaxed font-medium">
+            Cada produto é feito com muito carinho e ingredientes selecionados especialmente para você.
+            <br />
+            <span className="bg-gradient-to-r from-[var(--color-cookite-blue)] to-purple-600 bg-clip-text text-transparent font-bold"> 
+              ✨ Reserve já o seu favorito e ganhe 20% de desconto!
+            </span>
           </p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
           {products.map((product, index) => (
             <Card 
               key={product.id} 
-              className={`group relative overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer bg-white border border-gray-200 hover:border-[var(--color-cookite-blue)] ${
-                hoveredProduct === product.id ? 'ring-1 ring-[var(--color-cookite-blue)] ring-opacity-30' : ''
+              className={`group relative overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer bg-white border-2 border-gray-100 hover:border-[var(--color-cookite-blue)] rounded-3xl transform hover:scale-105 ${
+                hoveredProduct === product.id ? 'ring-2 ring-[var(--color-cookite-blue)] ring-opacity-50 scale-105' : ''
               }`}
-              style={{ animationDelay: `${index * 0.1}s` }}
+              style={{ 
+                animationDelay: `${index * 0.1}s`,
+                backdropFilter: 'blur(10px)'
+              }}
               onMouseEnter={() => setHoveredProduct(product.id)}
               onMouseLeave={() => setHoveredProduct(null)}
             >

@@ -24,7 +24,7 @@ export function Hero({ onGoToCheckout }: HeroProps) {
   };
 
   return (
-    <section className="relative pt-14 md:pt-16 pb-8 md:pb-12 px-4 bg-gradient-to-br from-[var(--color-cookite-gray)] via-white to-[var(--color-cookite-blue)] overflow-hidden">
+    <section className="relative pt-20 md:pt-24 pb-12 md:pb-16 px-4 bg-gradient-to-br from-[var(--color-cookite-gray)] via-white to-[var(--color-cookite-blue)] overflow-hidden min-h-[80vh] flex items-center">
       {/* Background subtle elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-64 h-64 bg-[var(--color-cookite-yellow)] rounded-full opacity-10 blur-2xl"></div>
@@ -35,19 +35,33 @@ export function Hero({ onGoToCheckout }: HeroProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center">
           <div className={`text-center lg:text-left transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {/* Badge de destaque */}
-            <div className="inline-flex items-center gap-2 bg-white/80 border border-[var(--color-cookite-yellow)] rounded-full px-4 py-2 mb-6 shadow-md hover:shadow-lg transition-all duration-300">
-              <div className="w-6 h-6 bg-[var(--color-cookite-blue)] rounded-full flex items-center justify-center">
-                <Sparkles className="w-3 h-3 text-white" />
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-white/90 to-white/70 border border-[var(--color-cookite-yellow)] rounded-full px-5 py-3 mb-8 shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm">
+              <div className="w-7 h-7 bg-gradient-to-r from-[var(--color-cookite-blue)] to-[var(--color-cookite-yellow)] rounded-full flex items-center justify-center animate-pulse">
+                <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <span className="text-sm font-medium text-gray-700">Evento JEPP Sebrae</span>
+              <span className="text-sm font-semibold text-gray-800">🎉 Evento JEPP Sebrae - Oferta Especial!</span>
             </div>
 
-            <h1 className="mb-6 md:mb-8 text-gray-800 text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight font-bold">
-              <span className="bg-gradient-to-r from-[var(--color-cookite-blue)] to-[var(--color-cookite-yellow)] bg-clip-text text-transparent">
+            <h1 className="mb-8 md:mb-10 text-gray-800 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight font-extrabold tracking-tight">
+              <span className="bg-gradient-to-r from-[var(--color-cookite-blue)] via-purple-500 to-[var(--color-cookite-yellow)] bg-clip-text text-transparent animate-pulse">
                 Cookite
               </span>
               <br />
-              <span className="text-gray-800">Doces artesanais</span>
+              <span className="text-gray-800 relative">
+                Doces 
+                <span className="relative mx-3">
+                  <span className="bg-gradient-to-r from-[var(--color-cookite-blue)] to-[var(--color-cookite-yellow)] bg-clip-text text-transparent">artesanais</span>
+                  <svg className="absolute -bottom-2 left-0 w-full h-3" viewBox="0 0 100 10" preserveAspectRatio="none">
+                    <path d="M0,8 Q50,2 100,8" stroke="url(#gradient)" strokeWidth="3" fill="none" />
+                    <defs>
+                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="var(--color-cookite-blue)" />
+                        <stop offset="100%" stopColor="var(--color-cookite-yellow)" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </span>
+              </span>
             </h1>
             
             <p className="mb-8 md:mb-10 text-gray-600 text-base sm:text-lg md:text-xl leading-relaxed max-w-lg mx-auto lg:mx-0">
@@ -77,27 +91,28 @@ export function Hero({ onGoToCheckout }: HeroProps) {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center lg:justify-start">
               <Button 
                 onClick={scrollToReservation}
                 size="lg"
-                className="group bg-[var(--color-cookite-blue)] hover:bg-[var(--color-cookite-blue-hover)] text-white rounded-xl py-2.5 sm:py-3 md:py-4 text-base sm:text-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                className="group bg-gradient-to-r from-[var(--color-cookite-blue)] to-purple-600 hover:from-[var(--color-cookite-blue-hover)] hover:to-purple-700 text-white rounded-2xl py-4 sm:py-5 md:py-6 px-8 text-lg sm:text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
               >
-                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/20 rounded-full flex items-center justify-center mr-2">
-                  <ShoppingCart size={16} className="sm:w-[18px] sm:h-[18px] text-white" />
+                <div className="w-6 h-6 sm:w-7 sm:h-7 bg-white/20 rounded-full flex items-center justify-center mr-3 group-hover:rotate-12 transition-transform duration-300">
+                  <ShoppingCart size={20} className="sm:w-6 sm:h-6 text-white" />
                 </div>
-                <span className="text-sm sm:text-base">Fazer Reserva Online</span>
+                <span>Fazer Reserva Online</span>
+                <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">🚀</div>
               </Button>
               <Button 
                 onClick={scrollToProducts}
                 variant="outline"
                 size="lg"
-                className="group bg-white border-2 border-[var(--color-cookite-yellow)] text-gray-700 hover:bg-[var(--color-cookite-yellow)] hover:border-[var(--color-cookite-yellow)] rounded-xl py-2.5 sm:py-3 md:py-4 text-base sm:text-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                className="group bg-white/90 backdrop-blur-sm border-3 border-[var(--color-cookite-yellow)] text-gray-800 hover:bg-[var(--color-cookite-yellow)] hover:text-white rounded-2xl py-4 sm:py-5 md:py-6 px-8 text-lg sm:text-xl font-bold shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
               >
-                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-[var(--color-cookite-yellow)] rounded-full flex items-center justify-center mr-2">
-                  <ArrowDown size={16} className="sm:w-[18px] sm:h-[18px] text-white" />
+                <div className="w-6 h-6 sm:w-7 sm:h-7 bg-[var(--color-cookite-yellow)] rounded-full flex items-center justify-center mr-3 group-hover:animate-bounce">
+                  <ArrowDown size={20} className="sm:w-6 sm:h-6 text-white group-hover:translate-y-1 transition-transform duration-300" />
                 </div>
-                <span className="text-sm sm:text-base">Ver Produtos</span>
+                <span>Ver Produtos</span>
               </Button>
             </div>
           </div>

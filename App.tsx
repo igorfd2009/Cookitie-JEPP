@@ -23,6 +23,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { AuthDebug } from './components/AuthDebug';
 import { LoginStatus } from './components/LoginStatus';
 import { AuthTester } from './components/AuthTester';
+import { MyOrders } from './components/orders/MyOrders';
 
 interface CartItem {
   id: string;
@@ -37,7 +38,7 @@ interface CartItem {
 export default function App() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'products' | 'checkout'>('products');
+  const [currentPage, setCurrentPage] = useState<'products' | 'checkout' | 'orders'>('products');
 
   const addToCart = useCallback((product: any) => {
     setCartItems(prevItems => {
@@ -106,6 +107,10 @@ export default function App() {
     setCurrentPage('products');
   }, []);
 
+  const handleGoToOrders = useCallback(() => {
+    setCurrentPage('orders');
+  }, []);
+
 
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -116,7 +121,11 @@ export default function App() {
       <div className="min-h-screen">
         {/* Fixed Topbar */}
         <Topbar />
-        <Header onCartClick={openCart} cartItemCount={cartItemCount} />
+        <Header 
+          onCartClick={openCart} 
+          onOrdersClick={handleGoToOrders}
+          cartItemCount={cartItemCount} 
+        />
         
         {/* Main Content */}
         <main>
@@ -148,7 +157,7 @@ export default function App() {
                       {/* Footer */}
           <Footer onGoToCheckout={handleGoToCheckout} />
             </>
-          ) : (
+          ) : currentPage === 'checkout' ? (
             /* Checkout Page */
             <ClientProvider>
               <CheckoutPage
@@ -157,6 +166,9 @@ export default function App() {
                 onBackToProducts={handleBackToProducts}
               />
             </ClientProvider>
+          ) : (
+            /* Orders Page */
+            <MyOrders onBackToProducts={handleBackToProducts} />
           )}
 
 
