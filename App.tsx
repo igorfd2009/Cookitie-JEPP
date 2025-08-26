@@ -143,7 +143,7 @@ function AppContent() {
   return (
       <div className="min-h-screen">
         {/* Fixed Topbar */}
-        <Topbar onGoToCheckout={handleGoToCheckout} hasItemsInCart={cartItemCount > 0} />
+        <Topbar onGoToCheckout={handleGoToCheckout} onGoToOrders={handleGoToOrders} hasItemsInCart={cartItemCount > 0} />
         <Header 
           onCartClick={openCart} 
           onOrdersClick={handleGoToOrders}
@@ -187,6 +187,7 @@ function AppContent() {
                 cartItems={cartItems}
                 onClearCart={clearCart}
                 onBackToProducts={handleBackToProducts}
+                onGoToOrders={handleGoToOrders}
               />
             </ClientProvider>
           ) : (

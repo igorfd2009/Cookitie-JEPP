@@ -79,9 +79,10 @@ interface CheckoutPageProps {
   cartItems: CartItem[];
   onClearCart: () => void;
   onBackToProducts: () => void;
+  onGoToOrders: () => void;
 }
 
-export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: CheckoutPageProps) {
+export function CheckoutPage({ cartItems, onClearCart, onBackToProducts, onGoToOrders }: CheckoutPageProps) {
   const { isAuthenticated, user, profile, updateProfile, loading: authLoading } = useAuth();
   const { addOrder } = useOrders();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
@@ -459,8 +460,15 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: Check
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
-                  onClick={onBackToProducts}
+                  onClick={onGoToOrders}
                   className="flex-1 bg-[var(--color-cookite-blue)] hover:bg-[var(--color-cookite-blue-hover)]"
+                >
+                  📦 Ver Meus Pedidos
+                </Button>
+                <Button 
+                  onClick={onBackToProducts}
+                  variant="outline"
+                  className="flex-1"
                 >
                   Fazer Nova Reserva
                 </Button>
@@ -616,6 +624,9 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: Check
                 
                 // Limpar carrinho após confirmação
                 onClearCart();
+                
+                // Ir para tela de confirmação
+                setCurrentStep('confirmation');
               }
               
               setShowPayment(false);
