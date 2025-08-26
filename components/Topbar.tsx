@@ -91,10 +91,10 @@ export function Topbar({ onGoToCheckout, onGoToOrders, hasItemsInCart = false }:
               {isAuthenticated ? '📦 Meus Pedidos' : hasItemsInCart ? 'Ir ao Checkout' : 'Ver Produtos'}
             </Button>
             <Button 
-              onClick={scrollToReservation}
+              onClick={isAuthenticated ? onGoToOrders : scrollToReservation}
               size="sm"
               className="group bg-white/90 hover:bg-white text-[var(--color-cookite-blue)] hover:text-[var(--color-cookite-blue-hover)] rounded-xl p-2 sm:hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
-              aria-label="Fazer Reserva"
+              aria-label={isAuthenticated ? "Meus Pedidos" : "Fazer Reserva"}
             >
               <ShoppingCart size={18} className="group-hover:scale-110 transition-transform duration-200" />
             </Button>
