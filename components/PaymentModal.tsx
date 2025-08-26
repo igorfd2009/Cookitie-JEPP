@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog'
 import { Button } from './ui/button'
 import { Card, CardContent } from './ui/card'
 import { Badge } from './ui/badge'
@@ -24,6 +24,7 @@ interface PaymentModalProps {
     amount: number
     pixCode: string
     qrCode: string
+    qrCodeUrl?: string
     transactionId: string
     expiresAt: string
   }
@@ -155,6 +156,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <DialogTitle className="text-center">
             💳 Pagamento PIX
           </DialogTitle>
+          <DialogDescription className="text-center text-sm text-gray-600">
+            Escaneie o QR Code ou copie o código PIX para realizar o pagamento
+          </DialogDescription>
           <div className="flex justify-center">
             <Button variant="ghost" size="sm" onClick={onClose} className="absolute right-4 top-4">
               <X className="w-4 h-4" />
@@ -195,11 +199,18 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           <Card>
             <CardContent className="p-4 text-center">
               <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                {paymentData.qrCode ? (
+                {(paymentData.qrCode || paymentData.qrCodeUrl) ? (
                   <img 
-                    src={`data:image/png;base64,${paymentData.qrCode}`} 
+                    src={
+                      paymentData.qrCodeUrl || 
+                      (paymentData.qrCode.startsWith('data:') ? paymentData.qrCode : `data:image/png;base64,${paymentData.qrCode}`)
+                    }
                     alt="QR Code PIX" 
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain rounded-lg"
+                    onError={(e) => {
+                      // Fallback para URL externa se imagem falhar
+                      e.currentTarget.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(paymentData.pixCode)}`
+                    }}
                   />
                 ) : (
                   <QrCode className="w-16 h-16 text-gray-400" />

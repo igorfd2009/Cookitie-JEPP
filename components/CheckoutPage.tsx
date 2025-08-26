@@ -34,7 +34,7 @@ import { toast } from "sonner";
 import { useReservations } from "../hooks/useReservations";
 import { useValidation } from "../hooks/useValidation";
 import { PaymentModal } from "./PaymentModal";
-import { pixSystem } from "../utils/pixAdvanced";
+import { pixSystem } from "../utils/pixSimple";
 import { emailSystem } from "../utils/emailAdvanced";
 
 // Sistema de Autenticação
@@ -532,7 +532,8 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: Check
             paymentData={{
               amount: paymentData.amount,
               pixCode: paymentData.pixCode,
-              qrCode: paymentData.qrCode,
+              qrCode: paymentData.qrCode || '',
+              qrCodeUrl: paymentData.qrCodeUrl,
               transactionId: paymentData.transactionId,
               expiresAt: paymentData.expiresAt
             }}

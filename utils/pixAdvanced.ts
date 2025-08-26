@@ -382,33 +382,20 @@ class PixAdvancedSystem {
       console.log('🧪 Resultado da validação:', validation)
       
       if (!validation.valid) {
-        console.error('❌ PIX inválido gerado:', validation.details)
-        console.error('📋 Detalhes completos:', {
-          pixCode,
-          config: this.config,
-          payment,
-          validation
-        })
-        
-        // Não falhar por enquanto, apenas avisar
-        console.warn('⚠️ Continuando mesmo com PIX inválido para debug')
+        console.warn('⚠️ PIX com problemas de validação (continuando para desenvolvimento):', validation.details?.errors)
       } else {
-        console.log('✅ PIX válido gerado:', {
-          pixCode,
-          validation: validation.details
-        })
+        console.log('✅ PIX válido gerado')
       }
       
       // Gerar QR Code
       const qrCodeBase64 = await this.generateQRCode(pixCode)
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixCode)}`
       
       const pixResponse: PixResponse = {
         success: true,
         transactionId,
         pixCode,
         qrCodeBase64,
-        qrCodeUrl,
+        qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(pixCode)}`,
         amount: payment.amount,
         expiresAt,
         status: 'pending',
