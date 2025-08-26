@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency';
 import { AuthModals } from '../auth/AuthModals';
+import { useReservations } from '../../hooks/useReservations';
 
 interface Order {
   id: string;
@@ -91,6 +92,7 @@ interface MyOrdersProps {
 
 export function MyOrders({ onBackToProducts }: MyOrdersProps) {
   const { isAuthenticated, profile } = useAuth();
+  const { reservations, loading: ordersLoading, reload } = useReservations();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -100,13 +102,32 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Simular carregamento de pedidos
-      setTimeout(() => {
-        setOrders(mockOrders);
-        setLoading(false);
-      }, 1000);
+      // Carregar reservas do storage/hook e mapear para Order
+      const mapped: Order[] = reservations.map((r) => ({
+        id: r.id,
+        status: r.paymentStatus === 'paid' ? 'delivered' : 'pending',
+        items: r.products.map(p => ({
+          id: p.id,
+          name: p.name,
+          quantity: p.quantity,
+          price: p.price,
+          image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=100&h=100&fit=crop'
+        })),
+        total: r.totalAmount,
+        created_at: r.createdAt,
+        pickup_date: r.createdAt,
+        pickup_location: 'Stand JEPP - Sebrae',
+        payment_method: 'PIX',
+        payment_status: r.paymentStatus,
+        notes: r.notes
+      }));
+      setOrders(mapped);
+      setLoading(ordersLoading);
+    } else {
+      setOrders([]);
+      setLoading(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, reservations, ordersLoading]);
 
   const getStatusInfo = (status: Order['status']) => {
     const statusMap = {

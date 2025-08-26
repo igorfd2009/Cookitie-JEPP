@@ -102,7 +102,7 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: Check
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { isAuthenticated, user, profile, loading: authLoading } = useAuth();
   
-  const { createReservation, isLoading } = useReservations();
+  const { createReservation, isLoading, updatePaymentStatus } = useReservations();
   const { formatPhone, validateWithServer, isValidEmail, isValidBrazilianPhone, isValidating } = useValidation();
 
   // Initialize quantities from cart items
@@ -546,6 +546,8 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: Check
                   ...pendingReservationDetails,
                   paymentStatus: 'paid'
                 });
+                // Persistir status de pagamento
+                updatePaymentStatus(pendingReservationDetails.id, 'paid', transactionId);
                 
                 // Enviar email de confirmação
                 emailSystem.sendPaymentConfirmation({

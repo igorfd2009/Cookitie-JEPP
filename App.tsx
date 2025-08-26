@@ -16,7 +16,7 @@ import { ShoppingCartModal, FloatingCartButton } from './components/ShoppingCart
 import { Toaster } from "sonner";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 // Sistema de Autenticação
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -126,7 +126,7 @@ function AppContent() {
   }, [isAuthenticated]);
 
   // Navegar automaticamente após autenticação
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated && nextPageAfterAuth) {
       setCurrentPage(nextPageAfterAuth);
       setNextPageAfterAuth(null);
