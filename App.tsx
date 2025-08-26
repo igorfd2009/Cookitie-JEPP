@@ -1,4 +1,5 @@
 import { Topbar } from './components/Topbar';
+import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { CountdownTimer } from './components/CountdownTimer';
 import { Products } from './components/Products';
@@ -13,6 +14,8 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { ClientProvider } from './components/ClientProvider';
 import { ShoppingCartModal, FloatingCartButton } from './components/ShoppingCart';
 import { Toaster } from "sonner";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useState, useCallback } from 'react';
 
 // Sistema de Autenticação
@@ -113,6 +116,7 @@ export default function App() {
       <div className="min-h-screen">
         {/* Fixed Topbar */}
         <Topbar />
+        <Header onCartClick={openCart} cartItemCount={cartItemCount} />
         
         {/* Main Content */}
         <main>
@@ -210,6 +214,7 @@ export default function App() {
           richColors
           closeButton
         />
+        <ToastContainer position="top-right" autoClose={3000} newestOnTop hideProgressBar={false} />
       </div>
     </AuthProvider>
   );
