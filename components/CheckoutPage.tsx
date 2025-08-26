@@ -35,6 +35,7 @@ import { useReservations } from "../hooks/useReservations";
 import { useValidation } from "../hooks/useValidation";
 import { PaymentModal } from "./PaymentModal";
 import { pixSystem } from "../utils/pixSimple";
+import { useOrders } from "../hooks/useOrders";
 import { emailSystem } from "../utils/emailAdvanced";
 
 // Sistema de Autenticação
@@ -81,6 +82,8 @@ interface CheckoutPageProps {
 }
 
 export function CheckoutPage({ cartItems, onClearCart, onBackToProducts }: CheckoutPageProps) {
+  const { isAuthenticated, user, profile, updateProfile } = useAuth();
+  const { addOrder } = useOrders();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [customerInfo, setCustomerInfo] = useState({
     name: '',

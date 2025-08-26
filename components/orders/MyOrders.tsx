@@ -16,30 +16,14 @@ import {
   ShoppingBag,
   ArrowLeft,
   Filter,
-  Search
+  Search,
+  RefreshCw
 } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency';
 import { AuthModals } from '../auth/AuthModals';
-import { useReservations } from '../../hooks/useReservations';
+import { useOrders, type Order } from '../../hooks/useOrders';
 
-interface Order {
-  id: string;
-  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'cancelled';
-  items: {
-    id: string;
-    name: string;
-    quantity: number;
-    price: number;
-    image: string;
-  }[];
-  total: number;
-  created_at: string;
-  pickup_date: string;
-  pickup_location: string;
-  payment_method: string;
-  payment_status: 'pending' | 'paid' | 'failed';
-  notes?: string;
-}
+
 
 // Mock data para demonstração
 const mockOrders: Order[] = [
@@ -92,31 +76,11 @@ interface MyOrdersProps {
 
 export function MyOrders({ onBackToProducts }: MyOrdersProps) {
   const { isAuthenticated, profile } = useAuth();
-  const { reservations, loading: ordersLoading, reload } = useReservations();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { orders, loading, loadOrders } = useOrders();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAuthModal, setShowAuthModal] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Carregar pedidos do localStorage
-      try {
-        const userOrders = JSON.parse(localStorage.getItem('user_orders') || '[]');
-        setOrders(userOrders);
-        setLoading(false);
-      } catch (error) {
-        console.error('Erro ao carregar pedidos:', error);
-        setOrders([]);
-        setLoading(false);
-      }
-    } else {
-      setOrders([]);
-      setLoading(false);
-    }
-  }, [isAuthenticated]);
 
   const getStatusInfo = (status: Order['status']) => {
     const statusMap = {
@@ -270,6 +234,16 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                 <option value="cancelled">Cancelado</option>
               </select>
             </div>
+            <Button
+              onClick={loadOrders}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              disabled={loading}
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Atualizar
+            </Button>
           </div>
         </div>
 

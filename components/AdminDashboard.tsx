@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Eye, X, Users, DollarSign, Package, TrendingUp, Search, RefreshCw, Phone, Calendar, CreditCard, Clock, CheckCircle, AlertCircle, QrCode, UserCheck, TrendingDown } from "lucide-react";
 import { PixDashboard } from './PixDashboard';
+import { AdminOrdersPanel } from './AdminOrdersPanel';
 import { useReservations } from "../hooks/useReservations";
 import { toast } from "sonner";
 
@@ -477,10 +478,14 @@ export function AdminDashboard() {
                 </div>
               )}
 
-              <Tabs defaultValue="reservations" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="reservations" className="flex items-center gap-2">
+              <Tabs defaultValue="orders" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="orders" className="flex items-center gap-2">
                     <Package size={16} />
+                    Pedidos
+                  </TabsTrigger>
+                  <TabsTrigger value="reservations" className="flex items-center gap-2">
+                    <Calendar size={16} />
                     Reservas ({reservations.length || 0})
                   </TabsTrigger>
                   <TabsTrigger value="payments" className="flex items-center gap-2">
@@ -492,6 +497,10 @@ export function AdminDashboard() {
                     Dashboard PIX
                   </TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="orders" className="space-y-4">
+                  <AdminOrdersPanel />
+                </TabsContent>
 
                 <TabsContent value="reservations" className="space-y-4">
                   <div className="flex flex-col md:flex-row gap-4">
