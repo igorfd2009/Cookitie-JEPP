@@ -5,9 +5,10 @@ import { useState, useEffect } from "react";
 
 interface HeroProps {
   onGoToCheckout: () => void;
+  hasItemsInCart?: boolean;
 }
 
-export function Hero({ onGoToCheckout }: HeroProps) {
+export function Hero({ onGoToCheckout, hasItemsInCart = false }: HeroProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -15,8 +16,12 @@ export function Hero({ onGoToCheckout }: HeroProps) {
   }, []);
 
   const scrollToReservation = () => {
-    // Ir para a página de checkout
-    onGoToCheckout();
+    // Se houver itens no carrinho, ir para checkout; senão, levar aos produtos
+    if (hasItemsInCart) {
+      onGoToCheckout();
+    } else {
+      scrollToProducts();
+    }
   };
 
   const scrollToProducts = () => {
@@ -100,7 +105,7 @@ export function Hero({ onGoToCheckout }: HeroProps) {
                 <div className="w-6 h-6 sm:w-7 sm:h-7 bg-white/20 rounded-full flex items-center justify-center mr-3 group-hover:rotate-12 transition-transform duration-300">
                   <ShoppingCart size={20} className="sm:w-6 sm:h-6 text-white" />
                 </div>
-                <span>Fazer Reserva Online</span>
+                <span>{hasItemsInCart ? 'Ir para Checkout' : 'Escolher Produtos'}</span>
                 <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">🚀</div>
               </Button>
               <Button 

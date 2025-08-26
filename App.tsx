@@ -154,7 +154,7 @@ function AppContent() {
           {currentPage === 'products' ? (
             <>
                       {/* Hero Section */}
-          <Hero onGoToCheckout={handleGoToCheckout} />
+          <Hero onGoToCheckout={handleGoToCheckout} hasItemsInCart={cartItemCount > 0} />
               
               {/* Countdown Timer */}
               <div className="py-6 md:py-8">
