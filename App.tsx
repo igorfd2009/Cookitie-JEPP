@@ -19,11 +19,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useState, useCallback } from 'react';
 
 // Sistema de Autenticação
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthDebug } from './components/AuthDebug';
 import { LoginStatus } from './components/LoginStatus';
 import { AuthTester } from './components/AuthTester';
 import { MyOrders } from './components/orders/MyOrders';
+import { AuthModals } from './components/auth/AuthModals';
 
 interface CartItem {
   id: string;
@@ -35,10 +36,13 @@ interface CartItem {
   maxStock: number;
 }
 
-export default function App() {
+function AppContent() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<'products' | 'checkout' | 'orders'>('products');
+  const { isAuthenticated } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [nextPageAfterAuth, setNextPageAfterAuth] = useState<null | 'checkout' | 'orders'>(null);
 
   const addToCart = useCallback((product: any) => {
     setCartItems(prevItems => {
@@ -100,16 +104,35 @@ export default function App() {
   }, [closeCart]);
 
   const handleGoToCheckout = useCallback(() => {
+    if (!isAuthenticated) {
+      setNextPageAfterAuth('checkout');
+      setShowAuthModal(true);
+      return;
+    }
     setCurrentPage('checkout');
-  }, []);
+  }, [isAuthenticated]);
 
   const handleBackToProducts = useCallback(() => {
     setCurrentPage('products');
   }, []);
 
   const handleGoToOrders = useCallback(() => {
+    if (!isAuthenticated) {
+      setNextPageAfterAuth('orders');
+      setShowAuthModal(true);
+      return;
+    }
     setCurrentPage('orders');
-  }, []);
+  }, [isAuthenticated]);
+
+  // Navegar automaticamente após autenticação
+  React.useEffect(() => {
+    if (isAuthenticated && nextPageAfterAuth) {
+      setCurrentPage(nextPageAfterAuth);
+      setNextPageAfterAuth(null);
+      setShowAuthModal(false);
+    }
+  }, [isAuthenticated, nextPageAfterAuth]);
 
 
 
@@ -117,7 +140,6 @@ export default function App() {
   const cartTotalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   return (
-    <AuthProvider>
       <div className="min-h-screen">
         {/* Fixed Topbar */}
         <Topbar />
@@ -227,7 +249,20 @@ export default function App() {
           closeButton
         />
         <ToastContainer position="top-right" autoClose={3000} newestOnTop hideProgressBar={false} />
+        {/* Modal de Autenticação Global */}
+        <AuthModals
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          defaultTab="login"
+        />
       </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
     </AuthProvider>
   );
 }

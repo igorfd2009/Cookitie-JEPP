@@ -19,6 +19,7 @@ import {
   Search
 } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency';
+import { AuthModals } from '../auth/AuthModals';
 
 interface Order {
   id: string;
@@ -95,6 +96,7 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -186,15 +188,25 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
             <p className="text-gray-600 mb-6">
               Acesse sua conta para visualizar o histórico de pedidos e acompanhar o status das suas encomendas.
             </p>
-            <Button 
-              onClick={onBackToProducts}
-              className="bg-[var(--color-cookite-blue)] hover:bg-[var(--color-cookite-blue-hover)] text-white"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar aos Produtos
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                onClick={() => setShowAuthModal(true)}
+                className="bg-[var(--color-cookite-blue)] hover:bg-[var(--color-cookite-blue-hover)] text-white"
+              >
+                Entrar para ver pedidos
+              </Button>
+              <Button 
+                onClick={onBackToProducts}
+                variant="outline"
+                className="border-[var(--color-cookite-blue)] text-[var(--color-cookite-blue)] hover:bg-[var(--color-cookite-blue)] hover:text-white"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar aos Produtos
+              </Button>
+            </div>
           </div>
         </div>
+        <AuthModals isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} defaultTab="login" />
       </div>
     );
   }
