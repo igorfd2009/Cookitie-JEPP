@@ -126,31 +126,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signUp = async (email: string, password: string, profileData: Partial<UserProfile>) => {
-    console.log('🔍 AuthContext.signUp called', { email, profileData, supabaseAvailable: !!supabase })
-    
     if (!supabase) {
-      console.log('📱 Modo offline - usando localStorage')
       // Modo offline - simular cadastro com localStorage
       try {
         // Validação básica de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
-          console.log('❌ Email inválido:', email)
           return { error: { message: 'Email inválido' } as AuthError }
         }
 
         // Validação de senha
         if (!password || password.length < 6) {
-          console.log('❌ Senha muito curta:', password?.length)
           return { error: { message: 'Senha deve ter pelo menos 6 caracteres' } as AuthError }
         }
 
         const existingUsers = JSON.parse(localStorage.getItem('offline_users') || '[]')
-        console.log('👥 Usuários existentes:', existingUsers.length)
         
         // Verificar se email já existe
         if (existingUsers.find((u: any) => u.email === email)) {
-          console.log('❌ Email já existe:', email)
           return { error: { message: 'Email já cadastrado' } as AuthError }
         }
         
@@ -167,23 +160,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           primeiro_pedido: true
         }
         
-        console.log('✅ Criando novo usuário:', newUser)
-        
         existingUsers.push(newUser)
         localStorage.setItem('offline_users', JSON.stringify(existingUsers))
         localStorage.setItem('offline_current_user', JSON.stringify(newUser))
-        
-        console.log('💾 Dados salvos no localStorage')
         
         // Simular sessão
         setUser(newUser as any)
         setProfile(newUser)
         setSession({ user: newUser } as any)
         
-        console.log('🎉 Usuário logado com sucesso!')
-        
         return { error: null }
       } catch (error) {
+        console.error('Erro no cadastro offline:', error)
         return { error: { message: 'Erro ao criar conta offline' } as AuthError }
       }
     }

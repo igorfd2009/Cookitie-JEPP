@@ -4,9 +4,9 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
-import { Loader2, Eye, EyeOff, Mail, Lock, User, Phone, AlertTriangle, Clock } from 'lucide-react'
+import { Loader2, Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react'
 import { toast } from 'react-toastify'
-import { useAuthRateLimit, useSignupRateLimit } from '../../hooks/useRateLimit'
+// import { useAuthRateLimit, useSignupRateLimit } from '../../hooks/useRateLimit'
 
 interface AuthModalsProps {
   isOpen: boolean
@@ -24,9 +24,9 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   const [loading, setLoading] = useState(false)
   const { signIn, signUp } = useAuth()
 
-  // Rate Limiting
-  const loginRateLimit = useAuthRateLimit()
-  const signupRateLimit = useSignupRateLimit()
+  // Rate Limiting - Temporariamente desabilitado para debug
+  // const loginRateLimit = useAuthRateLimit()
+  // const signupRateLimit = useSignupRateLimit()
 
   // Estados do formulário de login
   const [loginForm, setLoginForm] = useState({
@@ -57,16 +57,16 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
       return
     }
 
-    // Verificar rate limit
-    if (!loginRateLimit.canExecute()) {
-      if (loginRateLimit.isBlocked) {
-        const timeRemaining = loginRateLimit.getBlockedTimeFormatted()
-        toast.error(`Muitas tentativas. Tente novamente em ${timeRemaining}`)
-      } else {
-        toast.error('Limite de tentativas excedido')
-      }
-      return
-    }
+    // Rate limit temporariamente desabilitado
+    // if (!loginRateLimit.canExecute()) {
+    //   if (loginRateLimit.isBlocked) {
+    //     const timeRemaining = loginRateLimit.getBlockedTimeFormatted()
+    //     toast.error(`Muitas tentativas. Tente novamente em ${timeRemaining}`)
+    //   } else {
+    //     toast.error('Limite de tentativas excedido')
+    //   }
+    //   return
+    // }
 
     setLoading(true)
 
@@ -122,16 +122,16 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
       return
     }
 
-    // Verificar rate limit
-    if (!signupRateLimit.canExecute()) {
-      if (signupRateLimit.isBlocked) {
-        const timeRemaining = signupRateLimit.getBlockedTimeFormatted()
-        toast.error(`Muitas tentativas. Tente novamente em ${timeRemaining}`)
-      } else {
-        toast.error('Limite de tentativas excedido')
-      }
-      return
-    }
+    // Rate limit temporariamente desabilitado
+    // if (!signupRateLimit.canExecute()) {
+    //   if (signupRateLimit.isBlocked) {
+    //     const timeRemaining = signupRateLimit.getBlockedTimeFormatted()
+    //     toast.error(`Muitas tentativas. Tente novamente em ${timeRemaining}`)
+    //   } else {
+    //     toast.error('Limite de tentativas excedido')
+    //   }
+    //   return
+    // }
 
     setLoading(true)
 
@@ -245,8 +245,8 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
                 </div>
               </div>
 
-              {/* Rate Limit Indicator */}
-              {loginRateLimit.isBlocked && (
+              {/* Rate Limit Indicator - Temporariamente desabilitado */}
+              {/* {loginRateLimit.isBlocked && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center gap-2 text-red-800">
                     <AlertTriangle className="h-4 w-4" />
@@ -266,22 +266,17 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
                     </span>
                   </div>
                 </div>
-              )}
+              )} */}
 
               <Button
                 type="submit"
                 className="w-full"
-                disabled={loading || loginRateLimit.isBlocked}
+                disabled={loading}
               >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Entrando...
-                  </>
-                ) : loginRateLimit.isBlocked ? (
-                  <>
-                    <Clock className="mr-2 h-4 w-4" />
-                    Aguarde...
                   </>
                 ) : (
                   'Entrar'
@@ -394,8 +389,8 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
                 </div>
               </div>
 
-              {/* Rate Limit Indicator */}
-              {signupRateLimit.isBlocked && (
+              {/* Rate Limit Indicator - Temporariamente desabilitado */}
+              {/* {signupRateLimit.isBlocked && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center gap-2 text-red-800">
                     <AlertTriangle className="h-4 w-4" />
@@ -415,22 +410,17 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
                     </span>
                   </div>
                 </div>
-              )}
+              )} */}
 
               <Button
                 type="submit"
                 className="w-full"
-                disabled={loading || signupRateLimit.isBlocked}
+                disabled={loading}
               >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Cadastrando...
-                  </>
-                ) : signupRateLimit.isBlocked ? (
-                  <>
-                    <Clock className="mr-2 h-4 w-4" />
-                    Aguarde...
                   </>
                 ) : (
                   'Cadastrar'

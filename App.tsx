@@ -22,7 +22,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthDebug } from './components/AuthDebug';
 import { LoginStatus } from './components/LoginStatus';
-import { AuthTester } from './components/AuthTester';
+import { LoginTest } from './components/LoginTest';
 import { MyOrders } from './components/orders/MyOrders';
 import { AuthModals } from './components/auth/AuthModals';
 
@@ -211,7 +211,7 @@ function AppContent() {
         {/* Teste de Autenticação */}
         <ClientProvider>
           <div className="container mx-auto px-4 py-6">
-            <AuthTester />
+            <LoginTest />
           </div>
         </ClientProvider>
 
