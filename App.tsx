@@ -23,6 +23,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppStateProvider } from './contexts/AppStateContext';
 import { AuthTestSimple } from './components/AuthTestSimple';
+import { AuthTestMinimal } from './components/AuthTestMinimal';
 import { MyOrders } from './components/orders/MyOrders';
 import { AuthModals } from './components/auth/AuthModals';
 import { NotificationSystem } from './components/ui/NotificationSystem';
@@ -206,6 +207,7 @@ function AppContent() {
         {/* Debug da Autenticação - Teste Simples */}
         <ClientProvider>
           <div className="container mx-auto px-4 py-6">
+            <AuthTestMinimal />
             <AuthTestSimple />
           </div>
         </ClientProvider>
