@@ -12,7 +12,7 @@ import {
   QrCode, 
   RefreshCw, 
   Smartphone,
-  CreditCard,
+
   X
 } from 'lucide-react'
 import { toast } from 'sonner'

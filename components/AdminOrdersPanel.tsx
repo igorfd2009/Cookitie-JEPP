@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Input } from './ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { 
   Package, 
   Clock, 
@@ -15,13 +14,9 @@ import {
   Eye,
   Edit,
   DollarSign,
-  TrendingUp,
-  Users,
   Search,
   Filter,
-  RefreshCw,
-  AlertCircle,
-  Star
+  RefreshCw
 } from 'lucide-react'
 import { useOrders, type Order } from '../hooks/useOrders'
 import { formatCurrency } from '../utils/currency'
@@ -431,7 +426,7 @@ export const AdminOrdersPanel: React.FC = () => {
                   <div>
                     <label className="block text-sm font-medium mb-2">Status Atual</label>
                     <Badge className={`${getStatusInfo(selectedOrder.status).color} border`}>
-                      <StatusIcon className="w-3 h-3 mr-1" />
+                      {React.createElement(getStatusInfo(selectedOrder.status).icon, { className: "w-3 h-3 mr-1" })}
                       {getStatusInfo(selectedOrder.status).label}
                     </Badge>
                   </div>

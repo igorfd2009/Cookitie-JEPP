@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from './ui/button'
-import { ShoppingCart, Package, ChefHat } from 'lucide-react'
+import { ShoppingCart, Package } from 'lucide-react'
 
 interface StickyMobileCTAProps {
   currentPage: string

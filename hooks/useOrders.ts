@@ -28,7 +28,7 @@ export interface Order {
 }
 
 export const useOrders = () => {
-  const { isAuthenticated, profile } = useAuth()
+  const { isAuthenticated } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 

@@ -83,8 +83,7 @@ interface CheckoutPageProps {
 }
 
 export function CheckoutPage({ cartItems, onClearCart, onBackToProducts, onGoToOrders }: CheckoutPageProps) {
-  const { isAuthenticated, user, profile, updateProfile, loading: authLoading } = useAuth();
-  const { addOrder } = useOrders();
+  const { isAuthenticated, user, profile, loading: authLoading } = useAuth();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -543,7 +542,7 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts, onGoToO
               amount: paymentData.amount,
               pixCode: paymentData.pixCode,
               qrCode: paymentData.qrCode || '',
-              qrCodeUrl: paymentData.qrCodeUrl,
+              qrCodeUrl: (paymentData as any).qrCodeUrl,
               transactionId: paymentData.transactionId,
               expiresAt: paymentData.expiresAt
             }}

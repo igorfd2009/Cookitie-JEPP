@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
@@ -25,50 +25,7 @@ import { useOrders, type Order } from '../../hooks/useOrders';
 
 
 
-// Mock data para demonstração
-const mockOrders: Order[] = [
-  {
-    id: '001',
-    status: 'delivered',
-    items: [
-      { id: '1', name: 'Palha Italiana', quantity: 2, price: 6.00, image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=100&h=100&fit=crop' },
-      { id: '2', name: 'Cookie', quantity: 1, price: 7.00, image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=100&h=100&fit=crop' }
-    ],
-    total: 19.00,
-    created_at: '2024-01-15T10:30:00Z',
-    pickup_date: '2024-01-16T14:00:00Z',
-    pickup_location: 'Stand JEPP - Sebrae',
-    payment_method: 'PIX',
-    payment_status: 'paid'
-  },
-  {
-    id: '002',
-    status: 'ready',
-    items: [
-      { id: '3', name: 'Cake Pop', quantity: 4, price: 4.50, image: 'https://images.unsplash.com/photo-1571115764595-644a1f56a55c?w=100&h=100&fit=crop' }
-    ],
-    total: 18.00,
-    created_at: '2024-01-20T09:15:00Z',
-    pickup_date: '2024-01-21T16:30:00Z',
-    pickup_location: 'Stand JEPP - Sebrae',
-    payment_method: 'PIX',
-    payment_status: 'paid'
-  },
-  {
-    id: '003',
-    status: 'preparing',
-    items: [
-      { id: '4', name: 'Biscoito Amantegado', quantity: 3, price: 5.00, image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=100&h=100&fit=crop' },
-      { id: '1', name: 'Palha Italiana', quantity: 1, price: 6.00, image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=100&h=100&fit=crop' }
-    ],
-    total: 21.00,
-    created_at: '2024-01-22T11:45:00Z',
-    pickup_date: '2024-01-23T15:00:00Z',
-    pickup_location: 'Stand JEPP - Sebrae',
-    payment_method: 'PIX',
-    payment_status: 'paid'
-  }
-];
+
 
 interface MyOrdersProps {
   onBackToProducts: () => void;

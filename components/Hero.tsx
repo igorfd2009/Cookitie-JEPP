@@ -1,5 +1,5 @@
 import { Button } from "./ui/button";
-import { ShoppingCart, ArrowDown, Sparkles, Star, Clock } from "lucide-react";
+import { ShoppingCart, Sparkles, Star, Clock } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { useState, useEffect } from "react";
 
