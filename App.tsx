@@ -22,8 +22,7 @@ import { useState, useCallback, useEffect } from 'react';
 // Sistema de Autenticação
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppStateProvider } from './contexts/AppStateContext';
-import { AuthTestSimple } from './components/AuthTestSimple';
-import { AuthTestMinimal } from './components/AuthTestMinimal';
+// (Removido) Componentes de teste de autenticação
 import { MyOrders } from './components/orders/MyOrders';
 import { AuthModals } from './components/auth/AuthModals';
 import { NotificationSystem } from './components/ui/NotificationSystem';
@@ -204,15 +203,7 @@ function AppContent() {
           <StickyMobileCTA currentPage={currentPage} onGoToCheckout={handleGoToCheckout} />
         </ClientProvider>
 
-        {/* Debug da Autenticação - visível somente em desenvolvimento */}
-        {import.meta.env.DEV && (
-          <ClientProvider>
-            <div className="container mx-auto px-4 py-6">
-              <AuthTestMinimal />
-              <AuthTestSimple />
-            </div>
-          </ClientProvider>
-        )}
+        {/* Debug da Autenticação - removido em produção */}
 
 
 
