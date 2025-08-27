@@ -71,11 +71,11 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     setLoading(true)
 
     try {
-      console.log('🔑 Tentando fazer login...', { email: loginForm.email })
+      if (import.meta.env.DEV) console.log('🔑 Tentando fazer login...', { email: loginForm.email })
 
       const result = await signIn(loginForm.email, loginForm.password)
       
-      console.log('📋 Resultado do login:', result)
+      if (import.meta.env.DEV) console.log('📋 Resultado do login:', result)
 
       if (result.error) {
         toast.error(result.error.message || 'Erro ao fazer login')
@@ -136,7 +136,7 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     setLoading(true)
 
     try {
-      console.log('🚀 Iniciando cadastro...', {
+      if (import.meta.env.DEV) console.log('🚀 Iniciando cadastro...', {
         email: signupForm.email,
         fullName: signupForm.fullName,
         phone: signupForm.phone
@@ -151,7 +151,7 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
         }
       )
       
-      console.log('📋 Resultado do cadastro:', result)
+      if (import.meta.env.DEV) console.log('📋 Resultado do cadastro:', result)
 
       if (result.error) {
         toast.error(result.error.message || 'Erro ao fazer cadastro')

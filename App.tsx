@@ -204,20 +204,24 @@ function AppContent() {
           <StickyMobileCTA currentPage={currentPage} onGoToCheckout={handleGoToCheckout} />
         </ClientProvider>
 
-        {/* Debug da Autenticação - Teste Simples */}
-        <ClientProvider>
-          <div className="container mx-auto px-4 py-6">
-            <AuthTestMinimal />
-            <AuthTestSimple />
-          </div>
-        </ClientProvider>
+        {/* Debug da Autenticação - visível somente em desenvolvimento */}
+        {import.meta.env.DEV && (
+          <ClientProvider>
+            <div className="container mx-auto px-4 py-6">
+              <AuthTestMinimal />
+              <AuthTestSimple />
+            </div>
+          </ClientProvider>
+        )}
 
 
 
-        {/* Admin Dashboard */}
-        <ClientProvider>
-          <AdminDashboard />
-        </ClientProvider>
+        {/* Admin Dashboard - habilitar via VITE_ENABLE_ADMIN=true */}
+        {import.meta.env.VITE_ENABLE_ADMIN === 'true' && (
+          <ClientProvider>
+            <AdminDashboard />
+          </ClientProvider>
+        )}
 
         {/* Shopping Cart Modal */}
         <ShoppingCartModal
