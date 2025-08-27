@@ -35,7 +35,7 @@ import { useReservations } from "../hooks/useReservations";
 import { useValidation } from "../hooks/useValidation";
 import { PaymentModal } from "./PaymentModal";
 import { pixSystem } from "../utils/pixSimple";
-import { useOrders } from "../hooks/useOrders";
+
 import { emailSystem } from "../utils/emailAdvanced";
 
 // Sistema de Autenticação
