@@ -49,21 +49,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    console.log('🔄 AuthContext useEffect iniciado')
     // Obter sessão inicial
     const getInitialSession = async () => {
       if (!supabase) {
+        console.log('📱 Modo offline - verificando localStorage')
         // Modo offline - verificar localStorage
         try {
           const savedUser = localStorage.getItem('offline_current_user')
+          console.log('💾 Usuário salvo:', savedUser ? 'encontrado' : 'não encontrado')
           if (savedUser) {
             const user = JSON.parse(savedUser)
             setUser(user as any)
             setProfile(user)
             setSession({ user } as any)
+            console.log('✅ Usuário offline carregado:', user.email)
           }
         } catch (error) {
-          console.error('Erro ao carregar usuário offline:', error)
+          console.error('❌ Erro ao carregar usuário offline:', error)
         } finally {
+          console.log('🏁 Finalizando loading (offline)')
           setLoading(false)
         }
         return
@@ -86,20 +91,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     getInitialSession()
 
-    // Escutar mudanças de autenticação
-    const { data: { subscription } } = supabase?.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session)
-        setUser(session?.user ?? null)
-        
-        if (session?.user) {
-          await fetchUserProfile(session.user.id)
-        } else {
-          setProfile(null)
+    // Escutar mudanças de autenticação (apenas se Supabase estiver disponível)
+    let subscription = null
+    if (supabase) {
+      const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
+        async (_event, session) => {
+          setSession(session)
+          setUser(session?.user ?? null)
+          
+          if (session?.user) {
+            await fetchUserProfile(session.user.id)
+          } else {
+            setProfile(null)
+          }
+          setLoading(false)
         }
-        setLoading(false)
-      }
-    ) || { data: { subscription: null } }
+      )
+      subscription = authSubscription
+    }
 
     return () => subscription?.unsubscribe()
   }, [])
