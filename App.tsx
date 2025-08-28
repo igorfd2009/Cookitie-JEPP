@@ -26,6 +26,7 @@ import { AppStateProvider } from './contexts/AppStateContext';
 import { MyOrders } from './components/orders/MyOrders';
 import { AuthModals } from './components/auth/AuthModals';
 import { NotificationSystem } from './components/ui/NotificationSystem';
+import { SystemDiagnostic } from './components/SystemDiagnostic';
 
 interface CartItem {
   id: string;
@@ -40,7 +41,7 @@ interface CartItem {
 function AppContent() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'products' | 'checkout' | 'orders'>('products');
+  const [currentPage, setCurrentPage] = useState<'products' | 'checkout' | 'orders' | 'diagnostic'>('products');
   const { isAuthenticated } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [nextPageAfterAuth, setNextPageAfterAuth] = useState<null | 'checkout' | 'orders'>(null);
@@ -126,6 +127,10 @@ function AppContent() {
     setCurrentPage('orders');
   }, [isAuthenticated]);
 
+  const handleGoToDiagnostic = useCallback(() => {
+    setCurrentPage('diagnostic');
+  }, []);
+
   // Navegar automaticamente após autenticação
   useEffect(() => {
     if (isAuthenticated && nextPageAfterAuth) {
@@ -134,6 +139,14 @@ function AppContent() {
       setShowAuthModal(false);
     }
   }, [isAuthenticated, nextPageAfterAuth]);
+
+  // Verificar se deve abrir diagnóstico via URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('diagnostic') === 'true') {
+      setCurrentPage('diagnostic');
+    }
+  }, []);
 
 
 
@@ -190,9 +203,12 @@ function AppContent() {
                 onGoToOrders={handleGoToOrders}
               />
             </ClientProvider>
-          ) : (
+          ) : currentPage === 'orders' ? (
             /* Orders Page */
             <MyOrders onBackToProducts={handleBackToProducts} />
+          ) : (
+            /* System Diagnostic Page */
+            <SystemDiagnostic />
           )}
 
 
@@ -212,6 +228,18 @@ function AppContent() {
           <ClientProvider>
             <AdminDashboard />
           </ClientProvider>
+        )}
+
+        {/* Diagnostic Access - habilitar via ?diagnostic=true na URL ou modo dev */}
+        {(import.meta.env.DEV || new URLSearchParams(window.location.search).get('diagnostic') === 'true') && (
+          <div className="fixed bottom-4 left-4 z-50">
+            <button
+              onClick={handleGoToDiagnostic}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow-lg"
+            >
+              🔧 Diagnóstico
+            </button>
+          </div>
         )}
 
         {/* Shopping Cart Modal */}

@@ -73,7 +73,12 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     try {
       if (import.meta.env.DEV) console.log('🔑 Tentando fazer login...', { email: loginForm.email })
 
-      const result = await signIn(loginForm.email, loginForm.password)
+      // Timeout de segurança para evitar loading infinito (10s)
+      const timeoutMs = 10000
+      const result = await Promise.race([
+        signIn(loginForm.email, loginForm.password),
+        new Promise<any>((resolve) => setTimeout(() => resolve({ error: { message: 'Tempo esgotado no login. Verifique sua conexão.' } }), timeoutMs))
+      ])
       
       if (import.meta.env.DEV) console.log('📋 Resultado do login:', result)
 
@@ -142,14 +147,19 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
         phone: signupForm.phone
       })
 
-      const result = await signUp(
+      // Timeout de segurança para evitar loading infinito (12s)
+      const timeoutMs = 12000
+      const result = await Promise.race([
+        signUp(
         signupForm.email, 
         signupForm.password, 
         {
           name: signupForm.fullName,
           phone: signupForm.phone
         }
-      )
+        ),
+        new Promise<any>((resolve) => setTimeout(() => resolve({ error: { message: 'Tempo esgotado no cadastro. Verifique sua conexão.' } }), timeoutMs))
+      ])
       
       if (import.meta.env.DEV) console.log('📋 Resultado do cadastro:', result)
 
