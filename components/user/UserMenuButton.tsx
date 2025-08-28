@@ -46,12 +46,31 @@ export const UserMenuButton: React.FC<UserMenuButtonProps> = ({
   }
 
   const getInitials = (name: string) => {
+    if (!name || name.trim() === '') return 'U'
+    
     return name
-      ?.split(' ')
+      .trim()
+      .split(' ')
       .map(word => word.charAt(0))
       .join('')
       .toUpperCase()
-      .slice(0, 2) || 'U'
+      .slice(0, 2)
+  }
+
+  // CORREÇÃO: Função para obter nome com fallback
+  const getDisplayName = () => {
+    const name = profile?.full_name
+    if (!name || name.trim() === '') {
+      // Tentar extrair nome do email
+      const emailName = profile?.email?.split('@')[0]
+      return emailName || 'Usuário'
+    }
+    return name.trim()
+  }
+
+  // CORREÇÃO: Função para obter email com fallback
+  const getDisplayEmail = () => {
+    return profile?.email || 'email@exemplo.com'
   }
 
   if (loading) {
@@ -76,15 +95,15 @@ export const UserMenuButton: React.FC<UserMenuButtonProps> = ({
           <Avatar className="h-8 w-8">
             <AvatarImage src={profile?.avatar_url} alt={profile?.full_name || 'Usuário'} />
             <AvatarFallback className="bg-blue-100 text-blue-600 text-sm font-medium">
-              {getInitials(profile?.full_name || '')}
+              {getInitials(getDisplayName())}
             </AvatarFallback>
           </Avatar>
           <div className="hidden md:flex flex-col items-start">
             <span className="text-sm font-medium text-gray-900">
-              {profile?.full_name || 'Usuário'}
+              {getDisplayName()}
             </span>
             <span className="text-xs text-gray-500">
-              {profile?.email}
+              {getDisplayEmail()}
             </span>
           </div>
           <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -99,10 +118,10 @@ export const UserMenuButton: React.FC<UserMenuButtonProps> = ({
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {profile?.full_name || 'Usuário'}
+              {getDisplayName()}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {profile?.email}
+              {getDisplayEmail()}
             </p>
           </div>
         </DropdownMenuLabel>

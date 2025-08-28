@@ -159,7 +159,9 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-800">Meus Pedidos</h1>
-              <p className="text-gray-600">Olá, {profile?.full_name}! Aqui estão seus pedidos.</p>
+              <p className="text-gray-600">
+                Olá, {profile?.full_name?.trim() || profile?.email?.split('@')[0] || 'Usuário'}! Aqui estão seus pedidos.
+              </p>
             </div>
           </div>
 
