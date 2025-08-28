@@ -1,202 +1,400 @@
 import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { isSupabaseAvailable } from '../lib/supabase'
 import { Button } from './ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
-import { toast } from 'react-toastify'
+import { 
+  User, 
+  Mail, 
+  Phone, 
+  Database,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  RefreshCw,
+  UserPlus,
+  LogIn,
+  LogOut,
+  Bug
+} from 'lucide-react'
 
-export const AuthDebug: React.FC = () => {
-  const { signUp, signIn, user, profile, loading } = useAuth()
-  const [testEmail, setTestEmail] = useState('teste@exemplo.com')
+export function AuthDebug() {
+  const { user, profile, isAuthenticated, signIn, signUp, signOut, loading } = useAuth()
+  const [debugInfo, setDebugInfo] = useState<any>({})
+  const [testEmail, setTestEmail] = useState('test@cookite.com')
   const [testPassword, setTestPassword] = useState('123456')
   const [testName, setTestName] = useState('Usuário Teste')
-  const [testPhone, setTestPhone] = useState('(11) 99999-9999')
-  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [testPhone, setTestPhone] = useState('11999999999')
+  const [lastAction, setLastAction] = useState<string>('')
+  const [lastResult, setLastResult] = useState<any>(null)
 
-  const testSignup = async () => {
+  // Função para coletar informações de debug
+  const collectDebugInfo = () => {
+    const info = {
+      timestamp: new Date().toISOString(),
+      localStorage: {
+        offline_users: localStorage.getItem('offline_users'),
+        offline_current_user: localStorage.getItem('offline_current_user'),
+        user_orders: localStorage.getItem('user_orders')
+      },
+      authState: {
+        isAuthenticated,
+        loading,
+        user: user ? { id: user.id, email: user.email } : null,
+        profile: profile ? { id: profile.id, email: profile.email, full_name: profile.full_name } : null
+      },
+      environment: {
+        hasSupabase: !!import.meta.env.VITE_SUPABASE_URL,
+        supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+        nodeEnv: import.meta.env.MODE
+      }
+    }
+    setDebugInfo(info)
+    return info
+  }
+
+  // Teste de cadastro com debug
+  const testSignUp = async () => {
+    setLastAction('Cadastro')
+    setLastResult(null)
+    
     try {
-      console.log('🔍 Testando cadastro...')
-      console.log('Email:', testEmail)
-      console.log('Password:', testPassword)
-      console.log('Name:', testName)
-      console.log('Phone:', testPhone)
+      console.log('🔍 Iniciando teste de cadastro...')
+      console.log('📧 Email:', testEmail)
+      console.log('🔑 Senha:', testPassword)
+      console.log('👤 Nome:', testName)
+      console.log('📱 Telefone:', testPhone)
       
-      const result = await signUp(testEmail, testPassword, {
+      // Coletar info antes
+      const beforeInfo = collectDebugInfo()
+      console.log('📊 Estado antes:', beforeInfo)
+      
+      // Tentar cadastro
+      const result = await signUp(testEmail, testPassword, { 
         full_name: testName,
         phone: testPhone
       })
       
-      console.log('📋 Resultado do cadastro:', result)
-      setDebugInfo({ type: 'signup', result, timestamp: new Date().toISOString() })
+      console.log('📤 Resultado do cadastro:', result)
+      setLastResult(result)
       
-      if (result.error) {
-        toast.error(`Erro no cadastro: ${result.error.message}`)
+      // Aguardar um pouco para o estado atualizar
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Coletar info depois
+      const afterInfo = collectDebugInfo()
+      console.log('📊 Estado depois:', afterInfo)
+      
+      // Verificar se funcionou
+      if (!result.error) {
+        console.log('✅ Cadastro realizado com sucesso!')
+        console.log('👤 Usuário criado:', afterInfo.authState.user)
+        console.log('📋 Perfil criado:', afterInfo.authState.profile)
       } else {
-        toast.success('Cadastro realizado com sucesso!')
+        console.error('❌ Erro no cadastro:', result.error)
       }
+      
     } catch (error) {
-      console.error('❌ Erro no teste de cadastro:', error)
-      toast.error(`Erro interno: ${error}`)
+      console.error('💥 Erro inesperado no cadastro:', error)
+      setLastResult({ error: { message: `Erro inesperado: ${error}` } })
     }
   }
 
-  const testSignin = async () => {
+  // Teste de login com debug
+  const testSignIn = async () => {
+    setLastAction('Login')
+    setLastResult(null)
+    
     try {
-      console.log('🔍 Testando login...')
-      console.log('Email:', testEmail)
-      console.log('Password:', testPassword)
+      console.log('🔍 Iniciando teste de login...')
+      console.log('📧 Email:', testEmail)
+      console.log('🔑 Senha:', testPassword)
       
+      // Coletar info antes
+      const beforeInfo = collectDebugInfo()
+      console.log('📊 Estado antes:', beforeInfo)
+      
+      // Tentar login
       const result = await signIn(testEmail, testPassword)
       
-      console.log('📋 Resultado do login:', result)
-      setDebugInfo({ type: 'signin', result, timestamp: new Date().toISOString() })
+      console.log('📤 Resultado do login:', result)
+      setLastResult(result)
       
-      if (result.error) {
-        toast.error(`Erro no login: ${result.error.message}`)
+      // Aguardar um pouco para o estado atualizar
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Coletar info depois
+      const afterInfo = collectDebugInfo()
+      console.log('📊 Estado depois:', afterInfo)
+      
+      // Verificar se funcionou
+      if (!result.error) {
+        console.log('✅ Login realizado com sucesso!')
+        console.log('👤 Usuário logado:', afterInfo.authState.user)
+        console.log('📋 Perfil carregado:', afterInfo.authState.profile)
       } else {
-        toast.success('Login realizado com sucesso!')
+        console.error('❌ Erro no login:', result.error)
       }
+      
     } catch (error) {
-      console.error('❌ Erro no teste de login:', error)
-      toast.error(`Erro interno: ${error}`)
+      console.error('💥 Erro inesperado no login:', error)
+      setLastResult({ error: { message: `Erro inesperado: ${error}` } })
     }
   }
 
-  const checkLocalStorage = () => {
-    const offlineUsers = localStorage.getItem('offline_users')
-    const currentUser = localStorage.getItem('offline_current_user')
+  // Teste de logout
+  const testSignOut = async () => {
+    setLastAction('Logout')
+    setLastResult(null)
     
-    console.log('📦 Dados do localStorage:')
-    console.log('offline_users:', offlineUsers)
-    console.log('offline_current_user:', currentUser)
-    
-    setDebugInfo({ 
-      type: 'localStorage', 
-      offlineUsers: offlineUsers ? JSON.parse(offlineUsers) : null,
-      currentUser: currentUser ? JSON.parse(currentUser) : null,
-      timestamp: new Date().toISOString()
-    })
+    try {
+      console.log('🔍 Iniciando teste de logout...')
+      
+      // Coletar info antes
+      const beforeInfo = collectDebugInfo()
+      console.log('📊 Estado antes:', beforeInfo)
+      
+      // Fazer logout
+      await signOut()
+      
+      // Aguardar um pouco para o estado atualizar
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // Coletar info depois
+      const afterInfo = collectDebugInfo()
+      console.log('📊 Estado depois:', afterInfo)
+      
+      console.log('✅ Logout realizado com sucesso!')
+      
+    } catch (error) {
+      console.error('💥 Erro inesperado no logout:', error)
+      setLastResult({ error: { message: `Erro inesperado: ${error}` } })
+    }
   }
 
+  // Limpar localStorage
   const clearLocalStorage = () => {
-    localStorage.removeItem('offline_users')
-    localStorage.removeItem('offline_current_user')
-    toast.success('LocalStorage limpo!')
-    setDebugInfo(null)
+    try {
+      localStorage.removeItem('offline_users')
+      localStorage.removeItem('offline_current_user')
+      localStorage.removeItem('user_orders')
+      console.log('🧹 localStorage limpo com sucesso!')
+      collectDebugInfo()
+    } catch (error) {
+      console.error('❌ Erro ao limpar localStorage:', error)
+    }
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            🔧 Debug do Sistema de Autenticação
+            <Bug className="w-6 h-6 text-red-500" />
+            Debug do Sistema de Autenticação
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Status do Sistema */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Supabase:</span>
-              <Badge variant={isSupabaseAvailable() ? "default" : "secondary"}>
-                {isSupabaseAvailable() ? "Online" : "Offline"}
-              </Badge>
+        <CardContent className="space-y-6">
+          {/* Status Atual */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-3">
+              <h3 className="font-semibold flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Status da Autenticação
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span>Autenticado:</span>
+                  <Badge variant={isAuthenticated ? 'default' : 'secondary'}>
+                    {isAuthenticated ? 'Sim' : 'Não'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Loading:</span>
+                  <Badge variant={loading ? 'secondary' : 'default'}>
+                    {loading ? 'Sim' : 'Não'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Usuário ID:</span>
+                  <span className="truncate max-w-32">{user?.id || 'N/A'}</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Usuário:</span>
-              <Badge variant={user ? "default" : "outline"}>
-                {user ? "Logado" : "Não logado"}
-              </Badge>
+
+            <div className="space-y-3">
+              <h3 className="font-semibold flex items-center gap-2">
+                <Mail className="w-5 h-5" />
+                Dados do Perfil
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span>Nome:</span>
+                  <span className="truncate max-w-32">
+                    {profile?.full_name || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Email:</span>
+                  <span className="truncate max-w-32">
+                    {profile?.email || 'N/A'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Telefone:</span>
+                  <span className="truncate max-w-32">
+                    {profile?.phone || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="font-semibold flex items-center gap-2">
+                <Database className="w-5 h-5" />
+                Ambiente
+              </h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span>Supabase:</span>
+                  <Badge variant={!!import.meta.env.VITE_SUPABASE_URL ? 'default' : 'secondary'}>
+                    {!!import.meta.env.VITE_SUPABASE_URL ? 'Configurado' : 'Não configurado'}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Modo:</span>
+                  <Badge variant="outline">
+                    {import.meta.env.MODE}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Usuários Offline:</span>
+                  <span>
+                    {JSON.parse(localStorage.getItem('offline_users') || '[]').length}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Formulário de Teste */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="testEmail">Email</Label>
-              <Input
-                id="testEmail"
-                type="email"
-                value={testEmail}
-                onChange={(e) => setTestEmail(e.target.value)}
-                placeholder="teste@exemplo.com"
-              />
-            </div>
-            <div>
-              <Label htmlFor="testPassword">Senha</Label>
-              <Input
-                id="testPassword"
-                type="password"
-                value={testPassword}
-                onChange={(e) => setTestPassword(e.target.value)}
-                placeholder="123456"
-              />
-            </div>
-            <div>
-              <Label htmlFor="testName">Nome</Label>
-              <Input
-                id="testName"
-                type="text"
-                value={testName}
-                onChange={(e) => setTestName(e.target.value)}
-                placeholder="Usuário Teste"
-              />
-            </div>
-            <div>
-              <Label htmlFor="testPhone">Telefone</Label>
-              <Input
-                id="testPhone"
-                type="text"
-                value={testPhone}
-                onChange={(e) => setTestPhone(e.target.value)}
-                placeholder="(11) 99999-9999"
-              />
+          {/* Configuração de Teste */}
+          <div className="border-t pt-6">
+            <h3 className="font-semibold mb-4">Configuração de Teste</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <Label htmlFor="testEmail">Email de Teste</Label>
+                <Input
+                  id="testEmail"
+                  type="email"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="testPassword">Senha de Teste</Label>
+                <Input
+                  id="testPassword"
+                  type="password"
+                  value={testPassword}
+                  onChange={(e) => setTestPassword(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="testName">Nome de Teste</Label>
+                <Input
+                  id="testName"
+                  type="text"
+                  value={testName}
+                  onChange={(e) => setTestName(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="testPhone">Telefone de Teste</Label>
+                <Input
+                  id="testPhone"
+                  type="text"
+                  value={testPhone}
+                  onChange={(e) => setTestPhone(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Botões de Teste */}
-          <div className="flex gap-2 flex-wrap">
-            <Button onClick={testSignup} disabled={loading}>
-              🧪 Testar Cadastro
-            </Button>
-            <Button onClick={testSignin} disabled={loading}>
-              🔑 Testar Login
-            </Button>
-            <Button onClick={checkLocalStorage} variant="outline">
-              📦 Verificar LocalStorage
-            </Button>
-            <Button onClick={clearLocalStorage} variant="destructive">
-              🗑️ Limpar LocalStorage
-            </Button>
+          {/* Ações de Teste */}
+          <div className="border-t pt-6">
+            <h3 className="font-semibold mb-4">Ações de Teste</h3>
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={testSignUp} className="flex items-center gap-2">
+                <UserPlus className="w-4 h-4" />
+                Testar Cadastro
+              </Button>
+
+              <Button 
+                onClick={testSignIn} 
+                variant="outline" 
+                className="flex items-center gap-2"
+                disabled={!isAuthenticated}
+              >
+                <LogIn className="w-4 h-4" />
+                Testar Login
+              </Button>
+
+              <Button 
+                onClick={testSignOut} 
+                variant="outline" 
+                className="flex items-center gap-2"
+                disabled={!isAuthenticated}
+              >
+                <LogOut className="w-4 h-4" />
+                Testar Logout
+              </Button>
+
+              <Button 
+                onClick={collectDebugInfo} 
+                variant="outline" 
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Atualizar Debug
+              </Button>
+
+              <Button 
+                onClick={clearLocalStorage} 
+                variant="destructive" 
+                className="flex items-center gap-2"
+              >
+                🧹 Limpar localStorage
+              </Button>
+            </div>
           </div>
 
-          {/* Informações do Usuário Atual */}
-          {user && profile && (
-            <div className="border-t pt-4">
-              <h4 className="font-medium mb-2">👤 Usuário Atual:</h4>
-              <div className="text-sm space-y-1 bg-gray-50 p-3 rounded">
-                <div><strong>ID:</strong> {user.id}</div>
-                <div><strong>Email:</strong> {profile.email}</div>
-                <div><strong>Nome:</strong> {profile.full_name || 'Não informado'}</div>
-                <div><strong>Telefone:</strong> {profile.phone || 'Não informado'}</div>
-                <div><strong>Pedidos:</strong> {profile.total_pedidos || 0}</div>
-                <div><strong>Total gasto:</strong> R$ {(profile.total_gasto || 0).toFixed(2)}</div>
+          {/* Última Ação */}
+          {lastAction && (
+            <div className="border-t pt-6">
+              <h3 className="font-semibold mb-4">Última Ação: {lastAction}</h3>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <pre className="text-sm overflow-auto">
+                  {JSON.stringify(lastResult, null, 2)}
+                </pre>
               </div>
             </div>
           )}
 
-          {/* Debug Info */}
-          {debugInfo && (
-            <div className="border-t pt-4">
-              <h4 className="font-medium mb-2">📋 Último Debug:</h4>
-              <div className="text-xs bg-gray-100 p-3 rounded overflow-auto max-h-40">
-                <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
-              </div>
+          {/* Informações de Debug */}
+          <div className="border-t pt-6">
+            <h3 className="font-semibold mb-4">Informações de Debug</h3>
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <pre className="text-sm overflow-auto max-h-96">
+                {JSON.stringify(debugInfo, null, 2)}
+              </pre>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
     </div>

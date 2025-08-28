@@ -194,16 +194,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // CORREÇÃO: Validar unicidade de email em todos os dispositivos
   const validateEmailUniqueness = async (email: string) => {
     try {
+      if (import.meta.env.DEV) console.log('🔍 Validando unicidade do email:', email)
+      
       // Verificar em usuários offline locais
       const localUsers = JSON.parse(localStorage.getItem('offline_users') || '[]')
+      if (import.meta.env.DEV) console.log('📦 Usuários locais encontrados:', localUsers.length)
+      
       const localExists = localUsers.find((u: any) => u.email === email)
+      if (import.meta.env.DEV) console.log('🔍 Email local existe?', !!localExists)
       
       if (localExists) {
+        if (import.meta.env.DEV) console.log('❌ Email já existe localmente')
         return { exists: true, source: 'local' }
       }
       
       // Se Supabase disponível, verificar também lá
       if (supabase) {
+        if (import.meta.env.DEV) console.log('🌐 Verificando no Supabase...')
         const { data, error } = await supabase
           .from('user_profiles')
           .select('email')
@@ -211,10 +218,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           .single()
           
         if (data && !error) {
+          if (import.meta.env.DEV) console.log('❌ Email já existe no Supabase')
           return { exists: true, source: 'supabase' }
         }
       }
       
+      if (import.meta.env.DEV) console.log('✅ Email é único, pode prosseguir')
       return { exists: false, source: null }
     } catch (error) {
       console.error('Erro ao validar unicidade do email:', error)
@@ -226,26 +235,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!supabase) {
       // Modo offline - simular cadastro com localStorage
       try {
+        if (import.meta.env.DEV) console.log('🚀 Iniciando cadastro offline para:', email)
+        
         // Validação básica de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
+          if (import.meta.env.DEV) console.log('❌ Email inválido:', email)
           return { error: { message: 'Email inválido' } as AuthError }
         }
+        if (import.meta.env.DEV) console.log('✅ Email válido')
 
         // Validação de senha
         if (!password || password.length < 6) {
+          if (import.meta.env.DEV) console.log('❌ Senha inválida:', password)
           return { error: { message: 'Senha deve ter pelo menos 6 caracteres' } as AuthError }
         }
+        if (import.meta.env.DEV) console.log('✅ Senha válida')
 
         // CORREÇÃO: Validar unicidade de email (local + remoto)
+        if (import.meta.env.DEV) console.log('🔍 Verificando unicidade do email...')
         const uniqueCheck = await validateEmailUniqueness(email)
+        if (import.meta.env.DEV) console.log('📊 Resultado da validação:', uniqueCheck)
+        
         if (uniqueCheck.exists) {
+          if (import.meta.env.DEV) console.log('❌ Email já existe:', uniqueCheck.source)
           return { error: { message: `Email já cadastrado ${uniqueCheck.source === 'local' ? 'neste dispositivo' : 'no sistema'}. Faça login ao invés de criar nova conta.` } as AuthError }
         }
+        if (import.meta.env.DEV) console.log('✅ Email é único, prosseguindo...')
 
+        if (import.meta.env.DEV) console.log('📦 Carregando usuários existentes...')
         const existingUsers = JSON.parse(localStorage.getItem('offline_users') || '[]')
+        if (import.meta.env.DEV) console.log('📊 Usuários existentes:', existingUsers.length)
         
         // Criar usuário offline
+        if (import.meta.env.DEV) console.log('👤 Criando novo usuário...')
         const newUser = {
           id: `offline_${Date.now()}`,
           email,
@@ -257,16 +280,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           total_gasto: 0,
           primeiro_pedido: true
         }
+        if (import.meta.env.DEV) console.log('👤 Usuário criado:', newUser)
         
+        if (import.meta.env.DEV) console.log('💾 Salvando no localStorage...')
         existingUsers.push(newUser)
         localStorage.setItem('offline_users', JSON.stringify(existingUsers))
         localStorage.setItem('offline_current_user', JSON.stringify(newUser))
+        if (import.meta.env.DEV) console.log('✅ localStorage atualizado')
         
         // Simular sessão
+        if (import.meta.env.DEV) console.log('🔄 Atualizando estado da aplicação...')
         setUser(newUser as any)
         setProfile(newUser)
         setSession({ user: newUser } as any)
+        if (import.meta.env.DEV) console.log('✅ Estado atualizado')
         
+        if (import.meta.env.DEV) console.log('🎉 Cadastro concluído com sucesso!')
         return { error: null }
       } catch (error) {
         console.error('Erro no cadastro offline:', error)
