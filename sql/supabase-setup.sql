@@ -1,257 +1,196 @@
 -- =====================================================
--- CONFIGURAÇÃO DO SISTEMA DE AUTENTICAÇÃO - COOKITE JEPP
+-- CONFIGURAÇÃO COMPLETA DO BANCO SUPABASE
+-- Cookitie JEPP - Sistema de Autenticação e Pedidos
 -- =====================================================
 
--- Habilitar extensões necessárias
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- =====================================================
--- TABELA DE PERFIS DE USUÁRIO
--- =====================================================
-CREATE TABLE IF NOT EXISTS user_profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email TEXT NOT NULL UNIQUE,
-    full_name TEXT,
-    phone TEXT,
-    avatar_url TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+-- ✅ CORREÇÃO: Criar tabela profiles com constraint único
+CREATE TABLE IF NOT EXISTS profiles (
+  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  phone TEXT,
+  avatar_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- =====================================================
--- FUNÇÃO PARA ATUALIZAR TIMESTAMP
--- =====================================================
+-- ✅ CORREÇÃO: Criar índice único para email
+CREATE UNIQUE INDEX IF NOT EXISTS profiles_email_unique ON profiles(email);
+
+-- ✅ CORREÇÃO: Criar tabela orders
+CREATE TABLE IF NOT EXISTS orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  items JSONB NOT NULL,
+  total DECIMAL(10,2) NOT NULL,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
+  payment_method TEXT NOT NULL,
+  pickup_code TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ✅ CORREÇÃO: Criar índices para performance
+CREATE INDEX IF NOT EXISTS orders_user_id_idx ON orders(user_id);
+CREATE INDEX IF NOT EXISTS orders_status_idx ON orders(status);
+CREATE INDEX IF NOT EXISTS orders_created_at_idx ON orders(created_at);
+
+-- ✅ CORREÇÃO: Habilitar RLS (Row Level Security)
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+
+-- ✅ CORREÇÃO: Políticas de segurança para profiles
+CREATE POLICY "Usuários podem ver seus perfis" ON profiles 
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Usuários podem inserir seus perfis" ON profiles 
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "Usuários podem atualizar seus perfis" ON profiles 
+  FOR UPDATE USING (auth.uid() = id);
+
+-- ✅ CORREÇÃO: Políticas de segurança para orders
+CREATE POLICY "Usuários podem ver seus pedidos" ON orders 
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Usuários podem criar pedidos" ON orders 
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Usuários podem atualizar seus pedidos" ON orders 
+  FOR UPDATE USING (auth.uid() = user_id);
+
+-- ✅ CORREÇÃO: Função para atualizar updated_at automaticamente
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
+  NEW.updated_at = NOW();
+  RETURN NEW;
 END;
 $$ language 'plpgsql';
 
--- =====================================================
--- TRIGGER PARA ATUALIZAR TIMESTAMP AUTOMATICAMENTE
--- =====================================================
-CREATE TRIGGER update_user_profiles_updated_at 
-    BEFORE UPDATE ON user_profiles 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
+-- ✅ CORREÇÃO: Triggers para atualizar updated_at
+CREATE TRIGGER update_profiles_updated_at 
+  BEFORE UPDATE ON profiles 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- =====================================================
--- FUNÇÃO PARA CRIAR PERFIL AUTOMATICAMENTE
--- =====================================================
+CREATE TRIGGER update_orders_updated_at 
+  BEFORE UPDATE ON orders 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ✅ CORREÇÃO: Função para sincronizar dados do auth.users com profiles
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.user_profiles (id, email, full_name, phone)
-    VALUES (
-        NEW.id,
-        NEW.email,
-        NEW.raw_user_meta_data->>'full_name',
-        NEW.raw_user_meta_data->>'phone'
-    );
-    RETURN NEW;
+  INSERT INTO public.profiles (id, email, name, created_at, updated_at)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'name', 'Usuário'),
+    NOW(),
+    NOW()
+  );
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- =====================================================
--- TRIGGER PARA CRIAR PERFIL AUTOMATICAMENTE
--- =====================================================
+-- ✅ CORREÇÃO: Trigger para criar perfil automaticamente
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- =====================================================
--- POLÍTICAS DE SEGURANÇA (RLS - Row Level Security)
--- =====================================================
-
--- Habilitar RLS na tabela
-ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
-
--- Política: Usuários podem ver apenas seu próprio perfil
-CREATE POLICY "Users can view own profile" ON user_profiles
-    FOR SELECT USING (auth.uid() = id);
-
--- Política: Usuários podem atualizar apenas seu próprio perfil
-CREATE POLICY "Users can update own profile" ON user_profiles
-    FOR UPDATE USING (auth.uid() = id);
-
--- Política: Usuários podem inserir apenas seu próprio perfil
-CREATE POLICY "Users can insert own profile" ON user_profiles
-    FOR INSERT WITH CHECK (auth.uid() = id);
-
--- =====================================================
--- TABELA DE SESSÕES DE USUÁRIO (OPCIONAL)
--- =====================================================
-CREATE TABLE IF NOT EXISTS user_sessions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    session_token TEXT NOT NULL,
-    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    last_activity TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    ip_address INET,
-    user_agent TEXT
-);
-
--- Índices para performance
-CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON user_sessions(session_token);
-CREATE INDEX IF NOT EXISTS idx_user_sessions_expires ON user_sessions(expires_at);
-
--- =====================================================
--- TABELA DE LOGS DE ATIVIDADE (OPCIONAL)
--- =====================================================
-CREATE TABLE IF NOT EXISTS user_activity_logs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-    action TEXT NOT NULL,
-    details JSONB,
-    ip_address INET,
-    user_agent TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Índices para performance
-CREATE INDEX IF NOT EXISTS idx_user_activity_logs_user_id ON user_activity_logs(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_activity_logs_action ON user_activity_logs(action);
-CREATE INDEX IF NOT EXISTS idx_user_activity_logs_created_at ON user_activity_logs(created_at);
-
--- =====================================================
--- FUNÇÕES ÚTEIS PARA O SISTEMA
--- =====================================================
-
--- Função para obter perfil completo do usuário
-CREATE OR REPLACE FUNCTION get_user_profile(user_uuid UUID DEFAULT auth.uid())
-RETURNS TABLE (
-    id UUID,
-    email TEXT,
-    full_name TEXT,
-    phone TEXT,
-    avatar_url TEXT,
-    created_at TIMESTAMP WITH TIME ZONE,
-    updated_at TIMESTAMP WITH TIME ZONE
+-- ✅ CORREÇÃO: Função para obter estatísticas dos pedidos
+CREATE OR REPLACE FUNCTION get_user_order_stats(user_uuid UUID)
+RETURNS TABLE(
+  total_orders BIGINT,
+  total_spent DECIMAL(10,2),
+  first_order_date TIMESTAMP WITH TIME ZONE,
+  last_order_date TIMESTAMP WITH TIME ZONE
 ) AS $$
 BEGIN
-    RETURN QUERY
-    SELECT 
-        up.id,
-        up.email,
-        up.full_name,
-        up.phone,
-        up.avatar_url,
-        up.created_at,
-        up.updated_at
-    FROM user_profiles up
-    WHERE up.id = user_uuid;
+  RETURN QUERY
+  SELECT 
+    COUNT(*)::BIGINT as total_orders,
+    COALESCE(SUM(total), 0) as total_spent,
+    MIN(created_at) as first_order_date,
+    MAX(created_at) as last_order_date
+  FROM orders 
+  WHERE user_id = user_uuid;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Função para atualizar perfil do usuário
-CREATE OR REPLACE FUNCTION update_user_profile(
-    user_uuid UUID DEFAULT auth.uid(),
-    new_full_name TEXT DEFAULT NULL,
-    new_phone TEXT DEFAULT NULL,
-    new_avatar_url TEXT DEFAULT NULL
+-- ✅ CORREÇÃO: Função para buscar pedidos com paginação
+CREATE OR REPLACE FUNCTION get_user_orders_paginated(
+  user_uuid UUID,
+  page_size INTEGER DEFAULT 10,
+  page_number INTEGER DEFAULT 1
 )
-RETURNS BOOLEAN AS $$
+RETURNS TABLE(
+  id UUID,
+  items JSONB,
+  total DECIMAL(10,2),
+  status TEXT,
+  payment_method TEXT,
+  pickup_code TEXT,
+  created_at TIMESTAMP WITH TIME ZONE,
+  updated_at TIMESTAMP WITH TIME ZONE
+) AS $$
 BEGIN
-    UPDATE user_profiles 
-    SET 
-        full_name = COALESCE(new_full_name, full_name),
-        phone = COALESCE(new_phone, phone),
-        avatar_url = COALESCE(new_avatar_url, avatar_url),
-        updated_at = NOW()
-    WHERE id = user_uuid;
-    
-    RETURN FOUND;
+  RETURN QUERY
+  SELECT 
+    o.id,
+    o.items,
+    o.total,
+    o.status,
+    o.payment_method,
+    o.pickup_code,
+    o.created_at,
+    o.updated_at
+  FROM orders o
+  WHERE o.user_id = user_uuid
+  ORDER BY o.created_at DESC
+  LIMIT page_size
+  OFFSET (page_number - 1) * page_size;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- =====================================================
--- VIEWS ÚTEIS
--- =====================================================
+-- ✅ CORREÇÃO: Comentários nas tabelas
+COMMENT ON TABLE profiles IS 'Perfis dos usuários do sistema';
+COMMENT ON TABLE orders IS 'Pedidos dos usuários';
+COMMENT ON COLUMN profiles.email IS 'Email único do usuário';
+COMMENT ON COLUMN profiles.name IS 'Nome completo do usuário';
+COMMENT ON COLUMN orders.status IS 'Status do pedido: pending, confirmed, completed, cancelled';
+COMMENT ON COLUMN orders.items IS 'Itens do pedido em formato JSONB';
 
--- View para usuários ativos
-CREATE OR REPLACE VIEW active_users AS
-SELECT 
-    u.id,
-    u.email,
-    u.email_confirmed_at,
-    u.created_at,
-    up.full_name,
-    up.phone,
-    up.avatar_url,
-    up.updated_at
-FROM auth.users u
-JOIN user_profiles up ON u.id = up.id
-WHERE u.email_confirmed_at IS NOT NULL;
+-- ✅ CORREÇÃO: Verificar se as tabelas foram criadas
+DO $$
+BEGIN
+  RAISE NOTICE 'Verificando criação das tabelas...';
+  
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'profiles') THEN
+    RAISE NOTICE '✅ Tabela profiles criada com sucesso';
+  ELSE
+    RAISE NOTICE '❌ Erro: Tabela profiles não foi criada';
+  END IF;
+  
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'orders') THEN
+    RAISE NOTICE '✅ Tabela orders criada com sucesso';
+  ELSE
+    RAISE NOTICE '❌ Erro: Tabela orders não foi criada';
+  END IF;
+  
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'profiles' AND table_schema = 'public') THEN
+    RAISE NOTICE '✅ RLS habilitado para profiles';
+  ELSE
+    RAISE NOTICE '❌ Erro: RLS não foi habilitado para profiles';
+  END IF;
+  
+  IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'orders' AND table_schema = 'public') THEN
+    RAISE NOTICE '✅ RLS habilitado para orders';
+  ELSE
+    RAISE NOTICE '❌ Erro: RLS não foi habilitado para orders';
+  END IF;
+END $$;
 
--- =====================================================
--- CONFIGURAÇÕES DE AUTENTICAÇÃO
--- =====================================================
-
--- Configurar tempo de expiração da sessão (opcional)
--- ALTER SYSTEM SET session_timeout = '24h';
--- SELECT pg_reload_conf();
-
--- =====================================================
--- INSERIR DADOS DE EXEMPLO (OPCIONAL)
--- =====================================================
-
--- Descomente as linhas abaixo se quiser inserir dados de teste
-/*
-INSERT INTO user_profiles (id, email, full_name, phone) VALUES
-    (uuid_generate_v4(), 'admin@cookite.com', 'Administrador', '(11) 99999-9999'),
-    (uuid_generate_v4(), 'teste@cookite.com', 'Usuário Teste', '(11) 88888-8888');
-*/
-
--- =====================================================
--- VERIFICAÇÕES FINAIS
--- =====================================================
-
--- Verificar se as tabelas foram criadas
-SELECT 
-    table_name,
-    table_type
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
-AND table_name IN ('user_profiles', 'user_sessions', 'user_activity_logs');
-
--- Verificar se as políticas RLS estão ativas
-SELECT 
-    schemaname,
-    tablename,
-    policyname,
-    permissive,
-    roles,
-    cmd,
-    qual
-FROM pg_policies 
-WHERE tablename = 'user_profiles';
-
--- Verificar se as funções foram criadas
-SELECT 
-    routine_name,
-    routine_type
-FROM information_schema.routines 
-WHERE routine_schema = 'public' 
-AND routine_name IN ('handle_new_user', 'get_user_profile', 'update_user_profile');
-
--- =====================================================
--- COMANDOS PARA LIMPEZA (USE COM CUIDADO!)
--- =====================================================
-
-/*
--- Para remover tudo (use apenas em desenvolvimento):
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-DROP TRIGGER IF EXISTS update_user_profiles_updated_at ON user_profiles;
-DROP FUNCTION IF EXISTS handle_new_user();
-DROP FUNCTION IF EXISTS update_updated_at_column();
-DROP FUNCTION IF EXISTS get_user_profile(UUID);
-DROP FUNCTION IF EXISTS update_user_profile(UUID, TEXT, TEXT, TEXT);
-DROP VIEW IF EXISTS active_users;
-DROP TABLE IF EXISTS user_activity_logs;
-DROP TABLE IF EXISTS user_sessions;
-DROP TABLE IF EXISTS user_profiles;
-*/
+-- ✅ CORREÇÃO: Mensagem de conclusão
+SELECT '🎉 Configuração do banco Supabase concluída com sucesso!' as status;

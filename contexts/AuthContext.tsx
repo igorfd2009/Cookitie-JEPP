@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase'
 interface UserProfile {
   id: string
   email: string
-  full_name?: string
+  name?: string
   phone?: string
   avatar_url?: string
   created_at: string
@@ -25,6 +25,7 @@ interface AuthContextType {
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: AuthError | null }>
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>
+  refreshUser: () => Promise<void>
   isAuthenticated: boolean
 }
 
@@ -48,20 +49,149 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // ✅ CORREÇÃO: Função para recarregar dados do usuário
+  const refreshUser = async () => {
+    if (!user) return
+
+    try {
+      if (import.meta.env.DEV) console.log('🔄 Recarregando dados do usuário:', user.id)
+      
+      if (supabase) {
+        // Buscar perfil atualizado do Supabase
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+
+        if (error) {
+          console.error('❌ Erro ao buscar perfil atualizado:', error)
+          return
+        }
+
+        if (data) {
+          setProfile(data)
+          if (import.meta.env.DEV) console.log('✅ Perfil atualizado:', data)
+        }
+      } else {
+        // Modo offline - buscar do localStorage
+        const allUsers = JSON.parse(localStorage.getItem('offline_users') || '[]')
+        const currentUser = allUsers.find((u: any) => u.id === user.id)
+        
+        if (currentUser) {
+          setProfile(currentUser)
+          if (import.meta.env.DEV) console.log('✅ Perfil offline atualizado:', currentUser)
+        }
+      }
+    } catch (error) {
+      console.error('❌ Erro ao recarregar usuário:', error)
+    }
+  }
+
+  // ✅ CORREÇÃO: Função para sincronizar pedidos do usuário
+  const syncUserOrders = async (userId: string, userEmail: string) => {
+    try {
+      if (import.meta.env.DEV) console.log('🔄 Sincronizando pedidos para usuário:', userEmail)
+      
+      if (supabase) {
+        // Buscar pedidos do Supabase
+        const { data: supabaseOrders, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+
+        if (error) {
+          console.error('❌ Erro ao buscar pedidos do Supabase:', error)
+          return []
+        }
+
+        // Salvar no localStorage para modo offline
+        if (supabaseOrders) {
+          localStorage.setItem(`user_orders_${userId}`, JSON.stringify(supabaseOrders))
+          if (import.meta.env.DEV) console.log('✅ Pedidos sincronizados do Supabase:', supabaseOrders.length)
+        }
+
+        return supabaseOrders || []
+      } else {
+        // Modo offline - sincronizar localStorage
+        const allOrders = JSON.parse(localStorage.getItem('user_orders') || '[]')
+        const userOrders = allOrders.filter((order: any) => 
+          order.customer?.email === userEmail || order.customer?.id === userId
+        )
+        
+        const userSpecificOrders = JSON.parse(localStorage.getItem(`user_orders_${userId}`) || '[]')
+        const allUserOrders = [...userOrders, ...userSpecificOrders]
+        
+        // Remover duplicatas
+        const uniqueOrders = allUserOrders.filter((order, index, self) =>
+          index === self.findIndex(o => o.id === order.id)
+        )
+        
+        localStorage.setItem(`user_orders_${userId}`, JSON.stringify(uniqueOrders))
+        if (import.meta.env.DEV) console.log('✅ Pedidos sincronizados offline:', uniqueOrders.length)
+        
+        return uniqueOrders
+      }
+    } catch (error) {
+      console.error('❌ Erro ao sincronizar pedidos:', error)
+      return []
+    }
+  }
+
+  // ✅ CORREÇÃO: Validar unicidade de email (local + remoto)
+  const validateEmailUniqueness = async (email: string) => {
+    try {
+      if (import.meta.env.DEV) console.log('🔍 Validando unicidade do email:', email)
+      
+      // Verificar em usuários offline locais
+      const localUsers = JSON.parse(localStorage.getItem('offline_users') || '[]')
+      const localExists = localUsers.find((u: any) => u.email === email)
+      
+      if (localExists) {
+        if (import.meta.env.DEV) console.log('❌ Email já existe localmente')
+        return { exists: true, source: 'local' }
+      }
+      
+      // Se Supabase disponível, verificar também lá
+      if (supabase) {
+        if (import.meta.env.DEV) console.log('🌐 Verificando no Supabase...')
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('email', email)
+          .single()
+          
+        if (data && !error) {
+          if (import.meta.env.DEV) console.log('❌ Email já existe no Supabase')
+          return { exists: true, source: 'supabase' }
+        }
+      }
+      
+      if (import.meta.env.DEV) console.log('✅ Email é único, pode prosseguir')
+      return { exists: false, source: null }
+    } catch (error) {
+      console.error('❌ Erro ao validar unicidade do email:', error)
+      return { exists: false, source: null }
+    }
+  }
+
   useEffect(() => {
     if (import.meta.env.DEV) console.log('🔄 AuthContext useEffect iniciado')
+    
     // Obter sessão inicial
     const getInitialSession = async () => {
       if (!supabase) {
         if (import.meta.env.DEV) console.log('📱 Modo offline - verificando localStorage')
-        // Modo offline - verificar localStorage
+        
         try {
           const savedUser = localStorage.getItem('offline_current_user')
           if (import.meta.env.DEV) console.log('💾 Usuário salvo:', savedUser ? 'encontrado' : 'não encontrado')
+          
           if (savedUser) {
             const user = JSON.parse(savedUser)
             
-            // CORREÇÃO: Revalidar dados do usuário do localStorage
+            // ✅ CORREÇÃO: Revalidar dados do usuário do localStorage
             const allUsers = JSON.parse(localStorage.getItem('offline_users') || '[]')
             const currentUser = allUsers.find((u: any) => u.id === user.id)
             
@@ -77,10 +207,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               setSession({ user: revalidatedUser } as any)
               localStorage.setItem('offline_current_user', JSON.stringify(revalidatedUser))
               
-              // CORREÇÃO: Sincronizar pedidos na inicialização
+              // ✅ CORREÇÃO: Sincronizar pedidos na inicialização
               await syncUserOrders(revalidatedUser.id, revalidatedUser.email)
               
-              if (import.meta.env.DEV) console.log('✅ Usuário offline revalidado:', revalidatedUser.email, revalidatedUser.full_name)
+              if (import.meta.env.DEV) console.log('✅ Usuário offline revalidado:', revalidatedUser.email, revalidatedUser.name)
             } else {
               // Usuário não encontrado, limpar sessão
               localStorage.removeItem('offline_current_user')
@@ -89,7 +219,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         } catch (error) {
           console.error('❌ Erro ao carregar usuário offline:', error)
-          // Limpar dados corrompidos
           localStorage.removeItem('offline_current_user')
         } finally {
           if (import.meta.env.DEV) console.log('🏁 Finalizando loading (offline)')
@@ -107,7 +236,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await fetchUserProfile(session.user.id)
         }
       } catch (error) {
-        console.error('Erro ao obter sessão inicial:', error)
+        console.error('❌ Erro ao obter sessão inicial:', error)
       } finally {
         setLoading(false)
       }
@@ -115,11 +244,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     getInitialSession()
 
-    // Escutar mudanças de autenticação (apenas se Supabase estiver disponível)
+    // ✅ CORREÇÃO: Listener para mudanças de autenticação
     let subscription = null
     if (supabase) {
       const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
         async (_event, session) => {
+          if (import.meta.env.DEV) console.log('🔄 Mudança de estado de autenticação:', _event)
+          
           setSession(session)
           setUser(session?.user ?? null)
           
@@ -141,93 +272,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!supabase) return
 
     try {
+      if (import.meta.env.DEV) console.log('🔍 Buscando perfil do usuário:', userId)
+      
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
 
       if (error) {
-        console.error('Erro ao buscar perfil:', error)
+        console.error('❌ Erro ao buscar perfil:', error)
         return
       }
 
-      setProfile(data)
-    } catch (error) {
-      console.error('Erro ao buscar perfil:', error)
-    }
-  }
-
-  // CORREÇÃO: Função para sincronizar pedidos do usuário
-  const syncUserOrders = async (userId: string, userEmail: string) => {
-    try {
-      // Carregar pedidos existentes
-      const allOrders = JSON.parse(localStorage.getItem('user_orders') || '[]')
-      
-      // Filtrar pedidos do usuário atual
-      const userOrders = allOrders.filter((order: any) => 
-        order.customer.email === userEmail || order.customer.id === userId
-      )
-      
-      // Carregar pedidos específicos do usuário
-      const userSpecificOrders = JSON.parse(localStorage.getItem(`user_orders_${userId}`) || '[]')
-      
-      // Mesclar pedidos únicos
-      const allUserOrders = [...userOrders, ...userSpecificOrders]
-      const uniqueOrders = allUserOrders.filter((order, index, self) =>
-        index === self.findIndex(o => o.id === order.id)
-      )
-      
-      // Salvar pedidos sincronizados
-      localStorage.setItem(`user_orders_${userId}`, JSON.stringify(uniqueOrders))
-      localStorage.setItem('user_orders', JSON.stringify(uniqueOrders))
-      
-      if (import.meta.env.DEV) console.log('🔄 Pedidos sincronizados para usuário:', userEmail, uniqueOrders.length)
-      
-      return uniqueOrders
-    } catch (error) {
-      console.error('Erro ao sincronizar pedidos:', error)
-      return []
-    }
-  }
-
-  // CORREÇÃO: Validar unicidade de email em todos os dispositivos
-  const validateEmailUniqueness = async (email: string) => {
-    try {
-      if (import.meta.env.DEV) console.log('🔍 Validando unicidade do email:', email)
-      
-      // Verificar em usuários offline locais
-      const localUsers = JSON.parse(localStorage.getItem('offline_users') || '[]')
-      if (import.meta.env.DEV) console.log('📦 Usuários locais encontrados:', localUsers.length)
-      
-      const localExists = localUsers.find((u: any) => u.email === email)
-      if (import.meta.env.DEV) console.log('🔍 Email local existe?', !!localExists)
-      
-      if (localExists) {
-        if (import.meta.env.DEV) console.log('❌ Email já existe localmente')
-        return { exists: true, source: 'local' }
+      if (data) {
+        setProfile(data)
+        if (import.meta.env.DEV) console.log('✅ Perfil carregado:', data)
       }
-      
-      // Se Supabase disponível, verificar também lá
-      if (supabase) {
-        if (import.meta.env.DEV) console.log('🌐 Verificando no Supabase...')
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('email')
-          .eq('email', email)
-          .single()
-          
-        if (data && !error) {
-          if (import.meta.env.DEV) console.log('❌ Email já existe no Supabase')
-          return { exists: true, source: 'supabase' }
-        }
-      }
-      
-      if (import.meta.env.DEV) console.log('✅ Email é único, pode prosseguir')
-      return { exists: false, source: null }
     } catch (error) {
-      console.error('Erro ao validar unicidade do email:', error)
-      return { exists: false, source: null }
+      console.error('❌ Erro ao buscar perfil:', error)
     }
   }
 
@@ -252,7 +315,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
         if (import.meta.env.DEV) console.log('✅ Senha válida')
 
-        // CORREÇÃO: Validar unicidade de email (local + remoto)
+        // ✅ CORREÇÃO: Validar unicidade de email (local + remoto)
         if (import.meta.env.DEV) console.log('🔍 Verificando unicidade do email...')
         const uniqueCheck = await validateEmailUniqueness(email)
         if (import.meta.env.DEV) console.log('📊 Resultado da validação:', uniqueCheck)
@@ -272,7 +335,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const newUser = {
           id: `offline_${Date.now()}`,
           email,
-          full_name: profileData.full_name,
+          name: profileData.name,
           phone: profileData.phone,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -298,34 +361,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (import.meta.env.DEV) console.log('🎉 Cadastro concluído com sucesso!')
         return { error: null }
       } catch (error) {
-        console.error('Erro no cadastro offline:', error)
+        console.error('❌ Erro no cadastro offline:', error)
         return { error: { message: 'Erro ao criar conta offline' } as AuthError }
       }
     }
 
     try {
+      if (import.meta.env.DEV) console.log('🚀 Iniciando cadastro no Supabase para:', email)
+      
+      // ✅ CORREÇÃO: Validar unicidade de email antes de criar
+      const uniqueCheck = await validateEmailUniqueness(email)
+      if (uniqueCheck.exists) {
+        if (import.meta.env.DEV) console.log('❌ Email já existe:', uniqueCheck.source)
+        return { error: { message: `Email já cadastrado ${uniqueCheck.source === 'local' ? 'neste dispositivo' : 'no sistema'}. Faça login ao invés de criar nova conta.` } as AuthError }
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            full_name: profileData.full_name,
+            name: profileData.name,
             phone: profileData.phone
           }
         }
       })
 
-      if (error) return { error }
+      if (error) {
+        if (import.meta.env.DEV) console.log('❌ Erro no cadastro Supabase:', error)
+        return { error }
+      }
 
       if (data.user) {
-        // Criar perfil do usuário
+        if (import.meta.env.DEV) console.log('✅ Usuário criado no Supabase, criando perfil...')
+        
+        // ✅ CORREÇÃO: Criar perfil do usuário na tabela profiles
         const { error: profileError } = await supabase
-          .from('user_profiles')
+          .from('profiles')
           .insert([
             {
               id: data.user.id,
               email: data.user.email!,
-              full_name: profileData.full_name,
+              name: profileData.name,
               phone: profileData.phone,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
@@ -333,13 +410,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           ])
 
         if (profileError) {
-          console.error('Erro ao criar perfil:', profileError)
+          console.error('❌ Erro ao criar perfil:', profileError)
+          return { error: { message: 'Usuário criado mas erro ao criar perfil' } as AuthError }
         }
+
+        if (import.meta.env.DEV) console.log('✅ Perfil criado com sucesso')
       }
 
       return { error: null }
     } catch (error) {
-      console.error('Erro no cadastro:', error)
+      console.error('❌ Erro no cadastro:', error)
       return { error: { message: 'Erro interno no cadastro' } as AuthError }
     }
   }
@@ -348,6 +428,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!supabase) {
       // Modo offline - simular login com localStorage
       try {
+        if (import.meta.env.DEV) console.log('🔑 Iniciando login offline para:', email)
+        
         // Validação básica de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
@@ -366,7 +448,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           return { error: { message: 'Usuário não encontrado. Faça o cadastro primeiro.' } as AuthError }
         }
         
-        // CORREÇÃO: Revalidar e atualizar dados do usuário
+        // ✅ CORREÇÃO: Revalidar e atualizar dados do usuário
         const updatedUser = {
           ...user,
           last_login: new Date().toISOString()
@@ -379,40 +461,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           localStorage.setItem('offline_users', JSON.stringify(existingUsers))
         }
         
-        // CORREÇÃO: Garantir que profile seja definido corretamente
+        // ✅ CORREÇÃO: Garantir que profile seja definido corretamente
         setUser(updatedUser as any)
         setProfile(updatedUser)
         setSession({ user: updatedUser } as any)
         localStorage.setItem('offline_current_user', JSON.stringify(updatedUser))
         
-        // CORREÇÃO: Sincronizar pedidos do usuário
+        // ✅ CORREÇÃO: Sincronizar pedidos do usuário
         await syncUserOrders(updatedUser.id, updatedUser.email)
         
-        if (import.meta.env.DEV) console.log('✅ Login offline realizado:', updatedUser.email, updatedUser.full_name)
+        if (import.meta.env.DEV) console.log('✅ Login offline realizado:', updatedUser.email, updatedUser.name)
         
         return { error: null }
       } catch (error) {
-        console.error('Erro no login offline:', error)
+        console.error('❌ Erro no login offline:', error)
         return { error: { message: 'Erro ao fazer login offline' } as AuthError }
       }
     }
 
     try {
+      if (import.meta.env.DEV) console.log('🔑 Iniciando login no Supabase para:', email)
+      
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
-      return { error }
+      if (error) {
+        if (import.meta.env.DEV) console.log('❌ Erro no login Supabase:', error)
+        return { error }
+      }
+
+      if (import.meta.env.DEV) console.log('✅ Login Supabase realizado com sucesso')
+      return { error: null }
     } catch (error) {
-      console.error('Erro no login:', error)
+      console.error('❌ Erro no login:', error)
       return { error: { message: 'Erro interno no login' } as AuthError }
     }
   }
 
   const signOut = async () => {
     if (!supabase) {
-      // CORREÇÃO: Modo offline - limpar dados específicos do usuário
+      // ✅ CORREÇÃO: Modo offline - limpar dados específicos do usuário
       try {
         const currentUser = localStorage.getItem('offline_current_user')
         if (currentUser) {
@@ -434,7 +524,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         return
       } catch (error) {
-        console.error('Erro ao fazer logout offline:', error)
+        console.error('❌ Erro ao fazer logout offline:', error)
         // Forçar limpeza em caso de erro
         localStorage.removeItem('offline_current_user')
         setUser(null)
@@ -447,17 +537,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await supabase.auth.signOut()
       if (import.meta.env.DEV) console.log('🚪 Logout Supabase realizado')
     } catch (error) {
-      console.error('Erro ao fazer logout:', error)
+      console.error('❌ Erro ao fazer logout:', error)
     }
   }
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
+    if (!user) {
+      return { error: { message: 'Usuário não autenticado' } as AuthError }
+    }
+    
     if (!supabase) {
       // Modo offline - atualizar localStorage
-      if (!user) {
-        return { error: { message: 'Usuário não autenticado' } as AuthError }
-      }
-      
       try {
         const existingUsers = JSON.parse(localStorage.getItem('offline_users') || '[]')
         const userIndex = existingUsers.findIndex((u: any) => u.id === user.id)
@@ -477,13 +567,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     }
     
-    if (!user) {
-      return { error: { message: 'Usuário não autenticado' } as AuthError }
-    }
-
     try {
       const { error } = await supabase
-        .from('user_profiles')
+        .from('profiles')
         .update({
           ...updates,
           updated_at: new Date().toISOString()
@@ -492,14 +578,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (error) return { error: { message: error.message, status: 500 } as AuthError }
 
-      // Atualizar estado local
+      // ✅ CORREÇÃO: Atualizar estado local e recarregar dados
       if (profile) {
         setProfile({ ...profile, ...updates })
       }
+      
+      // Recarregar dados do usuário para garantir sincronização
+      await refreshUser()
 
       return { error: null }
     } catch (error) {
-      console.error('Erro ao atualizar perfil:', error)
+      console.error('❌ Erro ao atualizar perfil:', error)
       return { error: { message: 'Erro interno ao atualizar perfil' } as AuthError }
     }
   }
@@ -536,7 +625,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return { error }
     } catch (error) {
-      console.error('Erro ao resetar senha:', error)
+      console.error('❌ Erro ao resetar senha:', error)
       return { error: { message: 'Erro interno ao resetar senha' } as AuthError }
     }
   }
@@ -551,6 +640,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signOut,
     updateProfile,
     resetPassword,
+    refreshUser,
     isAuthenticated: !!user
   }
 

@@ -57,9 +57,9 @@ export const UserMenuButton: React.FC<UserMenuButtonProps> = ({
       .slice(0, 2)
   }
 
-  // CORREÇÃO: Função para obter nome com fallback
+  // ✅ CORREÇÃO: Função para obter nome com fallback
   const getDisplayName = () => {
-    const name = profile?.full_name
+    const name = profile?.name
     if (!name || name.trim() === '') {
       // Tentar extrair nome do email
       const emailName = profile?.email?.split('@')[0]
@@ -93,7 +93,7 @@ export const UserMenuButton: React.FC<UserMenuButtonProps> = ({
           className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-full"
         >
           <Avatar className="h-8 w-8">
-            <AvatarImage src={profile?.avatar_url} alt={profile?.full_name || 'Usuário'} />
+            <AvatarImage src={profile?.avatar_url} alt={profile?.name || 'Usuário'} />
             <AvatarFallback className="bg-blue-100 text-blue-600 text-sm font-medium">
               {getInitials(getDisplayName())}
             </AvatarFallback>

@@ -373,7 +373,7 @@ export function ShoppingCartModal({
                                 </div>
                                 <div className="flex-1">
                                   <p className="text-green-800">
-                                    Olá, <strong>{profile?.full_name?.split(' ')[0] || 'Usuário'}</strong>! 
+                                    Olá, <strong>{profile?.name?.split(' ')[0] || 'Usuário'}</strong>! 
                                     {profile?.primeiro_pedido ? ' 🎉 Seu primeiro pedido!' : ` Este é seu ${(profile?.total_pedidos || 0) + 1}º pedido.`}
                                   </p>
                                   {profile?.total_pedidos && profile.total_pedidos > 0 && (
