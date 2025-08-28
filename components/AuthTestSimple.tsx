@@ -31,7 +31,7 @@ export const AuthTestSimple: React.FC = () => {
       }
 
       const result = await auth.signUp(email, password, {
-        full_name: name,
+        name: name,
         phone: phone
       })
       
@@ -121,7 +121,7 @@ export const AuthTestSimple: React.FC = () => {
             </div>
             {auth.isAuthenticated && auth.profile && (
               <div className="text-sm space-y-1">
-                <div>Nome: {auth.profile.full_name}</div>
+                                 <div>Nome: {auth.profile.name}</div>
                 <div>Email: {auth.profile.email}</div>
                 <div>Telefone: {auth.profile.phone}</div>
               </div>

@@ -70,7 +70,7 @@ export function Topbar({ onGoToCheckout, onGoToOrders, hasItemsInCart = false }:
                   <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full border border-green-200">
                     <UserCheck className="w-3 h-3" />
                     <span className="hidden sm:inline font-medium">
-                      {profile?.full_name?.split(' ')[0] || 'Logado'}
+                                             {profile?.name?.split(' ')[0] || 'Logado'}
                     </span>
                   </div>
                 ) : (

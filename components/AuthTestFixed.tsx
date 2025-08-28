@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useOrders } from '../hooks/useOrders'
 import { Button } from './ui/button'
@@ -7,8 +7,8 @@ import { Badge } from './ui/badge'
 import { 
   User, 
   Mail, 
-  Phone, 
-  Calendar, 
+ 
+ 
   Database,
   CheckCircle,
   XCircle,
@@ -36,7 +36,7 @@ export function AuthTestFixed() {
       await new Promise(resolve => setTimeout(resolve, 500))
       
       const result = await signIn(testEmail, testPassword)
-      if (!result.error && profile?.full_name) {
+      if (!result.error && profile?.name) {
         setTestResults(prev => ({ ...prev, sessionPersistence: true }))
         return true
       }
@@ -53,7 +53,7 @@ export function AuthTestFixed() {
   const testDuplicateAccountPrevention = async () => {
     try {
       // Tentar criar conta com email já existente
-      const result = await signUp(testEmail, testPassword, { full_name: 'Outro Nome' })
+              const result = await signUp(testEmail, testPassword, { name: 'Outro Nome' })
       
       // Deve dar erro de email já cadastrado
       if (result.error && result.error.message.includes('já cadastrado')) {
@@ -77,7 +77,7 @@ export function AuthTestFixed() {
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       // Verificar se dados do usuário são consistentes
-      const hasValidProfile = profile?.full_name && profile?.email
+      const hasValidProfile = profile?.name && profile?.email
       const ordersLoaded = Array.isArray(orders)
       
       if (hasValidProfile && ordersLoaded) {
@@ -99,7 +99,7 @@ export function AuthTestFixed() {
     
     // Primeiro criar uma conta de teste se não existir
     const signUpResult = await signUp(testEmail, testPassword, { 
-      full_name: testName,
+              name: testName,
       phone: '11999999999'
     })
     
@@ -167,7 +167,7 @@ export function AuthTestFixed() {
                 <div className="flex items-center justify-between">
                   <span>Nome:</span>
                   <span className="truncate max-w-32">
-                    {profile?.full_name || 'N/A'}
+                                         {profile?.name || 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -294,7 +294,7 @@ export function AuthTestFixed() {
             {!isAuthenticated ? (
               <>
                 <Button
-                  onClick={() => signUp(testEmail, testPassword, { full_name: testName })}
+                                     onClick={() => signUp(testEmail, testPassword, { name: testName })}
                   variant="outline"
                   className="flex items-center gap-2"
                 >

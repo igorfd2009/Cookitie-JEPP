@@ -1,26 +1,34 @@
 import React, { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { Button } from '../ui/button'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { Separator } from '../ui/separator'
-import { Loader2, User, Mail, Phone, Calendar, Edit3, Save, X, Camera } from 'lucide-react'
+import { 
+  Edit3, 
+  Save, 
+  X, 
+  User, 
+  Mail, 
+  Phone, 
+  Calendar,
+  Loader2
+} from 'lucide-react'
 import { toast } from 'react-toastify'
 
 export const UserProfile: React.FC = () => {
   const { profile, updateProfile, loading } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({
-    full_name: profile?.full_name || '',
+    name: profile?.name || '',
     phone: profile?.phone || ''
   })
   const [updating, setUpdating] = useState(false)
 
   const handleEdit = () => {
     setEditForm({
-      full_name: profile?.full_name || '',
+      name: profile?.name || '',
       phone: profile?.phone || ''
     })
     setIsEditing(true)
@@ -29,7 +37,7 @@ export const UserProfile: React.FC = () => {
   const handleCancel = () => {
     setIsEditing(false)
     setEditForm({
-      full_name: profile?.full_name || '',
+      name: profile?.name || '',
       phone: profile?.phone || ''
     })
   }
@@ -84,7 +92,7 @@ export const UserProfile: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-900">Meu Perfil</h1>
         {!isEditing && (
           <Button onClick={handleEdit} variant="outline" size="sm">
-            <Edit3 className="h-4 w-4 mr-2" />
+            <Edit3 className="h-4 h-4 mr-2" />
             Editar Perfil
           </Button>
         )}
@@ -96,197 +104,197 @@ export const UserProfile: React.FC = () => {
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={profile.avatar_url} alt={profile.full_name || 'Usuário'} />
+                <AvatarImage src={profile.avatar_url} alt={profile.name || 'Usuário'} />
                 <AvatarFallback className="text-2xl bg-blue-100 text-blue-600">
-                  {profile.full_name ? getInitials(profile.full_name) : 'U'}
+                  {profile.name ? getInitials(profile.name) : 'U'}
                 </AvatarFallback>
               </Avatar>
             </div>
             <CardTitle className="text-xl">
-              {profile.full_name || 'Usuário'}
+              {profile.name || 'Usuário'}
             </CardTitle>
             <CardDescription>
               Membro desde {new Date(profile.created_at).toLocaleDateString('pt-BR')}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full" disabled>
-              <Camera className="h-4 w-4 mr-2" />
-              Alterar Foto
-            </Button>
+          <CardContent className="space-y-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">
+                {profile.total_pedidos || 0}
+              </div>
+              <div className="text-sm text-gray-600">Pedidos realizados</div>
+            </div>
+            {profile.total_gasto && (
+              <div className="text-center">
+                <div className="text-lg font-semibold text-green-600">
+                  R$ {profile.total_gasto.toFixed(2).replace('.', ',')}
+                </div>
+                <div className="text-sm text-gray-600">Total gasto</div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Card de Detalhes do Perfil */}
+        {/* Card de Informações Detalhadas */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Informações do Perfil</CardTitle>
-            <CardDescription>
-              Gerencie suas informações pessoais e de contato
-            </CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Informações Pessoais
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Email (não editável) */}
-            <div className="space-y-2">
-              <Label className="flex items-center text-sm font-medium text-gray-700">
-                <Mail className="h-4 w-4 mr-2 text-gray-400" />
-                Email
-              </Label>
-              <Input
-                value={profile.email}
-                disabled
-                className="bg-gray-50"
-              />
-              <p className="text-xs text-gray-500">
-                O email não pode ser alterado por questões de segurança
-              </p>
-            </div>
-
-            <Separator />
-
-            {/* Nome Completo */}
-            <div className="space-y-2">
-              <Label className="flex items-center text-sm font-medium text-gray-700">
-                <User className="h-4 w-4 mr-2 text-gray-400" />
-                Nome Completo
-              </Label>
-              {isEditing ? (
-                <Input
-                  value={editForm.full_name}
-                  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                  placeholder="Seu nome completo"
-                />
-              ) : (
-                <div className="p-3 bg-gray-50 rounded-md">
-                  {profile.full_name || 'Não informado'}
+            {isEditing ? (
+              // Formulário de Edição
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="name">Nome Completo</Label>
+                  <Input
+                    id="name"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Seu nome completo"
+                    className="mt-1"
+                  />
                 </div>
-              )}
-            </div>
-
-            {/* Telefone */}
-            <div className="space-y-2">
-              <Label className="flex items-center text-sm font-medium text-gray-700">
-                <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                Telefone
-              </Label>
-              {isEditing ? (
-                <Input
-                  value={editForm.phone}
-                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                  placeholder="(11) 99999-9999"
-                  type="tel"
-                />
-              ) : (
-                <div className="p-3 bg-gray-50 rounded-md">
-                  {profile.phone || 'Não informado'}
+                
+                <div>
+                  <Label htmlFor="phone">Telefone</Label>
+                  <Input
+                    id="phone"
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="(11) 99999-9999"
+                    className="mt-1"
+                  />
                 </div>
-              )}
-            </div>
 
-            {/* Data de Criação */}
-            <div className="space-y-2">
-              <Label className="flex items-center text-sm font-medium text-gray-700">
-                <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                Data de Cadastro
-              </Label>
-              <div className="p-3 bg-gray-50 rounded-md">
-                {new Date(profile.created_at).toLocaleDateString('pt-BR', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </div>
-            </div>
-
-            {/* Última Atualização */}
-            {profile.updated_at !== profile.created_at && (
-              <div className="space-y-2">
-                <Label className="flex items-center text-sm font-medium text-gray-700">
-                  <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                  Última Atualização
-                </Label>
-                <div className="p-3 bg-gray-50 rounded-md">
-                  {new Date(profile.updated_at).toLocaleDateString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
+                <div className="flex gap-3 pt-4">
+                  <Button 
+                    onClick={handleSave} 
+                    disabled={updating}
+                    className="flex-1"
+                  >
+                    {updating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Salvar Alterações
+                      </>
+                    )}
+                  </Button>
+                  <Button 
+                    onClick={handleCancel} 
+                    variant="outline" 
+                    className="flex-1"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancelar
+                  </Button>
                 </div>
               </div>
-            )}
+            ) : (
+              // Visualização das Informações
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <User className="h-5 w-5 text-gray-500" />
+                  <div>
+                    <div className="text-sm text-gray-600">Nome</div>
+                    <div className="font-medium">{profile.name || 'Não informado'}</div>
+                  </div>
+                </div>
 
-            {/* Botões de Ação */}
-            {isEditing && (
-              <div className="flex space-x-3 pt-4">
-                <Button
-                  onClick={handleSave}
-                  disabled={updating}
-                  className="flex-1"
-                >
-                  {updating ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      Salvar
-                    </>
-                  )}
-                </Button>
-                <Button
-                  onClick={handleCancel}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Cancelar
-                </Button>
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Mail className="h-5 w-5 text-gray-500" />
+                  <div>
+                    <div className="text-sm text-gray-600">Email</div>
+                    <div className="font-medium">{profile.email}</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Phone className="h-5 w-5 text-gray-500" />
+                  <div>
+                    <div className="text-sm text-gray-600">Telefone</div>
+                    <div className="font-medium">{profile.phone || 'Não informado'}</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Calendar className="h-5 w-5 text-gray-500" />
+                  <div>
+                    <div className="text-sm text-gray-600">Membro desde</div>
+                    <div className="font-medium">
+                      {new Date(profile.created_at).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {profile.updated_at && profile.updated_at !== profile.created_at && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <Calendar className="h-5 w-5 text-gray-500" />
+                    <div>
+                      <div className="text-sm text-gray-600">Última atualização</div>
+                      <div className="font-medium">
+                        {new Date(profile.updated_at).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: 'long',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Seção de Segurança */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Segurança</CardTitle>
-          <CardDescription>
-            Gerencie suas configurações de segurança
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <h4 className="font-medium">Alterar Senha</h4>
-              <p className="text-sm text-gray-500">
-                Atualize sua senha regularmente para manter sua conta segura
-              </p>
+      {/* Estatísticas Adicionais */}
+      {profile.total_pedidos && profile.total_pedidos > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Histórico de Pedidos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">{profile.total_pedidos}</div>
+                <div className="text-sm text-blue-600">Total de Pedidos</div>
+              </div>
+              {profile.total_gasto && (
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">
+                    R$ {profile.total_gasto.toFixed(2).replace('.', ',')}
+                  </div>
+                  <div className="text-sm text-green-600">Total Gasto</div>
+                </div>
+              )}
+              {profile.primeiro_pedido !== undefined && (
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {profile.primeiro_pedido ? '🎉' : '✅'}
+                  </div>
+                  <div className="text-sm text-purple-600">
+                    {profile.primeiro_pedido ? 'Primeiro Pedido' : 'Cliente Regular'}
+                  </div>
+                </div>
+              )}
             </div>
-            <Button variant="outline" size="sm" disabled>
-              Alterar
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <h4 className="font-medium">Autenticação em Duas Etapas</h4>
-              <p className="text-sm text-gray-500">
-                Adicione uma camada extra de segurança à sua conta
-              </p>
-            </div>
-            <Button variant="outline" size="sm" disabled>
-              Configurar
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

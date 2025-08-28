@@ -19,7 +19,7 @@ export const LoginTest: React.FC = () => {
     
     try {
       const result = await signUp(email, password, {
-        full_name: name,
+        name: name,
         phone: phone
       })
       
@@ -98,7 +98,7 @@ export const LoginTest: React.FC = () => {
             </div>
             {isAuthenticated && profile && (
               <div className="text-sm space-y-1">
-                <div><strong>Nome:</strong> {profile.full_name}</div>
+                                 <div><strong>Nome:</strong> {profile.name}</div>
                 <div><strong>Email:</strong> {profile.email}</div>
                 <div><strong>Telefone:</strong> {profile.phone}</div>
               </div>

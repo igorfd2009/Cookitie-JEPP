@@ -59,7 +59,7 @@ export const AuthExample: React.FC = () => {
                 <div>
                   <span className="font-medium">Nome:</span>
                   <p className="text-sm text-gray-600">
-                    {profile?.full_name || 'Não informado'}
+                                         {profile?.name || 'Não informado'}
                   </p>
                 </div>
                 <div>

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
-interface OrderItem {
+export interface OrderItem {
   id: string
   name: string
   price: number
@@ -10,7 +10,7 @@ interface OrderItem {
   total: number
 }
 
-interface Order {
+export interface Order {
   id: string
   user_id: string
   items: OrderItem[]
@@ -22,7 +22,7 @@ interface Order {
   updated_at: string
 }
 
-interface CreateOrderData {
+export interface CreateOrderData {
   items: OrderItem[]
   total: number
   payment_method: string

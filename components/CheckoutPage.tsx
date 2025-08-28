@@ -129,7 +129,7 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts, onGoToO
     if (isAuthenticated && profile && !authLoading) {
       setCustomerInfo(prev => ({
         ...prev,
-        name: profile.full_name || '',
+                 name: profile.name || '',
         email: profile.email || '',
         phone: profile.phone || ''
       }));
@@ -260,7 +260,7 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts, onGoToO
       if (isAuthenticated && user && profile) {
         // Cliente logado - usa dados do perfil
         emailCliente = user.email!;
-        nomeCliente = profile.full_name || customerInfo.name.trim();
+                 nomeCliente = profile.name || customerInfo.name.trim();
         telefoneCliente = profile.phone || customerInfo.phone.trim();
         
         // Aqui você pode atualizar estatísticas do usuário se necessário
@@ -814,7 +814,7 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts, onGoToO
                         <div className="flex items-center gap-2 text-green-700 bg-green-50 p-2 rounded">
                           <UserCheck className="w-4 h-4" />
                           <span className="text-sm font-medium">
-                            Logado como {profile?.full_name || user?.email}
+                                                         Logado como {profile?.name || user?.email}
                           </span>
                           <Button
                             type="button"

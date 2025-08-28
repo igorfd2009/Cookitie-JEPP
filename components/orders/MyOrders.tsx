@@ -8,7 +8,6 @@ import {
   Clock, 
   CheckCircle, 
   XCircle, 
-  Truck, 
   MapPin, 
   Calendar,
   Eye,
@@ -53,23 +52,11 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
         icon: CheckCircle,
         description: 'Pedido confirmado'
       },
-      preparing: { 
-        label: 'Preparando', 
-        color: 'bg-orange-500', 
-        icon: Package,
-        description: 'Sendo preparado com carinho'
-      },
-      ready: { 
-        label: 'Pronto', 
+      completed: { 
+        label: 'Completo', 
         color: 'bg-green-500', 
         icon: CheckCircle,
-        description: 'Pronto para retirada'
-      },
-      delivered: { 
-        label: 'Entregue', 
-        color: 'bg-emerald-500', 
-        icon: Truck,
-        description: 'Pedido entregue'
+        description: 'Pedido completo'
       },
       cancelled: { 
         label: 'Cancelado', 
@@ -81,13 +68,13 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
     return statusMap[status];
   };
 
-  const getPaymentStatusInfo = (status: Order['payment_status']) => {
-    const statusMap = {
+  const getPaymentStatusInfo = (status: string) => {
+    const statusMap: Record<string, { label: string; color: string }> = {
       pending: { label: 'Pendente', color: 'bg-yellow-500' },
       paid: { label: 'Pago', color: 'bg-green-500' },
       failed: { label: 'Falhou', color: 'bg-red-500' }
     };
-    return statusMap[status];
+    return statusMap[status] || statusMap.pending;
   };
 
   const formatDate = (dateString: string) => {
@@ -187,9 +174,7 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                 <option value="all">Todos os status</option>
                 <option value="pending">Pendente</option>
                 <option value="confirmed">Confirmado</option>
-                <option value="preparing">Preparando</option>
-                <option value="ready">Pronto</option>
-                <option value="delivered">Entregue</option>
+                                 <option value="completed">Completo</option>
                 <option value="cancelled">Cancelado</option>
               </select>
             </div>
@@ -238,7 +223,7 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredOrders.map((order) => {
               const statusInfo = getStatusInfo(order.status);
-              const paymentInfo = getPaymentStatusInfo(order.payment_status);
+               const paymentInfo = getPaymentStatusInfo('pending');
               const StatusIcon = statusInfo.icon;
 
               return (
@@ -273,11 +258,9 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                     <div className="space-y-2">
                       {order.items.slice(0, 2).map((item) => (
                         <div key={item.id} className="flex items-center gap-3">
-                          <img 
-                            src={item.image} 
-                            alt={item.name}
-                            className="w-10 h-10 rounded-lg object-cover"
-                          />
+                                                     <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                             <Package className="w-5 h-5 text-gray-500" />
+                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-800 truncate">{item.name}</p>
                             <p className="text-xs text-gray-500">{item.quantity}x {formatCurrency(item.price)}</p>
@@ -299,7 +282,7 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                       </div>
                       <div className="flex items-center gap-2 text-gray-600">
                         <MapPin className="w-4 h-4" />
-                        <span className="truncate">{order.pickup_location}</span>
+                                                 <span className="truncate">Retirada no evento</span>
                       </div>
                     </div>
 
@@ -323,7 +306,7 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                       >
                         Ver Detalhes
                       </Button>
-                      {order.status === 'delivered' && (
+                                             {order.status === 'completed' && (
                         <Button
                           variant="ghost"
                           size="sm"
@@ -363,7 +346,7 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                 <div className="flex gap-3 mb-6">
                   {(() => {
                     const statusInfo = getStatusInfo(selectedOrder.status);
-                    const paymentInfo = getPaymentStatusInfo(selectedOrder.payment_status);
+                                         const paymentInfo = getPaymentStatusInfo('pending');
                     const StatusIcon = statusInfo.icon;
                     
                     return (
@@ -384,13 +367,11 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Itens do Pedido</h3>
                   <div className="space-y-3">
-                    {selectedOrder.items.map((item) => (
-                      <div key={item.id} className="flex items-center gap-4 bg-gray-50 rounded-lg p-3">
-                        <img 
-                          src={item.image} 
-                          alt={item.name}
-                          className="w-16 h-16 rounded-lg object-cover"
-                        />
+                                         {selectedOrder.items.map((item: any) => (
+                       <div key={item.id} className="flex items-center gap-4 bg-gray-50 rounded-lg p-3">
+                         <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                           <Package className="w-8 h-8 text-gray-500" />
+                         </div>
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-800">{item.name}</h4>
                           <p className="text-sm text-gray-600">
@@ -413,11 +394,11 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-gray-400" />
-                        <span>Retirada: {formatDate(selectedOrder.pickup_date)}</span>
+                                                 <span>Retirada: {formatDate(selectedOrder.created_at)}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-gray-400" />
-                        <span>Local: {selectedOrder.pickup_location}</span>
+                                                 <span>Local: Retirada no evento</span>
                       </div>
                     </div>
                   </div>
@@ -439,14 +420,7 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                   </div>
                 </div>
 
-                {selectedOrder.notes && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Observações</h3>
-                    <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-                      {selectedOrder.notes}
-                    </p>
-                  </div>
-                )}
+                
 
                 {/* Actions */}
                 <div className="flex gap-3">
@@ -457,12 +431,12 @@ export function MyOrders({ onBackToProducts }: MyOrdersProps) {
                   >
                     Fechar
                   </Button>
-                  {selectedOrder.status === 'delivered' && (
-                    <Button className="bg-[var(--color-cookite-blue)] hover:bg-[var(--color-cookite-blue-hover)] text-white">
-                      <Star className="w-4 h-4 mr-2" />
-                      Avaliar
-                    </Button>
-                  )}
+                                     {selectedOrder.status === 'completed' && (
+                     <Button className="bg-[var(--color-cookite-blue)] hover:bg-[var(--color-cookite-blue-hover)] text-white">
+                       <Star className="w-4 h-4 mr-2" />
+                       Avaliar
+                     </Button>
+                   )}
                 </div>
               </div>
             </div>

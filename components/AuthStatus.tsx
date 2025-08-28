@@ -72,8 +72,8 @@ export const AuthStatus: React.FC = () => {
           <div className="pt-2 border-t">
             <div className="text-sm space-y-1">
               <div><strong>Email:</strong> {profile.email}</div>
-              {profile.full_name && (
-                <div><strong>Nome:</strong> {profile.full_name}</div>
+              {profile.name && (
+                <div><strong>Nome:</strong> {profile.name}</div>
               )}
               {profile.phone && (
                 <div><strong>Telefone:</strong> {profile.phone}</div>

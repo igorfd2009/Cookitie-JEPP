@@ -18,7 +18,7 @@ export const AuthTester: React.FC = () => {
     try {
       console.log('🧪 Teste de cadastro iniciado')
       const result = await signUp(email, password, {
-        full_name: name,
+        name: name,
         phone: phone
       })
       
@@ -91,7 +91,7 @@ export const AuthTester: React.FC = () => {
         {isAuthenticated && profile ? (
           <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
             <div className="text-sm">
-              <div><strong>Nome:</strong> {profile.full_name}</div>
+                             <div><strong>Nome:</strong> {profile.name}</div>
               <div><strong>Email:</strong> {profile.email}</div>
               <div><strong>Telefone:</strong> {profile.phone}</div>
             </div>

@@ -224,9 +224,9 @@ export const UserMenuButtonMobile: React.FC<UserMenuButtonProps> = (props) => {
       onClick={props.onProfileClick}
     >
       <Avatar className="h-8 w-8">
-        <AvatarImage src={profile?.avatar_url} alt={profile?.full_name || 'Usuário'} />
+                 <AvatarImage src={profile?.avatar_url} alt={profile?.name || 'Usuário'} />
         <AvatarFallback className="bg-blue-100 text-blue-600 text-sm font-medium">
-          {getInitials(profile?.full_name || '')}
+                     {getInitials(profile?.name || '')}
         </AvatarFallback>
       </Avatar>
     </Button>

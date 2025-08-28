@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
@@ -8,11 +8,11 @@ import { Badge } from './ui/badge'
 import { 
   User, 
   Mail, 
-  Phone, 
+ 
   Database,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
+
+
+
   RefreshCw,
   UserPlus,
   LogIn,
@@ -43,7 +43,7 @@ export function AuthDebug() {
         isAuthenticated,
         loading,
         user: user ? { id: user.id, email: user.email } : null,
-        profile: profile ? { id: profile.id, email: profile.email, full_name: profile.full_name } : null
+        profile: profile ? { id: profile.id, email: profile.email, name: profile.name } : null
       },
       environment: {
         hasSupabase: !!import.meta.env.VITE_SUPABASE_URL,
@@ -73,7 +73,7 @@ export function AuthDebug() {
       
       // Tentar cadastro
       const result = await signUp(testEmail, testPassword, { 
-        full_name: testName,
+        name: testName,
         phone: testPhone
       })
       
@@ -233,7 +233,7 @@ export function AuthDebug() {
                 <div className="flex items-center justify-between">
                   <span>Nome:</span>
                   <span className="truncate max-w-32">
-                    {profile?.full_name || 'N/A'}
+                                         {profile?.name || 'N/A'}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -23,7 +23,7 @@ export function SimpleAuthTest() {
       console.log('📦 Usuários antes:', beforeUsers)
       
       // Tentar cadastro
-      const signUpResult = await signUp(email, password, { full_name: name })
+              const signUpResult = await signUp(email, password, { name: name })
       console.log('📤 Resultado do cadastro:', signUpResult)
       
       if (signUpResult.error) {
@@ -155,7 +155,7 @@ export function SimpleAuthTest() {
             <div className="text-sm space-y-1">
               <p>Autenticado: {isAuthenticated ? '✅ Sim' : '❌ Não'}</p>
               <p>Usuário: {user ? `✅ ${user.email}` : '❌ Nenhum'}</p>
-              <p>Perfil: {profile ? `✅ ${profile.full_name}` : '❌ Nenhum'}</p>
+                             <p>Perfil: {profile ? `✅ ${profile.name}` : '❌ Nenhum'}</p>
             </div>
           </div>
         </CardContent>

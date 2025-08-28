@@ -8,14 +8,14 @@ export const AuthTestMinimal: React.FC = () => {
   console.log('🔍 AuthTestMinimal - Estado:', {
     isAuthenticated: auth.isAuthenticated,
     user: auth.user?.email,
-    profile: auth.profile?.full_name,
+    profile: auth.profile?.name,
     loading: auth.loading
   })
 
   const testSignup = async () => {
     console.log('🔑 Teste de cadastro iniciado...')
     const result = await auth.signUp('teste@teste.com', '123456', {
-      full_name: 'Usuario Teste',
+      name: 'Usuario Teste',
       phone: '(11) 99999-9999'
     })
     console.log('📋 Resultado:', result)
@@ -63,7 +63,7 @@ export const AuthTestMinimal: React.FC = () => {
       
       {auth.isAuthenticated && (
         <div style={{ marginBottom: '20px' }}>
-          <strong>Usuário:</strong> {auth.profile?.full_name} ({auth.user?.email})
+                     <strong>Usuário:</strong> {auth.profile?.name} ({auth.user?.email})
         </div>
       )}
       

@@ -25,7 +25,7 @@ export const AuthDebugFixed: React.FC = () => {
       hasProfile: !!profile,
       loading,
       userEmail: user?.email,
-      profileName: profile?.full_name,
+      profileName: profile?.name,
       localStorage: {
         currentUser: localStorage.getItem('offline_current_user'),
         users: localStorage.getItem('offline_users')
@@ -42,7 +42,7 @@ export const AuthDebugFixed: React.FC = () => {
       console.log('📋 Dados:', { email: testEmail, password: testPassword, name: testName, phone: testPhone })
       
       const result = await signUp(testEmail, testPassword, {
-        full_name: testName,
+        name: testName,
         phone: testPhone
       })
       
@@ -151,7 +151,7 @@ export const AuthDebugFixed: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <User className="w-4 h-4" />
                   <span className="font-medium">Nome:</span>
-                  <span>{profile.full_name}</span>
+                                     <span>{profile.name}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />

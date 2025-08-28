@@ -146,7 +146,7 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
         signupForm.email, 
         signupForm.password, 
         {
-          full_name: signupForm.fullName,
+          name: signupForm.fullName,
           phone: signupForm.phone
         }
       )

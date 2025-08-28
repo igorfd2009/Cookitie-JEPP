@@ -33,7 +33,7 @@ export const LoginStatus: React.FC = () => {
                     Logado como
                   </div>
                   <div className="text-xs text-gray-600">
-                    {profile?.full_name || profile?.email || 'Usuário'}
+                                         {profile?.name || profile?.email || 'Usuário'}
                   </div>
                 </div>
               </>

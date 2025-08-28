@@ -534,7 +534,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     try {
-      await supabase.auth.signOut()
+      if (supabase) {
+        await supabase.auth.signOut()
+      }
       if (import.meta.env.DEV) console.log('🚪 Logout Supabase realizado')
     } catch (error) {
       console.error('❌ Erro ao fazer logout:', error)
