@@ -57,6 +57,7 @@ interface CartItem {
 interface PaymentData {
   transactionId: string;
   qrCode: string;
+  qrCodeUrl?: string;
   pixCode: string;
   amount: number;
   expiresAt: string;
@@ -321,6 +322,7 @@ export function CheckoutPage({ cartItems, onClearCart, onBackToProducts, onGoToO
           setPaymentData({
             transactionId: pixPayment.transactionId,
             qrCode: pixPayment.qrCodeBase64,
+            qrCodeUrl: pixPayment.qrCodeUrl,
             pixCode: pixPayment.pixCode,
             amount: pixPayment.amount,
             expiresAt: pixPayment.expiresAt

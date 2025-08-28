@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "deploy:build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
@@ -43,6 +44,7 @@
     "embla-carousel-react": "^8.0.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.376.0",
+    "qrcode": "^1.5.4",
     "react": "^18.2.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
