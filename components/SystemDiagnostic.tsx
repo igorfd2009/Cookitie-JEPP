@@ -40,6 +40,14 @@ export function SystemDiagnostic() {
     setResults([])
   }
 
+  // Helpers com timeout para evitar travamentos quando o backend está lento/indisponível
+  const withTimeout = async <T,>(promise: Promise<T>, ms: number, timeoutMessage: string): Promise<T | { error: { message: string } }> => {
+    return Promise.race([
+      promise,
+      new Promise<{ error: { message: string } }>((resolve) => setTimeout(() => resolve({ error: { message: timeoutMessage } }), ms))
+    ]) as any
+  }
+
   const runDiagnostic = async () => {
     setTesting(true)
     clearResults()
@@ -122,10 +130,14 @@ export function SystemDiagnostic() {
         message: 'Testando cadastro de novo usuário...'
       })
 
-      const signUpResult = await signUp(testEmail, testPassword, {
+      const signUpResult = await withTimeout(
+        signUp(testEmail, testPassword, {
         name: testName,
         phone: '(11) 99999-9999'
-      })
+        }),
+        12000,
+        'Tempo esgotado no cadastro (diagnóstico). Verifique conexão/Supabase.'
+      )
 
       if (signUpResult.error) {
         addResult({
@@ -184,7 +196,11 @@ export function SystemDiagnostic() {
           message: 'Testando login com conta criada...'
         })
 
-        const signInResult = await signIn(testEmail, testPassword)
+        const signInResult = await withTimeout(
+          signIn(testEmail, testPassword),
+          10000,
+          'Tempo esgotado no login (diagnóstico). Verifique conexão/Supabase.'
+        )
         await new Promise(resolve => setTimeout(resolve, 500))
 
         if (signInResult.error) {
@@ -287,10 +303,14 @@ export function SystemDiagnostic() {
           message: 'Testando validação de email duplicado...'
         })
 
-        const duplicateResult = await signUp(testEmail, testPassword, {
+        const duplicateResult = await withTimeout(
+          signUp(testEmail, testPassword, {
           name: 'Outro Nome',
           phone: '(11) 88888-8888'
-        })
+          }),
+          10000,
+          'Tempo esgotado ao testar email duplicado (diagnóstico).'
+        )
 
         if (duplicateResult.error && duplicateResult.error.message.includes('já cadastrado')) {
           addResult({
