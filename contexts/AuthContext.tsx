@@ -219,14 +219,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setSession(session)
           
           // Buscar perfil do usuário
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          
-          if (profile) {
-            setProfile(profile)
+          try {
+            const { data: profile, error } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
+            
+            if (profile && !error) {
+              setProfile(profile)
+            } else if (error) {
+              console.warn('⚠️ Perfil não encontrado na inicialização, criando perfil básico:', error)
+              // Criar um perfil básico temporário
+              setProfile({
+                id: session.user.id,
+                email: session.user.email || '',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              })
+            }
+          } catch (error) {
+            console.error('❌ Erro ao buscar perfil na inicialização:', error)
           }
           
           if (import.meta.env.DEV) console.log('✅ Sessão Supabase recuperada:', session.user.email)
@@ -252,14 +265,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             
             // Buscar perfil atualizado
             if (supabase) {
-              const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
-              
-              if (profile) {
-                setProfile(profile)
+              try {
+                const { data: profile, error } = await supabase
+                  .from('profiles')
+                  .select('*')
+                  .eq('id', session.user.id)
+                  .single()
+                
+                if (profile && !error) {
+                  setProfile(profile)
+                } else if (error) {
+                  console.warn('⚠️ Perfil não encontrado, usuário autenticado sem perfil completo:', error)
+                  // Criar um perfil básico temporário
+                  setProfile({
+                    id: session.user.id,
+                    email: session.user.email || '',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                  })
+                }
+              } catch (error) {
+                console.error('❌ Erro ao buscar perfil no listener:', error)
               }
             }
           } else {
@@ -378,21 +404,35 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       if (data.user) {
+        // ✅ CORREÇÃO: Atualizar estado imediatamente após signup
+        setUser(data.user)
+        setSession(data.session)
+        
         // Criar perfil na tabela profiles
+        const newProfile = {
+          id: data.user.id,
+          email: data.user.email!,
+          name: profileData.name,
+          phone: profileData.phone,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+        
         const { error: profileError } = await supabase
           .from('profiles')
-          .insert({
-            id: data.user.id,
-            email: data.user.email!,
-            name: profileData.name,
-            phone: profileData.phone,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
+          .insert(newProfile)
 
         if (profileError) {
-          console.error('Erro ao criar perfil:', profileError)
+          console.error('❌ Erro ao criar perfil:', profileError)
+          // Mesmo com erro no perfil, definir perfil básico
+          setProfile(newProfile)
+        } else {
+          // Perfil criado com sucesso
+          setProfile(newProfile)
+          if (import.meta.env.DEV) console.log('✅ Perfil criado no Supabase:', newProfile)
         }
+        
+        if (import.meta.env.DEV) console.log('✅ Signup Supabase realizado para:', data.user.email)
       }
 
       return { error: null }
@@ -459,13 +499,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Modo online - usar Supabase
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
       if (error) {
         return { error }
+      }
+
+      // ✅ CORREÇÃO: Aguardar e forçar atualização do estado após login
+      if (data.user) {
+        setUser(data.user)
+        setSession(data.session)
+        
+        // Buscar perfil do usuário logado
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', data.user.id)
+            .single()
+          
+          if (profile && !profileError) {
+            setProfile(profile)
+          } else {
+            console.warn('⚠️ Perfil não encontrado no login, criando perfil básico')
+            // Criar perfil básico
+            setProfile({
+              id: data.user.id,
+              email: data.user.email || '',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+          }
+        } catch (profileError) {
+          console.error('❌ Erro ao buscar perfil no login:', profileError)
+        }
+        
+        if (import.meta.env.DEV) console.log('✅ Login Supabase realizado para:', data.user.email)
       }
 
       return { error: null }
@@ -584,7 +656,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const isAuthenticated = Boolean(user && profile)
+  // ✅ CORREÇÃO: isAuthenticated mais robusto - considera user como suficiente
+  const isAuthenticated = Boolean(user)
 
   const value: AuthContextType = {
     user,
