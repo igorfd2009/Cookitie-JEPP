@@ -70,14 +70,14 @@ export const Products = () => {
 
       <div className="relative z-10 space-y-16">
         {/* Hero Section */}
-        <section className="text-center space-y-6 py-16">
+        <section className="text-center space-y-4 sm:space-y-6 py-8 sm:py-12 lg:py-16 px-4">
           <div className="fade-in">
-            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-100 to-yellow-100 px-6 py-3 rounded-full mb-6">
-              <span className="text-2xl">🎓</span>
-              <span className="font-cookitie text-blue-700 font-medium">Projeto JEPP • Sebrae</span>
+            <div className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-100 to-yellow-100 px-4 py-2 sm:px-6 sm:py-3 rounded-full mb-4 sm:mb-6">
+              <span className="text-lg sm:text-2xl">🎓</span>
+              <span className="font-cookitie text-blue-700 font-medium text-sm sm:text-base">Projeto JEPP • Sebrae</span>
             </div>
             
-            <h1 className="font-cookitie text-5xl md:text-6xl font-bold mb-4">
+            <h1 className="font-cookitie text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4">
               <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 bg-clip-text text-transparent">
                 Bem-vindos à
               </span>
@@ -87,41 +87,42 @@ export const Products = () => {
               </span>
             </h1>
             
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
               Somos estudantes do 1º ano do ensino médio apaixonados por confeitaria! 
-              <br />
-              Criamos doces artesanais com muito amor e dedicação para adoçar o seu dia. 🍪✨
+              <br className="hidden sm:block" />
+              <span className="sm:hidden"> </span>Criamos doces artesanais com muito amor e dedicação para adoçar o seu dia. 🍪✨
             </p>
           </div>
 
           <div className="slide-in-left">
-            <div className="inline-flex items-center gap-2 text-gray-500">
-              <Heart className="text-red-400" size={20} />
+            <div className="inline-flex items-center gap-2 text-gray-500 text-sm sm:text-base">
+              <Heart className="text-red-400" size={16} />
               <span className="font-medium">Feito com carinho por jovens empreendedores</span>
-              <Heart className="text-red-400" size={20} />
+              <Heart className="text-red-400" size={16} />
             </div>
           </div>
         </section>
 
         {/* Produtos Principais */}
-        <section className="space-y-12">
+        <section className="space-y-8 sm:space-y-12 px-4">
           <div className="text-center slide-in-right">
-            <h2 className="font-cookitie text-4xl font-bold mb-4">
+            <h2 className="font-cookitie text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">
               <span className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
                 Nossos Queridinhos
               </span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
               Conheça os 4 produtos que conquistaram o coração de todos! 
-              Cada um feito com ingredientes selecionados e técnicas artesanais.
+              <br className="hidden sm:block" />
+              <span className="sm:hidden"> </span>Cada um feito com ingredientes selecionados e técnicas artesanais.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 max-w-7xl mx-auto">
             {COOKITIE_PRODUCTS.map((product, index) => (
               <div
                 key={product.id}
-                className="cookitie-card p-6 group hover:scale-105 transition-all duration-300 relative overflow-hidden fade-in"
+                className="cookitie-card p-4 sm:p-6 group hover:scale-105 transition-all duration-300 relative overflow-hidden fade-in"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 {product.popular && (
@@ -131,30 +132,30 @@ export const Products = () => {
                   </div>
                 )}
 
-                <div className="text-center space-y-4">
+                <div className="text-center space-y-3 sm:space-y-4">
                   <div className="relative">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-48 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-40 sm:h-48 object-cover rounded-xl sm:rounded-2xl group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute -top-2 -right-2 text-3xl bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg">
+                    <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 text-2xl sm:text-3xl bg-white rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shadow-lg">
                       {product.emoji}
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <h3 className="font-cookitie text-xl font-bold text-gray-900">
+                    <h3 className="font-cookitie text-lg sm:text-xl font-bold text-gray-900">
                       {product.name}
                     </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed px-2">
                       {product.description}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="text-left">
-                      <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent font-cookitie">
+                  <div className="flex flex-col sm:flex-row items-center justify-between pt-2 space-y-2 sm:space-y-0">
+                    <div className="text-center sm:text-left">
+                      <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent font-cookitie">
                         R$ {product.price.toFixed(2)}
                       </span>
                       <p className="text-xs text-gray-500">unidade</p>
@@ -162,9 +163,9 @@ export const Products = () => {
                     
                     <button
                       onClick={() => handleAddToCart(product)}
-                      className="btn-cookitie-primary flex items-center gap-2 text-sm group-hover:scale-110 transition-transform"
+                      className="btn-cookitie-primary flex items-center gap-2 text-xs sm:text-sm group-hover:scale-110 transition-transform w-full sm:w-auto justify-center"
                     >
-                      <Plus size={16} />
+                      <Plus size={14} />
                       Adicionar
                     </button>
                   </div>
@@ -175,50 +176,51 @@ export const Products = () => {
         </section>
 
         {/* Seção Sobre o Projeto JEPP */}
-        <section className="gradient-cookitie-mixed rounded-3xl p-12 text-center space-y-8 fade-in">
-          <div className="space-y-4">
-            <div className="inline-flex items-center gap-3 bg-white/80 px-6 py-3 rounded-full">
-              <span className="text-2xl">🚀</span>
-              <span className="font-cookitie text-lg font-bold text-gray-800">Projeto JEPP • Sebrae</span>
+        <section className="gradient-cookitie-mixed rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 text-center space-y-6 sm:space-y-8 fade-in mx-4">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="inline-flex items-center gap-2 sm:gap-3 bg-white/80 px-4 py-2 sm:px-6 sm:py-3 rounded-full">
+              <span className="text-lg sm:text-2xl">🚀</span>
+              <span className="font-cookitie text-sm sm:text-lg font-bold text-gray-800">Projeto JEPP • Sebrae</span>
             </div>
             
-            <h2 className="font-cookitie text-3xl md:text-4xl font-bold text-gray-800">
+            <h2 className="font-cookitie text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
               Jovens Empreendedores
             </h2>
             
-            <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base lg:text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed px-4">
               A <strong>Cookitie</strong> nasceu como parte do programa JEPP (Jovens Empreendedores Primeiros Passos) do Sebrae. 
-              Somos um grupo de estudantes determinados a transformar nossa paixão por doces em um negócio real, 
+              <br className="hidden sm:block" />
+              <span className="sm:hidden"> </span>Somos um grupo de estudantes determinados a transformar nossa paixão por doces em um negócio real, 
               aprendendo sobre empreendedorismo, trabalho em equipe e realização de sonhos! 🌟
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="bg-white/60 rounded-2xl p-6 space-y-3">
-              <div className="text-3xl">📚</div>
-              <h3 className="font-cookitie text-lg font-bold text-gray-800">Aprendizado</h3>
-              <p className="text-sm text-gray-700">Desenvolvendo habilidades empreendedoras na prática</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+            <div className="bg-white/60 rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-2 sm:space-y-3">
+              <div className="text-2xl sm:text-3xl">📚</div>
+              <h3 className="font-cookitie text-base sm:text-lg font-bold text-gray-800">Aprendizado</h3>
+              <p className="text-xs sm:text-sm text-gray-700">Desenvolvendo habilidades empreendedoras na prática</p>
             </div>
             
-            <div className="bg-white/60 rounded-2xl p-6 space-y-3">
-              <div className="text-3xl">🤝</div>
-              <h3 className="font-cookitie text-lg font-bold text-gray-800">Trabalho em Equipe</h3>
-              <p className="text-sm text-gray-700">Colaboração e união para alcançar nossos objetivos</p>
+            <div className="bg-white/60 rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-2 sm:space-y-3">
+              <div className="text-2xl sm:text-3xl">🤝</div>
+              <h3 className="font-cookitie text-base sm:text-lg font-bold text-gray-800">Trabalho em Equipe</h3>
+              <p className="text-xs sm:text-sm text-gray-700">Colaboração e união para alcançar nossos objetivos</p>
             </div>
             
-            <div className="bg-white/60 rounded-2xl p-6 space-y-3">
-              <div className="text-3xl">💝</div>
-              <h3 className="font-cookitie text-lg font-bold text-gray-800">Paixão</h3>
-              <p className="text-sm text-gray-700">Amor pela confeitaria e dedicação em cada produto</p>
+            <div className="bg-white/60 rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-2 sm:space-y-3">
+              <div className="text-2xl sm:text-3xl">💝</div>
+              <h3 className="font-cookitie text-base sm:text-lg font-bold text-gray-800">Paixão</h3>
+              <p className="text-xs sm:text-sm text-gray-700">Amor pela confeitaria e dedicação em cada produto</p>
             </div>
           </div>
 
-          <div className="bg-white/80 rounded-2xl p-6 max-w-2xl mx-auto">
-            <p className="text-gray-800 font-medium">
+          <div className="bg-white/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 max-w-2xl mx-auto">
+            <p className="text-gray-800 font-medium text-sm sm:text-base">
               💫 <em>"Cada doce que fazemos carrega nossos sonhos e aprendizados. 
               Obrigado por fazer parte desta jornada conosco!"</em>
             </p>
-            <p className="text-sm text-gray-600 mt-2 font-cookitie">— Equipe Cookitie</p>
+            <p className="text-xs sm:text-sm text-gray-600 mt-2 font-cookitie">— Equipe Cookitie</p>
           </div>
         </section>
       </div>

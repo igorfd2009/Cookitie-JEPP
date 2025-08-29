@@ -223,46 +223,46 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
 
   if (step === 'payment') {
     return (
-      <div className="max-w-lg mx-auto space-y-6">
+      <div className="max-w-lg mx-auto space-y-4 sm:space-y-6 px-4">
         <div className="text-center space-y-2">
           <button
             onClick={() => setStep('review')}
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mb-4"
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mb-3 sm:mb-4 text-sm"
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={14} />
             <span>Voltar</span>
           </button>
-          <h2 className="font-cookitie text-3xl font-bold text-gray-900">
+          <h2 className="font-cookitie text-2xl sm:text-3xl font-bold text-gray-900">
             🍪 Pagamento PIX
           </h2>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600 px-4">
             Escaneie o QR Code ou copie o código PIX para finalizar seu pedido
           </p>
         </div>
 
-        <div className="cookitie-card p-8 text-center space-y-6">
+        <div className="cookitie-card p-4 sm:p-6 lg:p-8 text-center space-y-4 sm:space-y-6">
           {/* QR Code */}
-          <div className="bg-white p-4 rounded-2xl shadow-sm mx-auto w-fit">
+          <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm mx-auto w-fit">
             {qrCodeDataURL ? (
               <img 
                 src={qrCodeDataURL} 
                 alt="QR Code PIX" 
-                className="w-64 h-64 mx-auto"
+                className="w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 mx-auto"
               />
             ) : (
-              <div className="w-64 h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 bg-gray-100 rounded-lg flex items-center justify-center">
                 <div className="text-center text-gray-500">
-                  <CreditCard size={48} />
-                  <p className="text-sm mt-2">Gerando QR Code...</p>
+                  <CreditCard size={32} className="sm:w-12 sm:h-12" />
+                  <p className="text-xs sm:text-sm mt-2">Gerando QR Code...</p>
                 </div>
               </div>
             )}
           </div>
 
           {/* Código PIX */}
-          <div className="space-y-4">
-            <p className="font-cookitie text-lg font-bold text-gray-800">Código PIX:</p>
-            <div className="bg-gray-50 p-4 rounded-xl border-2 border-blue-100">
+          <div className="space-y-3 sm:space-y-4">
+            <p className="font-cookitie text-base sm:text-lg font-bold text-gray-800">Código PIX:</p>
+            <div className="bg-gray-50 p-3 sm:p-4 rounded-xl border-2 border-blue-100">
               <p className="text-xs font-mono break-all text-gray-700 leading-relaxed">
                 {pixCode}
               </p>
@@ -270,7 +270,7 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
             
             <button
               onClick={copyPixCode}
-              className="w-full btn-cookitie-secondary py-3 font-cookitie flex items-center justify-center gap-2 hover:scale-105 transition-transform"
+              className="w-full btn-cookitie-secondary py-3 font-cookitie flex items-center justify-center gap-2 hover:scale-105 transition-transform text-sm sm:text-base"
             >
               {copied ? <Check size={16} /> : <Copy size={16} />}
               {copied ? '✅ Copiado!' : '📋 Copiar Código PIX'}
@@ -279,15 +279,15 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
         </div>
 
         {/* Resumo do Pagamento */}
-        <div className="bg-gradient-to-r from-blue-50 to-yellow-50 rounded-2xl p-6">
-          <h3 className="font-cookitie text-xl font-bold text-gray-800 mb-3 text-center">
+        <div className="bg-gradient-to-r from-blue-50 to-yellow-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+          <h3 className="font-cookitie text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3 text-center">
             💰 Total a Pagar
           </h3>
           <div className="text-center">
-            <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent font-cookitie">
+            <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent font-cookitie">
               R$ {totalPrice.toFixed(2)}
             </p>
-            <p className="text-sm text-gray-700 mt-2">
+            <p className="text-xs sm:text-sm text-gray-700 mt-2">
               Após o pagamento, confirme abaixo para finalizar seu pedido 🍪
             </p>
           </div>
@@ -295,12 +295,12 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
 
         <button
           onClick={handlePaymentConfirm}
-          className="w-full btn-cookitie-primary py-4 font-cookitie text-lg hover:scale-105 transition-transform"
+          className="w-full btn-cookitie-primary py-3 sm:py-4 font-cookitie text-base sm:text-lg hover:scale-105 transition-transform"
         >
           ✅ Confirmar Pagamento
         </button>
 
-        <p className="text-xs text-center text-gray-500">
+        <p className="text-xs text-center text-gray-500 px-4">
           💡 Após efetuar o pagamento em seu banco, clique em "Confirmar Pagamento"
         </p>
       </div>
@@ -308,84 +308,84 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8 px-4">
       <div className="text-center">
-        <h1 className="font-cookitie text-4xl font-bold text-gray-900 mb-2">
+        <h1 className="font-cookitie text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
           🛍️ Finalizar Pedido
         </h1>
-        <p className="text-gray-600">Revise suas informações antes de prosseguir</p>
+        <p className="text-sm sm:text-base text-gray-600">Revise suas informações antes de prosseguir</p>
       </div>
 
       {/* Resumo do pedido */}
-      <div className="cookitie-card p-6 space-y-4">
-        <h2 className="font-cookitie text-xl font-bold text-gray-800 mb-4">📋 Resumo do Pedido</h2>
+      <div className="cookitie-card p-4 sm:p-6 space-y-4">
+        <h2 className="font-cookitie text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">📋 Resumo do Pedido</h2>
         
         <div className="space-y-3">
           {items.map((item) => (
-            <div key={item.id} className="flex justify-between items-center py-3 border-b border-blue-100 last:border-b-0">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                <div>
-                  <span className="font-medium text-gray-900">{item.name}</span>
-                  <span className="text-blue-600 ml-2 text-sm">x{item.quantity}</span>
+            <div key={item.id} className="flex justify-between items-center py-2 sm:py-3 border-b border-blue-100 last:border-b-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                <div className="min-w-0">
+                  <span className="font-medium text-gray-900 text-sm sm:text-base block">{item.name}</span>
+                  <span className="text-blue-600 text-xs sm:text-sm">x{item.quantity}</span>
                 </div>
               </div>
-              <span className="font-bold text-gray-900">
+              <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">
                 R$ {(item.price * item.quantity).toFixed(2)}
               </span>
             </div>
           ))}
         </div>
         
-        <div className="flex justify-between items-center pt-4 border-t-2 border-blue-200">
-          <span className="text-xl font-bold text-gray-800">Total:</span>
-          <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent font-cookitie">
+        <div className="flex justify-between items-center pt-3 sm:pt-4 border-t-2 border-blue-200">
+          <span className="text-lg sm:text-xl font-bold text-gray-800">Total:</span>
+          <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent font-cookitie">
             R$ {totalPrice.toFixed(2)}
           </span>
         </div>
       </div>
 
       {/* Informações do cliente */}
-      <div className="cookitie-card p-6">
-        <h2 className="font-cookitie text-xl font-bold text-gray-800 mb-4">👤 Dados do Cliente</h2>
+      <div className="cookitie-card p-4 sm:p-6">
+        <h2 className="font-cookitie text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">👤 Dados do Cliente</h2>
         <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-            <p><strong>Nome:</strong> {user?.name}</p>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
+            <p className="text-sm sm:text-base"><strong>Nome:</strong> {user?.name}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-            <p><strong>Email:</strong> {user?.email}</p>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
+            <p className="text-sm sm:text-base break-all"><strong>Email:</strong> {user?.email}</p>
           </div>
           {user?.phone && (
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-              <p><strong>Telefone:</strong> {user.phone}</p>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
+              <p className="text-sm sm:text-base"><strong>Telefone:</strong> {user.phone}</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Entrega */}
-      <div className="bg-gradient-to-r from-blue-50 to-yellow-50 rounded-2xl p-6">
-        <h2 className="font-cookitie text-xl font-bold text-gray-800 mb-3">
+      <div className="bg-gradient-to-r from-blue-50 to-yellow-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <h2 className="font-cookitie text-lg sm:text-xl font-bold text-gray-800 mb-3">
           🎉 Informações de Entrega
         </h2>
         <div className="space-y-2 text-gray-700">
-          <p className="flex items-center gap-2">
-            <span className="text-lg">🏫</span>
+          <p className="flex items-center gap-2 text-sm sm:text-base">
+            <span className="text-base sm:text-lg">🏫</span>
             <strong>Evento JEPP 2024</strong>
           </p>
-          <p className="flex items-center gap-2">
-            <span className="text-lg">🍪</span>
+          <p className="flex items-center gap-2 text-sm sm:text-base">
+            <span className="text-base sm:text-lg">🍪</span>
             Seus cookies serão entregues fresquinhos no dia do evento
           </p>
-          <p className="flex items-center gap-2">
-            <span className="text-lg">📍</span>
+          <p className="flex items-center gap-2 text-sm sm:text-base">
+            <span className="text-base sm:text-lg">📍</span>
             Local será informado por email
           </p>
-          <p className="flex items-center gap-2">
-            <span className="text-lg">💝</span>
+          <p className="flex items-center gap-2 text-sm sm:text-base">
+            <span className="text-base sm:text-lg">💝</span>
             Feitos com amor pelos jovens empreendedores da Cookitie
           </p>
         </div>
@@ -393,7 +393,7 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
 
       <button
         onClick={handleCreateOrder}
-        className="w-full btn-cookitie-primary py-4 font-cookitie text-xl hover:scale-105 transition-transform"
+        className="w-full btn-cookitie-primary py-3 sm:py-4 font-cookitie text-lg sm:text-xl hover:scale-105 transition-transform"
       >
         🍪 Pagar com PIX
       </button>
