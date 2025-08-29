@@ -51,9 +51,9 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
   }
 
   const generatePixCode = () => {
-    // Chave PIX do estabelecimento (pode ser CPF, CNPJ, email, etc.)
-    const pixKey = 'cookitie@contato.com'
-    const merchantName = 'COOKITIE JEPP'
+    // Chave PIX da Nicolly (telefone)
+    const pixKey = '11998008397'
+    const merchantName = 'NICOLLY ASCIONE SALOMAO'
     const merchantCity = 'SAO PAULO'
     const amount = totalPrice.toFixed(2)
     
