@@ -8,6 +8,7 @@ import { Checkout } from './components/Checkout'
 import { MyOrders } from './components/MyOrders'
 import { AuthModal } from './components/AuthModal'
 import { Footer } from './components/Footer'
+import { SupabaseWarning } from './components/SupabaseWarning'
 import { useAuth } from './contexts/AuthContext'
 import { Toaster } from 'sonner'
 import './styles/globals.css'
@@ -17,7 +18,7 @@ type Page = 'products' | 'cart' | 'checkout' | 'orders'
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>('products')
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, supabaseError } = useAuth()
 
   const handleGoToCheckout = () => {
     if (!isAuthenticated) {
@@ -52,6 +53,8 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {supabaseError && <SupabaseWarning />}
+      
       <Header 
         currentPage={currentPage}
         onNavigate={setCurrentPage}
@@ -60,7 +63,7 @@ function AppContent() {
         onShowAuth={() => setShowAuthModal(true)}
       />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className={`container mx-auto px-4 py-8 ${supabaseError ? 'pt-24' : ''}`}>
         {renderPage()}
       </main>
 

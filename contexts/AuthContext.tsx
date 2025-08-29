@@ -17,6 +17,7 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   isAuthenticated: boolean
+  supabaseError: string | null
   signUp: (email: string, password: string, name: string, phone?: string) => Promise<{ success: boolean; error?: string }>
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   signOut: () => Promise<void>
@@ -42,6 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [supabaseError, setSupabaseError] = useState<string | null>(null)
 
   // Função para buscar perfil do usuário
   const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
@@ -55,7 +57,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         .single()
       
       if (error) {
-        console.error('Erro ao buscar perfil:', error)
+        console.error('Erro ao buscar perfil:', error.message)
+        
+        // Se a tabela não existe (erro 406), alertar
+        if (error.code === 'PGRST116' || error.message.includes('relation "public.profiles" does not exist')) {
+          const errorMsg = 'Tabela profiles não existe. Execute sql/supabase-setup.sql no painel do Supabase.'
+          console.error('❌ ERRO:', errorMsg)
+          setSupabaseError(errorMsg)
+        }
+        
         return null
       }
       
@@ -310,6 +320,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     session,
     loading,
     isAuthenticated,
+    supabaseError,
     signUp,
     signIn,
     signOut,
