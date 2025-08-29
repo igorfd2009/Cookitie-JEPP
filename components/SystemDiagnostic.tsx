@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useOrders } from '../hooks/useOrders'
+import { isSupabaseAvailable, testSupabaseConnection } from '../lib/supabase'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Badge } from './ui/badge'
@@ -21,6 +22,11 @@ interface DiagnosticResult {
   status: 'success' | 'error' | 'warning' | 'pending'
   message: string
   details?: any
+}
+
+interface ConnectivityResult {
+  available: boolean
+  reason: string
 }
 
 export function SystemDiagnostic() {
@@ -46,6 +52,25 @@ export function SystemDiagnostic() {
       promise,
       new Promise<{ error: { message: string } }>((resolve) => setTimeout(() => resolve({ error: { message: timeoutMessage } }), ms))
     ]) as any
+  }
+
+  // Teste de conectividade antes de executar testes que dependem de API
+  const testConnectivity = async (): Promise<ConnectivityResult> => {
+    if (!isSupabaseAvailable()) {
+      return { available: false, reason: 'Supabase não configurado (modo offline)' }
+    }
+    
+    try {
+      const isConnected = await testSupabaseConnection()
+      
+      if (isConnected) {
+        return { available: true, reason: 'Supabase conectado' }
+      } else {
+        return { available: false, reason: 'Supabase não respondeu' }
+      }
+    } catch (error) {
+      return { available: false, reason: `Erro ao testar Supabase: ${error}` }
+    }
   }
 
   const runDiagnostic = async () => {
@@ -130,13 +155,24 @@ export function SystemDiagnostic() {
         message: 'Testando cadastro de novo usuário...'
       })
 
+      // Verificar conectividade antes do cadastro
+      const connectivity = await testConnectivity()
+      if (!connectivity.available) {
+        addResult({
+          test: '3. Cadastro de Usuário',
+          status: 'warning',
+          message: `Cadastro em modo offline: ${connectivity.reason}`,
+          details: { mode: 'offline', reason: connectivity.reason }
+        })
+      }
+
       const signUpResult = await withTimeout(
         signUp(testEmail, testPassword, {
-        name: testName,
-        phone: '(11) 99999-9999'
+          name: testName,
+          phone: '(11) 99999-9999'
         }),
-        12000,
-        'Tempo esgotado no cadastro (diagnóstico). Verifique conexão/Supabase.'
+        20000,
+        'Tempo esgotado no cadastro (20s). Supabase lento ou indisponível.'
       )
 
       if (signUpResult.error) {
@@ -198,8 +234,8 @@ export function SystemDiagnostic() {
 
         const signInResult = await withTimeout(
           signIn(testEmail, testPassword),
-          10000,
-          'Tempo esgotado no login (diagnóstico). Verifique conexão/Supabase.'
+          15000,
+          'Tempo esgotado no login (15s). Supabase lento ou indisponível.'
         )
         await new Promise(resolve => setTimeout(resolve, 500))
 
@@ -305,11 +341,11 @@ export function SystemDiagnostic() {
 
         const duplicateResult = await withTimeout(
           signUp(testEmail, testPassword, {
-          name: 'Outro Nome',
-          phone: '(11) 88888-8888'
+            name: 'Outro Nome',
+            phone: '(11) 88888-8888'
           }),
-          10000,
-          'Tempo esgotado ao testar email duplicado (diagnóstico).'
+          15000,
+          'Tempo esgotado ao testar email duplicado (15s).'
         )
 
         if (duplicateResult.error && duplicateResult.error.message.includes('já cadastrado')) {
