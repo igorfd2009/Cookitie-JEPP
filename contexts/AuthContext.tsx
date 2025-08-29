@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single()
+        .maybeSingle()
       
       if (error) {
         console.error('Erro ao buscar perfil:', error.message)
@@ -69,14 +69,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return null
       }
       
-      return data
+      return data || null
     } catch (error) {
       console.error('Erro ao buscar perfil:', error)
       return null
     }
   }
 
-  // Função para criar perfil do usuário
+  // Função para criar/atualizar perfil do usuário (idempotente)
   const createUserProfile = async (user: User, name: string, phone?: string): Promise<UserProfile | null> => {
     if (!supabase) return null
     
@@ -92,16 +92,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const { data, error } = await supabase
         .from('profiles')
-        .insert(profileData)
+        .upsert(profileData, { onConflict: 'id' })
         .select()
-        .single()
+        .maybeSingle()
       
       if (error) {
-        console.error('Erro ao criar perfil:', error)
+        console.error('Erro ao criar/atualizar perfil:', error)
         return null
       }
       
-      return data
+      return data || null
     } catch (error) {
       console.error('Erro ao criar perfil:', error)
       return null
@@ -156,10 +156,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setSession(session)
           
           // Buscar perfil do usuário
-          const userProfile = await fetchUserProfile(session.user.id)
-          if (userProfile) {
-            setProfile(userProfile)
+          let userProfile = await fetchUserProfile(session.user.id)
+          if (!userProfile) {
+            // criar perfil básico se não existir ainda
+            const defaultName = (session.user.user_metadata as any)?.name || 'Usuário'
+            userProfile = await createUserProfile(session.user, defaultName)
           }
+          if (userProfile) setProfile(userProfile)
         } else {
           setUser(null)
           setProfile(null)
@@ -199,17 +202,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (data.user) {
         console.log('Conta criada com sucesso:', data.user.email)
         
-        // Criar perfil na tabela profiles
-        const userProfile = await createUserProfile(data.user, name, phone)
-        
-        if (userProfile) {
-          setUser(data.user)
-          setSession(data.session)
-          setProfile(userProfile)
-          return { success: true }
-        } else {
-          return { success: false, error: 'Erro ao criar perfil do usuário' }
+        // Criar/obter perfil na tabela profiles (idempotente)
+        let userProfile = await createUserProfile(data.user, name, phone)
+        if (!userProfile) {
+          userProfile = await fetchUserProfile(data.user.id)
         }
+
+        setUser(data.user)
+        if (data.session) setSession(data.session)
+        if (userProfile) setProfile(userProfile)
+        return { success: true }
       }
 
       return { success: false, error: 'Erro desconhecido ao criar conta' }
@@ -244,10 +246,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setSession(data.session)
         
         // Buscar perfil do usuário
-        const userProfile = await fetchUserProfile(data.user.id)
-        if (userProfile) {
-          setProfile(userProfile)
+        let userProfile = await fetchUserProfile(data.user.id)
+        if (!userProfile) {
+          const defaultName = (data.user.user_metadata as any)?.name || 'Usuário'
+          userProfile = await createUserProfile(data.user, defaultName)
         }
+        if (userProfile) setProfile(userProfile)
         
         return { success: true }
       }
