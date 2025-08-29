@@ -10,16 +10,16 @@ export const Footer = () => {
       <div className="absolute top-4 sm:top-10 right-1/3 w-16 h-16 sm:w-24 sm:h-24 cookitie-blob-2 opacity-20"></div>
       
       <div className="relative z-10">
-        {/* Call-to-action flutuante - Mobile First */}
-        <div className="absolute -top-6 sm:-top-8 left-1/2 transform -translate-x-1/2 z-20 px-4">
-          <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-800 px-4 py-3 sm:px-8 sm:py-4 rounded-full shadow-lg max-w-xs sm:max-w-none">
-            <div className="flex items-center gap-2 sm:gap-3 text-center">
-              <span className="text-lg sm:text-2xl animate-bounce">🍪</span>
-              <div>
-                <p className="font-cookitie font-bold text-sm sm:text-base">Experimente nossos doces!</p>
-                <p className="text-xs sm:text-sm opacity-90 hidden sm:block">Feitos com amor pelos jovens da Cookitie</p>
+        {/* Call-to-action flutuante - Apenas Desktop */}
+        <div className="hidden lg:block absolute -top-8 left-1/2 transform -translate-x-1/2 z-20">
+          <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-800 px-8 py-4 rounded-full shadow-lg">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl animate-bounce">🍪</span>
+              <div className="text-center">
+                <p className="font-cookitie font-bold">Experimente nossos doces!</p>
+                <p className="text-sm opacity-90">Feitos com amor pelos jovens da Cookitie</p>
               </div>
-              <span className="text-lg sm:text-2xl animate-bounce" style={{ animationDelay: '0.5s' }}>✨</span>
+              <span className="text-2xl animate-bounce" style={{ animationDelay: '0.5s' }}>✨</span>
             </div>
           </div>
         </div>
