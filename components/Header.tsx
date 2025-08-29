@@ -1,4 +1,4 @@
-import { ShoppingCart, User, Package } from 'lucide-react'
+import { ShoppingCart, Package, Heart } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 
@@ -15,25 +15,36 @@ export const Header = ({ currentPage, onNavigate, onGoToCheckout, onGoToOrders, 
   const { totalItems, totalPrice } = useCart()
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-blue-100 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo Cookitie */}
           <div 
-            className="text-2xl font-bold text-purple-600 cursor-pointer"
+            className="flex items-center space-x-3 cursor-pointer group"
             onClick={() => onNavigate('products')}
           >
-            Cookitie JEPP
+            <div className="relative">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-200 to-yellow-200 rounded-2xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                <span className="text-2xl">🍪</span>
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-yellow-300 to-pink-300 rounded-full animate-pulse"></div>
+            </div>
+            <div>
+              <h1 className="font-cookitie text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent">
+                Cookitie
+              </h1>
+              <p className="text-xs text-gray-500 font-medium">Projeto JEPP</p>
+            </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
+          {/* Navigation Desktop */}
+          <nav className="hidden md:flex items-center space-x-2">
             <button
               onClick={() => onNavigate('products')}
-              className={`px-3 py-2 rounded-lg transition-colors ${
+              className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
                 currentPage === 'products' 
-                  ? 'bg-purple-100 text-purple-700' 
-                  : 'text-gray-600 hover:text-purple-600'
+                  ? 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 shadow-sm' 
+                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
               }`}
             >
               Produtos
@@ -42,39 +53,41 @@ export const Header = ({ currentPage, onNavigate, onGoToCheckout, onGoToOrders, 
             {isAuthenticated && (
               <button
                 onClick={onGoToOrders}
-                className={`px-3 py-2 rounded-lg transition-colors ${
+                className={`px-4 py-2 rounded-full font-medium transition-all duration-300 flex items-center gap-2 ${
                   currentPage === 'orders' 
-                    ? 'bg-purple-100 text-purple-700' 
-                    : 'text-gray-600 hover:text-purple-600'
+                    ? 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700 shadow-sm' 
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
                 }`}
               >
+                <Package size={16} />
                 Meus Pedidos
               </button>
             )}
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center space-x-4">
-            {/* Cart */}
+          <div className="flex items-center space-x-3">
+            {/* Cart Button */}
             <button
               onClick={() => onNavigate('cart')}
-              className="relative p-2 text-gray-600 hover:text-purple-600 transition-colors"
+              className="relative p-3 text-gray-600 hover:text-blue-600 transition-colors bg-white hover:bg-blue-50 rounded-2xl shadow-sm hover:shadow-md"
             >
-              <ShoppingCart size={24} />
+              <ShoppingCart size={20} />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-bounce">
                   {totalItems}
-                </span>
+                </div>
               )}
             </button>
 
             {/* Cart Total */}
             {totalItems > 0 && (
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 <button
                   onClick={onGoToCheckout}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                  className="btn-cookitie-secondary flex items-center gap-2 font-cookitie"
                 >
+                  <Heart size={16} className="text-red-400" />
                   R$ {totalPrice.toFixed(2)}
                 </button>
               </div>
@@ -83,24 +96,31 @@ export const Header = ({ currentPage, onNavigate, onGoToCheckout, onGoToOrders, 
             {/* User Menu */}
             {isAuthenticated ? (
               <div className="relative group">
-                <button className="flex items-center space-x-2 p-2 text-gray-600 hover:text-purple-600">
-                  <User size={20} />
-                  <span className="hidden md:block">{user?.name}</span>
+                <button className="flex items-center space-x-2 p-3 text-gray-600 hover:text-blue-600 bg-white hover:bg-blue-50 rounded-2xl shadow-sm hover:shadow-md transition-all">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
+                  <span className="hidden md:block font-medium font-cookitie">{user?.name}</span>
                 </button>
                 
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
                   <div className="py-2">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900 font-cookitie">Olá, {user?.name}! 👋</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                    </div>
                     <button
                       onClick={onGoToOrders}
-                      className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-50"
+                      className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                     >
                       <Package size={16} className="mr-2" />
                       Meus Pedidos
                     </button>
                     <button
                       onClick={signOut}
-                      className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-50"
+                      className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors"
                     >
+                      <span className="mr-2">👋</span>
                       Sair
                     </button>
                   </div>
@@ -109,14 +129,44 @@ export const Header = ({ currentPage, onNavigate, onGoToCheckout, onGoToOrders, 
             ) : (
               <button
                 onClick={onShowAuth}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                className="btn-cookitie-primary font-cookitie"
               >
-                Entrar
+                Entrar 🍪
               </button>
             )}
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isAuthenticated && (
+          <div className="md:hidden mt-4 flex justify-center space-x-4">
+            <button
+              onClick={() => onNavigate('products')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                currentPage === 'products' 
+                  ? 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700' 
+                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              Produtos
+            </button>
+            <button
+              onClick={onGoToOrders}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                currentPage === 'orders' 
+                  ? 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700' 
+                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              Meus Pedidos
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Elementos decorativos */}
+      <div className="absolute top-0 left-1/4 w-20 h-20 cookitie-blob pointer-events-none"></div>
+      <div className="absolute top-0 right-1/3 w-16 h-16 cookitie-blob-2 pointer-events-none"></div>
     </header>
   )
 }
