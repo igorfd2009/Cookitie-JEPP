@@ -7,6 +7,7 @@ import { Cart } from './components/Cart'
 import { Checkout } from './components/Checkout'
 import { MyOrders } from './components/MyOrders'
 import { AuthModal } from './components/AuthModal'
+import { Footer } from './components/Footer'
 import { useAuth } from './contexts/AuthContext'
 import { Toaster } from 'sonner'
 import './styles/globals.css'
@@ -62,6 +63,8 @@ function AppContent() {
       <main className="container mx-auto px-4 py-8">
         {renderPage()}
       </main>
+
+      <Footer />
 
       <AuthModal 
         isOpen={showAuthModal}
