@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 export const Header = ({ currentPage, onNavigate, onGoToCheckout, onGoToOrders, onShowAuth }: HeaderProps) => {
-  const { user, isAuthenticated, signOut } = useAuth()
+  const { user, profile, isAuthenticated, signOut } = useAuth()
   const { totalItems, totalPrice } = useCart()
 
   return (
@@ -98,15 +98,15 @@ export const Header = ({ currentPage, onNavigate, onGoToCheckout, onGoToOrders, 
               <div className="relative group">
                 <button className="flex items-center space-x-1 sm:space-x-2 p-2 sm:p-3 text-gray-600 hover:text-blue-600 bg-white hover:bg-blue-50 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-md transition-all">
                   <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm">
-                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                    {profile?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
-                  <span className="hidden lg:block font-medium font-cookitie text-sm">{user?.name}</span>
+                  <span className="hidden lg:block font-medium font-cookitie text-sm">{profile?.name || 'Usuário'}</span>
                 </button>
                 
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
                   <div className="py-2">
                     <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900 font-cookitie">Olá, {user?.name}! 👋</p>
+                      <p className="text-sm font-medium text-gray-900 font-cookitie">Olá, {profile?.name || 'Usuário'}! 👋</p>
                       <p className="text-xs text-gray-500">{user?.email}</p>
                     </div>
                     <button

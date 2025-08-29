@@ -58,6 +58,9 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           toast.error(result.error || 'Erro no cadastro')
         }
       }
+    } catch (error) {
+      console.error('Erro no formulário:', error)
+      toast.error('Erro inesperado. Tente novamente.')
     } finally {
       setLoading(false)
     }

@@ -1,125 +1,319 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { User, Session } from '@supabase/supabase-js'
+import { supabase } from '../lib/supabase'
 
-export interface User {
+interface UserProfile {
   id: string
   email: string
-  name: string
+  name?: string
   phone?: string
   created_at: string
+  updated_at: string
 }
 
 interface AuthContextType {
   user: User | null
-  isAuthenticated: boolean
+  profile: UserProfile | null
+  session: Session | null
   loading: boolean
+  isAuthenticated: boolean
   signUp: (email: string, password: string, name: string, phone?: string) => Promise<{ success: boolean; error?: string }>
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
-  signOut: () => void
+  signOut: () => Promise<void>
+  updateProfile: (updates: Partial<UserProfile>) => Promise<{ success: boolean; error?: string }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
 }
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+interface AuthProviderProps {
+  children: ReactNode
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Carregar usuário do localStorage na inicialização
+  // Função para buscar perfil do usuário
+  const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
+    if (!supabase) return null
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      
+      if (error) {
+        console.error('Erro ao buscar perfil:', error)
+        return null
+      }
+      
+      return data
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error)
+      return null
+    }
+  }
+
+  // Função para criar perfil do usuário
+  const createUserProfile = async (user: User, name: string, phone?: string): Promise<UserProfile | null> => {
+    if (!supabase) return null
+    
+    try {
+      const profileData = {
+        id: user.id,
+        email: user.email!,
+        name,
+        phone,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert(profileData)
+        .select()
+        .single()
+      
+      if (error) {
+        console.error('Erro ao criar perfil:', error)
+        return null
+      }
+      
+      return data
+    } catch (error) {
+      console.error('Erro ao criar perfil:', error)
+      return null
+    }
+  }
+
   useEffect(() => {
-    const savedUser = localStorage.getItem('cookitie_user')
-    if (savedUser) {
+    const getInitialSession = async () => {
+      if (!supabase) {
+        console.warn('Supabase não configurado. Verifique as variáveis de ambiente.')
+        setLoading(false)
+        return
+      }
+
       try {
-        setUser(JSON.parse(savedUser))
+        // Buscar sessão atual
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+          console.error('Erro ao buscar sessão:', error)
+          setLoading(false)
+          return
+        }
+
+        if (session?.user) {
+          console.log('Sessão encontrada:', session.user.email)
+          setUser(session.user)
+          setSession(session)
+          
+          // Buscar perfil do usuário
+          const userProfile = await fetchUserProfile(session.user.id)
+          if (userProfile) {
+            setProfile(userProfile)
+          }
+        }
       } catch (error) {
-        console.error('Erro ao carregar usuário:', error)
-        localStorage.removeItem('cookitie_user')
+        console.error('Erro ao inicializar sessão:', error)
+      } finally {
+        setLoading(false)
       }
     }
-    setLoading(false)
+
+    getInitialSession()
+
+    // Listener para mudanças de autenticação
+    if (supabase) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email)
+        
+        if (session?.user) {
+          setUser(session.user)
+          setSession(session)
+          
+          // Buscar perfil do usuário
+          const userProfile = await fetchUserProfile(session.user.id)
+          if (userProfile) {
+            setProfile(userProfile)
+          }
+        } else {
+          setUser(null)
+          setProfile(null)
+          setSession(null)
+        }
+      })
+
+      return () => subscription.unsubscribe()
+    }
   }, [])
 
   const signUp = async (email: string, password: string, name: string, phone?: string) => {
+    if (!supabase) {
+      return { success: false, error: 'Supabase não configurado. Verifique as variáveis de ambiente.' }
+    }
+
     try {
-      // Validações básicas
-      if (!email || !password || !name) {
-        return { success: false, error: 'Todos os campos são obrigatórios' }
-      }
-
-      if (password.length < 6) {
-        return { success: false, error: 'Senha deve ter pelo menos 6 caracteres' }
-      }
-
-      // Verificar se email já existe
-      const users = JSON.parse(localStorage.getItem('cookitie_users') || '[]')
-      if (users.find((u: User) => u.email === email)) {
-        return { success: false, error: 'Email já cadastrado' }
-      }
-
-      // Criar novo usuário
-      const newUser: User = {
-        id: `user_${Date.now()}`,
-        email,
-        name,
-        phone,
-        created_at: new Date().toISOString()
-      }
-
-      // Salvar no localStorage
-      users.push(newUser)
-      localStorage.setItem('cookitie_users', JSON.stringify(users))
-      localStorage.setItem('cookitie_user', JSON.stringify(newUser))
+      console.log('Tentando criar conta:', email)
       
-      setUser(newUser)
-      return { success: true }
+      // Criar conta no Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            phone
+          }
+        }
+      })
+
+      if (error) {
+        console.error('Erro no signup:', error)
+        return { success: false, error: error.message }
+      }
+
+      if (data.user) {
+        console.log('Conta criada com sucesso:', data.user.email)
+        
+        // Criar perfil na tabela profiles
+        const userProfile = await createUserProfile(data.user, name, phone)
+        
+        if (userProfile) {
+          setUser(data.user)
+          setSession(data.session)
+          setProfile(userProfile)
+          return { success: true }
+        } else {
+          return { success: false, error: 'Erro ao criar perfil do usuário' }
+        }
+      }
+
+      return { success: false, error: 'Erro desconhecido ao criar conta' }
     } catch (error) {
-      return { success: false, error: 'Erro interno no cadastro' }
+      console.error('Erro no signup:', error)
+      return { success: false, error: 'Erro inesperado ao criar conta' }
     }
   }
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) {
+      return { success: false, error: 'Supabase não configurado. Verifique as variáveis de ambiente.' }
+    }
+
     try {
-      // Validações básicas
-      if (!email || !password) {
-        return { success: false, error: 'Email e senha são obrigatórios' }
+      console.log('Tentando fazer login:', email)
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+
+      if (error) {
+        console.error('Erro no login:', error)
+        return { success: false, error: error.message }
       }
 
-      // Buscar usuário
-      const users = JSON.parse(localStorage.getItem('cookitie_users') || '[]')
-      const foundUser = users.find((u: User) => u.email === email)
-      
-      if (!foundUser) {
-        return { success: false, error: 'Email não encontrado' }
+      if (data.user && data.session) {
+        console.log('Login realizado com sucesso:', data.user.email)
+        
+        setUser(data.user)
+        setSession(data.session)
+        
+        // Buscar perfil do usuário
+        const userProfile = await fetchUserProfile(data.user.id)
+        if (userProfile) {
+          setProfile(userProfile)
+        }
+        
+        return { success: true }
       }
 
-      // Salvar sessão
-      localStorage.setItem('cookitie_user', JSON.stringify(foundUser))
-      setUser(foundUser)
-      
-      return { success: true }
+      return { success: false, error: 'Erro desconhecido no login' }
     } catch (error) {
-      return { success: false, error: 'Erro interno no login' }
+      console.error('Erro no login:', error)
+      return { success: false, error: 'Erro inesperado no login' }
     }
   }
 
-  const signOut = () => {
-    localStorage.removeItem('cookitie_user')
-    setUser(null)
+  const signOut = async () => {
+    if (!supabase) {
+      return
+    }
+
+    try {
+      console.log('Fazendo logout...')
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.error('Erro no logout:', error)
+      }
+      
+      // Limpar estado local
+      setUser(null)
+      setProfile(null)
+      setSession(null)
+    } catch (error) {
+      console.error('Erro no logout:', error)
+    }
   }
+
+  const updateProfile = async (updates: Partial<UserProfile>) => {
+    if (!supabase || !user) {
+      return { success: false, error: 'Usuário não autenticado ou Supabase não configurado' }
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+
+      if (error) {
+        console.error('Erro ao atualizar perfil:', error)
+        return { success: false, error: error.message }
+      }
+
+      // Atualizar estado local
+      if (profile) {
+        setProfile({ ...profile, ...updates, updated_at: new Date().toISOString() })
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error)
+      return { success: false, error: 'Erro inesperado ao atualizar perfil' }
+    }
+  }
+
+  const isAuthenticated = Boolean(user && session)
 
   const value: AuthContextType = {
     user,
-    isAuthenticated: !!user,
+    profile,
+    session,
     loading,
+    isAuthenticated,
     signUp,
     signIn,
-    signOut
+    signOut,
+    updateProfile,
   }
 
   return (

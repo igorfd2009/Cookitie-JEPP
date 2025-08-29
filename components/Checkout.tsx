@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { CreditCard, Copy, Check, ArrowLeft, Heart } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 import { toast } from 'sonner'
 import QRCode from 'qrcode'
 
@@ -27,7 +28,7 @@ interface Order {
 
 export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
   const { items, totalPrice, clearCart } = useCart()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [step, setStep] = useState<'review' | 'payment' | 'success'>('review')
   const [pixCode, setPixCode] = useState('')
   const [qrCodeDataURL, setQrCodeDataURL] = useState('')
@@ -136,7 +137,34 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
         createdAt: new Date().toISOString()
       }
 
-      // Salvar pedido no localStorage
+      // Salvar pedido no Supabase (se disponível)
+      if (supabase) {
+        try {
+          const { error } = await supabase
+            .from('orders')
+            .insert({
+              id: order.id,
+              user_id: order.userId,
+              items: order.items,
+              total: order.total,
+              status: order.status,
+              payment_method: order.paymentMethod,
+              pix_code: order.pixCode,
+              created_at: order.createdAt
+            })
+
+          if (error) {
+            console.error('Erro ao salvar pedido no Supabase:', error)
+            toast.error('Erro ao salvar pedido no servidor. Usando modo offline.')
+          } else {
+            console.log('Pedido salvo no Supabase com sucesso')
+          }
+        } catch (error) {
+          console.error('Erro ao salvar pedido no Supabase:', error)
+        }
+      }
+
+      // Sempre salvar no localStorage como backup
       const existingOrders = JSON.parse(localStorage.getItem('cookitie_orders') || '[]')
       existingOrders.push(order)
       localStorage.setItem('cookitie_orders', JSON.stringify(existingOrders))
@@ -158,23 +186,45 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
     }
   }
 
-  const handlePaymentConfirm = () => {
-    // Simular confirmação de pagamento
-    const orders = JSON.parse(localStorage.getItem('cookitie_orders') || '[]')
-    const updatedOrders = orders.map((order: Order) => 
-      order.pixCode === pixCode ? { ...order, status: 'paid' } : order
-    )
-    localStorage.setItem('cookitie_orders', JSON.stringify(updatedOrders))
+  const handlePaymentConfirm = async () => {
+    try {
+      // Atualizar no Supabase (se disponível)
+      if (supabase) {
+        const { error } = await supabase
+          .from('orders')
+          .update({ 
+            status: 'paid',
+            updated_at: new Date().toISOString()
+          })
+          .eq('pix_code', pixCode)
 
-    clearCart()
-    setStep('success')
-    toast.success('Pagamento confirmado! Obrigado por escolher a Cookitie! 🎉', {
-      style: {
-        background: 'linear-gradient(135deg, #dcfce7 0%, #fff5b8 100%)',
-        border: '1px solid #bbf7d0',
-        color: '#374151'
+        if (error) {
+          console.error('Erro ao confirmar pagamento no Supabase:', error)
+        } else {
+          console.log('Pagamento confirmado no Supabase')
+        }
       }
-    })
+
+      // Atualizar localStorage como backup
+      const orders = JSON.parse(localStorage.getItem('cookitie_orders') || '[]')
+      const updatedOrders = orders.map((order: Order) => 
+        order.pixCode === pixCode ? { ...order, status: 'paid' } : order
+      )
+      localStorage.setItem('cookitie_orders', JSON.stringify(updatedOrders))
+
+      clearCart()
+      setStep('success')
+      toast.success('Pagamento confirmado! Obrigado por escolher a Cookitie! 🎉', {
+        style: {
+          background: 'linear-gradient(135deg, #dcfce7 0%, #fff5b8 100%)',
+          border: '1px solid #bbf7d0',
+          color: '#374151'
+        }
+      })
+    } catch (error) {
+      console.error('Erro ao confirmar pagamento:', error)
+      toast.error('Erro ao confirmar pagamento. Tente novamente.')
+    }
   }
 
   const copyPixCode = () => {
@@ -351,16 +401,16 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
         <div className="space-y-3">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
-            <p className="text-sm sm:text-base"><strong>Nome:</strong> {user?.name}</p>
+            <p className="text-sm sm:text-base"><strong>Nome:</strong> {profile?.name || 'Não informado'}</p>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
             <p className="text-sm sm:text-base break-all"><strong>Email:</strong> {user?.email}</p>
           </div>
-          {user?.phone && (
+          {profile?.phone && (
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0"></div>
-              <p className="text-sm sm:text-base"><strong>Telefone:</strong> {user.phone}</p>
+              <p className="text-sm sm:text-base"><strong>Telefone:</strong> {profile.phone}</p>
             </div>
           )}
         </div>
