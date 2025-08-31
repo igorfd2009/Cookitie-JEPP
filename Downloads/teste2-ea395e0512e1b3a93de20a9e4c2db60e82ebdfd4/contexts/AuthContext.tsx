@@ -163,9 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setSession(null)
         } else if (event === 'TOKEN_REFRESHED') {
           setSession(session)
-        } else if (event === 'TOKEN_REFRESHED_FAILED') {
-          console.error('Falha ao renovar token JWT')
-          // Limpar dados da sessão
+        } else if (!session?.user) {
           setUser(null)
           setProfile(null)
           setSession(null)
@@ -181,81 +179,94 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [supabaseAvailable])
 
   const signUp = async (email: string, password: string, name: string, phone?: string) => {
-    // Temporariamente usar modo offline para signup
-    console.log('Usando autenticação offline para signup (temporário)')
-    return await offlineAuth.signUp(email, password, name, phone)
-    
-    // Código original comentado temporariamente
-    /*
-    if (!supabaseAvailable) {
-      // Usar autenticação offline
-      console.log('Usando autenticação offline para signup')
-      return await offlineAuth.signUp(email, password, name, phone)
-    }
-    */
-
-    try {
-      console.log('Tentando criar conta:', email)
-      
-      // Criar conta no Supabase Auth
-      const { data, error } = await supabase!.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            phone
+    // Primeiro tentar signup online
+    if (supabaseAvailable) {
+      console.log('Tentando signup online primeiro')
+      try {
+        console.log('Tentando criar conta online:', email)
+        
+        // Criar conta no Supabase Auth
+        const { data, error } = await supabase!.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name,
+              phone
+            }
           }
+        })
+
+        if (error) {
+          console.error('Erro no signup online:', error)
+          // Se falhou online, usar offline
+          console.log('Signup online falhou, usando offline')
+          return await offlineAuth.signUp(email, password, name, phone)
         }
-      })
 
-      if (error) {
-        console.error('Erro no signup:', error)
-        return { success: false, error: error.message }
-      }
-
-      if (data.user) {
-        console.log('Conta criada com sucesso:', data.user.email)
-        
-        // Definir usuário e sessão imediatamente
-        setUser(data.user)
-        setSession(data.session)
-        
-        // Criar perfil manualmente (sem depender do trigger)
-        try {
-          console.log('Criando perfil manualmente para:', data.user.email)
-          const userProfile = await createUserProfile(data.user, name, phone)
+        if (data.user) {
+          console.log('Conta criada online com sucesso:', data.user.email)
           
-          if (userProfile) {
-            console.log('Perfil criado com sucesso')
-            setProfile(userProfile)
-          } else {
-            console.warn('Não foi possível criar o perfil, mas o signup foi bem-sucedido')
+          // Definir usuário e sessão imediatamente
+          setUser(data.user)
+          setSession(data.session)
+          
+          // Criar perfil manualmente
+          try {
+            console.log('Criando perfil online para:', data.user.email)
+            const userProfile = await createUserProfile(data.user, name, phone)
+            
+            if (userProfile) {
+              console.log('Perfil criado online com sucesso')
+              setProfile(userProfile)
+            } else {
+              console.warn('Não foi possível criar o perfil online')
+            }
+          } catch (profileError) {
+            console.warn('Erro ao criar perfil online (não crítico):', profileError)
           }
-        } catch (profileError) {
-          console.warn('Erro ao criar perfil (não crítico):', profileError)
-          // Não falhar o signup por causa do perfil
+          
+          return { success: true }
         }
-        
-        return { success: true }
+      } catch (error) {
+        console.error('Erro no signup online:', error)
+        // Se falhou online, usar offline
+        console.log('Signup online falhou, usando offline')
+        return await offlineAuth.signUp(email, password, name, phone)
       }
-
-      return { success: false, error: 'Erro desconhecido ao criar conta' }
-    } catch (error) {
-      console.error('Erro no signup:', error)
-      return { success: false, error: 'Erro inesperado ao criar conta' }
     }
+    
+    // Se não há Supabase ou falhou, usar offline
+    console.log('Usando signup offline')
+    return await offlineAuth.signUp(email, password, name, phone)
   }
 
   const signIn = async (email: string, password: string) => {
+    // Primeiro tentar login offline (para contas criadas offline)
+    console.log('Tentando login offline primeiro')
+    const offlineResult = await offlineAuth.signIn(email, password)
+    
+    if (offlineResult.success) {
+      console.log('Login offline bem-sucedido')
+      return offlineResult
+    }
+    
+    // Se não funcionou offline, tentar online
+    if (supabaseAvailable) {
+      console.log('Tentando login online')
+      return await signInOnline(email, password)
+    }
+    
+    return { success: false, error: 'Credenciais inválidas' }
+  }
+
+  const signInOnline = async (email: string, password: string) => {
     if (!supabaseAvailable) {
-      // Usar autenticação offline
-      console.log('Usando autenticação offline para signin')
-      return await offlineAuth.signIn(email, password)
+      return { success: false, error: 'Supabase não disponível' }
     }
 
     try {
-      console.log('Tentando fazer login:', email)
+      console.log('Tentando fazer login online:', email)
       
       const { data, error } = await supabase!.auth.signInWithPassword({
         email,
@@ -263,12 +274,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       })
 
       if (error) {
-        console.error('Erro no login:', error)
+        console.error('Erro no login online:', error)
         return { success: false, error: error.message }
       }
 
       if (data.user && data.session) {
-        console.log('Login realizado com sucesso:', data.user.email)
+        console.log('Login online realizado com sucesso:', data.user.email)
         
         setUser(data.user)
         setSession(data.session)
@@ -282,10 +293,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return { success: true }
       }
 
-      return { success: false, error: 'Erro desconhecido no login' }
+      return { success: false, error: 'Erro desconhecido no login online' }
     } catch (error) {
-      console.error('Erro no login:', error)
-      return { success: false, error: 'Erro inesperado no login' }
+      console.error('Erro no login online:', error)
+      return { success: false, error: 'Erro inesperado no login online' }
     }
   }
 
