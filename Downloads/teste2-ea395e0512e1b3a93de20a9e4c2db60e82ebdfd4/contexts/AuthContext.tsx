@@ -255,18 +255,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signIn = async (email: string, password: string) => {
-    // Primeiro tentar login online (para sincronização)
+    // Verificar se a conta existe no Supabase antes de tentar login online
     if (supabaseAvailable) {
-      console.log('Tentando login online primeiro...')
-      const onlineResult = await signInOnline(email, password)
-      if (onlineResult.success) {
-        console.log('Login online realizado com sucesso')
-        return onlineResult
+      console.log('Verificando se conta existe no Supabase:', email)
+      try {
+        const { data: existingUser } = await supabase!
+          .from('profiles')
+          .select('email')
+          .eq('email', email)
+          .single()
+        
+        if (existingUser) {
+          console.log('Conta encontrada no Supabase, tentando login online...')
+          const onlineResult = await signInOnline(email, password)
+          if (onlineResult.success) {
+            console.log('Login online realizado com sucesso')
+            return onlineResult
+          }
+        } else {
+          console.log('Conta não encontrada no Supabase, tentando login offline...')
+        }
+      } catch (error) {
+        console.log('Erro ao verificar conta no Supabase, tentando login offline...')
       }
     }
     
-    // Se online falhou, tentar offline
-    console.log('Login online falhou, tentando offline...')
+    // Se online falhou ou conta não existe, tentar offline
+    console.log('Tentando login offline...')
     const offlineResult = await offlineAuth.signIn(email, password)
     
     if (offlineResult.success) {
