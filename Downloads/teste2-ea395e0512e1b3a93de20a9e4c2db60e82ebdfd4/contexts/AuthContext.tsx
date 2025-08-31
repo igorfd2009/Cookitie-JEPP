@@ -167,10 +167,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(null)
           setProfile(null)
           setSession(null)
-        } else if (!session?.user) {
-          setUser(null)
-          setProfile(null)
-          setSession(null)
         }
       })
 
@@ -184,6 +180,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log('Tentando signup online primeiro')
       try {
         console.log('Tentando criar conta online:', email)
+        
+        // Verificar se email já existe
+        try {
+          const { data: existingUser } = await supabase!
+            .from('profiles')
+            .select('email')
+            .eq('email', email)
+            .single()
+          
+          if (existingUser) {
+            console.error('Email já cadastrado:', email)
+            return { success: false, error: 'Email já cadastrado' }
+          }
+        } catch (error) {
+          // Email não existe, pode continuar
+          console.log('Email disponível para cadastro')
+        }
         
         // Criar conta no Supabase Auth
         const { data, error } = await supabase!.auth.signUp({
@@ -242,22 +255,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signIn = async (email: string, password: string) => {
-    // Primeiro verificar se a conta existe offline
-    console.log('Verificando se conta existe offline...')
+    // Primeiro tentar login online (para sincronização)
+    if (supabaseAvailable) {
+      console.log('Tentando login online primeiro...')
+      const onlineResult = await signInOnline(email, password)
+      if (onlineResult.success) {
+        console.log('Login online realizado com sucesso')
+        return onlineResult
+      }
+    }
+    
+    // Se online falhou, tentar offline
+    console.log('Login online falhou, tentando offline...')
     const offlineResult = await offlineAuth.signIn(email, password)
     
     if (offlineResult.success) {
-      console.log('Conta encontrada offline, login realizado')
+      console.log('Login offline realizado com sucesso')
       return offlineResult
-    }
-    
-    // Se não existe offline, tentar online
-    if (supabaseAvailable) {
-      console.log('Conta não encontrada offline, tentando online')
-      const onlineResult = await signInOnline(email, password)
-      if (onlineResult.success) {
-        return onlineResult
-      }
     }
     
     return { success: false, error: 'Credenciais inválidas' }
@@ -306,27 +320,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signOut = async () => {
     console.log('Fazendo logout...')
     
-    if (!supabaseAvailable) {
-      // Usar autenticação offline
-      console.log('Usando logout offline')
-      await offlineAuth.signOut()
-    } else {
+    // Limpar Supabase (se disponível)
+    if (supabaseAvailable) {
       try {
         const { error } = await supabase!.auth.signOut()
         if (error) {
-          console.error('Erro no logout:', error)
+          console.error('Erro no logout Supabase:', error)
         }
       } catch (error) {
-        console.error('Erro no logout:', error)
+        console.error('Erro no logout Supabase:', error)
       }
     }
     
-    // Limpar estado local independente do modo
+    // Limpar autenticação offline
+    try {
+      await offlineAuth.signOut()
+    } catch (error) {
+      console.error('Erro no logout offline:', error)
+    }
+    
+    // Limpar localStorage
+    try {
+      localStorage.removeItem('cookitie_user')
+      localStorage.removeItem('cookitie_cart')
+      localStorage.removeItem('supabase-auth-token')
+    } catch (error) {
+      console.error('Erro ao limpar localStorage:', error)
+    }
+    
+    // Limpar estados locais
     setUser(null)
     setProfile(null)
     setSession(null)
     
-    console.log('Logout concluído')
+    console.log('Logout completo realizado')
   }
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
@@ -366,12 +393,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
+  // Garantir que profile sempre existe (online ou offline)
+  const getCurrentProfile = (): UserProfile | null => {
+    if (supabaseAvailable && profile) {
+      return profile
+    }
+    
+    if (offlineAuth.user) {
+      return {
+        id: offlineAuth.user.id,
+        email: offlineAuth.user.email,
+        name: offlineAuth.user.name,
+        phone: offlineAuth.user.phone,
+        created_at: offlineAuth.user.created_at,
+        updated_at: offlineAuth.user.updated_at
+      }
+    }
+    
+    return null
+  }
+
   const isAuthenticated = supabaseAvailable ? Boolean(user && session) : Boolean(offlineAuth.user)
   const isLoading = supabaseAvailable ? loading : offlineAuth.loading
+  const currentProfile = getCurrentProfile()
 
   const value: AuthContextType = {
     user: supabaseAvailable ? user : offlineAuth.user,
-    profile,
+    profile: currentProfile,
     session,
     loading: isLoading,
     isAuthenticated,
