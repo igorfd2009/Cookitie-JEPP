@@ -271,6 +271,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     if (offlineResult.success) {
       console.log('Login offline realizado com sucesso')
+      
+      // ✅ ATUALIZAR ESTADOS LOCAIS após login offline
+      if (offlineAuth.user) {
+        // Usar 'any' para compatibilidade entre tipos online/offline
+        setUser(offlineAuth.user as any)
+        setProfile({
+          id: offlineAuth.user.id,
+          email: offlineAuth.user.email,
+          name: offlineAuth.user.name,
+          phone: offlineAuth.user.phone,
+          created_at: offlineAuth.user.created_at,
+          updated_at: offlineAuth.user.updated_at
+        })
+        console.log('Estados locais atualizados após login offline')
+      }
+      
       return offlineResult
     }
     
