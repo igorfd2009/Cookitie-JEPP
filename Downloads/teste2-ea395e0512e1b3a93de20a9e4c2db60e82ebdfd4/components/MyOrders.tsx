@@ -1,100 +1,14 @@
-import { useState, useEffect } from 'react'
-import { Package, Clock, CheckCircle, XCircle, ArrowLeft } from 'lucide-react'
+import { Package, Clock, CheckCircle, XCircle, ArrowLeft, BarChart3 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
-
-interface OrderItem {
-  id: string
-  name: string
-  price: number
-  quantity: number
-}
-
-interface Order {
-  id: string
-  user_id: string
-  items: OrderItem[]
-  total: number
-  status: 'pending' | 'paid' | 'preparing' | 'ready' | 'completed'
-  payment_method: string
-  pix_code?: string
-  created_at: string
-  updated_at?: string
-}
+import { useOrders, Order } from '../hooks/useOrders'
 
 interface MyOrdersProps {
   onBackToProducts: () => void
 }
 
 export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
-  const { user, isAuthenticated, loading: authLoading } = useAuth()
-  const [orders, setOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!isAuthenticated || !user) {
-        setOrders([])
-        setLoading(false)
-        return
-      }
-
-      setLoading(true)
-      setError(null)
-
-      try {
-        if (supabase) {
-          // Buscar pedidos no Supabase
-          console.log('Buscando pedidos do usuário:', user.id)
-          
-          const { data, error: supabaseError } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-
-          if (supabaseError) {
-            console.error('Erro ao buscar pedidos no Supabase:', supabaseError)
-            setError('Erro ao carregar pedidos do servidor')
-          } else {
-            console.log('Pedidos encontrados no Supabase:', data?.length || 0)
-            setOrders(data || [])
-            
-            // Salvar no localStorage como backup (mesmo se vazio)
-            localStorage.setItem(`user_orders_${user.id}`, JSON.stringify(data || []))
-          }
-        } else {
-          console.log('Supabase não configurado, buscando no localStorage')
-          // Fallback para localStorage se Supabase não estiver configurado
-          const storedOrders = localStorage.getItem(`user_orders_${user.id}`)
-          if (storedOrders) {
-            const parsedOrders = JSON.parse(storedOrders)
-            setOrders(parsedOrders)
-          }
-        }
-      } catch (error) {
-        console.error('Erro ao buscar pedidos:', error)
-        setError('Erro inesperado ao carregar pedidos')
-        
-        // Tentar carregar do localStorage como fallback
-        try {
-          const storedOrders = localStorage.getItem(`user_orders_${user.id}`)
-          if (storedOrders) {
-            const parsedOrders = JSON.parse(storedOrders)
-            setOrders(parsedOrders)
-            setError(null) // Limpar erro se conseguiu carregar do localStorage
-          }
-        } catch (localError) {
-          console.error('Erro ao carregar do localStorage:', localError)
-        }
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchOrders()
-  }, [isAuthenticated, user])
+  const { isAuthenticated, loading: authLoading } = useAuth()
+  const { orders, loading, getOrderStats } = useOrders()
 
   const getStatusInfo = (status: Order['status']) => {
     switch (status) {
@@ -170,25 +84,7 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
     )
   }
 
-  if (error) {
-    return (
-      <div className="text-center py-16 px-4">
-        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <XCircle size={40} className="text-red-500" />
-        </div>
-        <h2 className="font-cookitie text-2xl font-bold text-gray-900 mb-3">
-          Erro ao carregar pedidos
-        </h2>
-        <p className="text-red-600 mb-6">{error}</p>
-        <button
-          onClick={onBackToProducts}
-          className="btn-cookitie-primary py-3 px-6 font-cookitie"
-        >
-          Voltar para Produtos
-        </button>
-      </div>
-    )
-  }
+
 
   if (orders.length === 0) {
     return (
@@ -212,6 +108,8 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
     )
   }
 
+  const stats = getOrderStats()
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 px-4">
       <div className="flex items-center justify-between">
@@ -233,6 +131,40 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
         </button>
       </div>
 
+      {/* Estatísticas dos Pedidos */}
+      <div className="cookitie-card p-4 sm:p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="text-blue-500" size={20} />
+          <h2 className="font-cookitie text-lg font-bold text-gray-900">
+            📊 Estatísticas dos Pedidos
+          </h2>
+        </div>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="text-center p-3 bg-blue-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">{stats.totalOrders}</div>
+            <div className="text-sm text-gray-600">Total de Pedidos</div>
+          </div>
+          
+          <div className="text-center p-3 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">
+              R$ {stats.totalSpent.toFixed(2)}
+            </div>
+            <div className="text-sm text-gray-600">Total Gasto</div>
+          </div>
+          
+          <div className="text-center p-3 bg-yellow-50 rounded-lg">
+            <div className="text-2xl font-bold text-yellow-600">{stats.pendingOrders}</div>
+            <div className="text-sm text-gray-600">Aguardando</div>
+          </div>
+          
+          <div className="text-center p-3 bg-purple-50 rounded-lg">
+            <div className="text-2xl font-bold text-purple-600">{stats.completedOrders}</div>
+            <div className="text-sm text-gray-600">Concluídos</div>
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-4">
         {orders.map((order) => {
           const statusInfo = getStatusInfo(order.status)
@@ -246,7 +178,7 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
                     Pedido #{order.id.slice(-8).toUpperCase()}
                   </h3>
                   <p className="text-sm text-gray-500">
-                    {new Date(order.created_at).toLocaleDateString('pt-BR', {
+                    {new Date(order.createdAt).toLocaleDateString('pt-BR', {
                       day: '2-digit',
                       month: '2-digit',
                       year: 'numeric',
@@ -284,7 +216,7 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
                 </span>
               </div>
 
-              {order.status === 'pending' && order.pix_code && (
+              {order.status === 'pending' && order.pixCode && (
                 <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
                   <p className="text-sm text-yellow-800">
                     <strong>⏰ Aguardando pagamento:</strong> Use o código PIX gerado para finalizar seu pedido.

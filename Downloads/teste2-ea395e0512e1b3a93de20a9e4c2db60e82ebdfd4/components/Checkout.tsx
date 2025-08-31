@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CreditCard, Copy, Check, ArrowLeft, Heart } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
+import { useOrders } from '../hooks/useOrders'
 import { toast } from 'sonner'
 import QRCode from 'qrcode'
 
@@ -10,25 +10,12 @@ interface CheckoutProps {
   onOrderComplete: () => void
 }
 
-interface Order {
-  id: string
-  userId: string
-  items: Array<{
-    id: string
-    name: string
-    price: number
-    quantity: number
-  }>
-  total: number
-  status: 'pending' | 'paid' | 'preparing' | 'ready' | 'completed'
-  paymentMethod: 'pix'
-  pixCode?: string
-  createdAt: string
-}
+import { Order } from '../hooks/useOrders'
 
 export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
   const { items, totalPrice, clearCart } = useCart()
   const { user, profile } = useAuth()
+  const { createOrder, updateOrderStatus } = useOrders()
   const [step, setStep] = useState<'review' | 'payment' | 'success'>('review')
   const [pixCode, setPixCode] = useState('')
   const [qrCodeDataURL, setQrCodeDataURL] = useState('')
@@ -121,9 +108,8 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
         width: 256,
       })
 
-      const order: Order = {
-        id: `cookitie_${Date.now()}`,
-        userId: user.id,
+      // Criar pedido usando o hook
+      await createOrder({
         items: items.map(item => ({
           id: item.id,
           name: item.name,
@@ -133,41 +119,8 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
         total: totalPrice,
         status: 'pending',
         paymentMethod: 'pix',
-        pixCode,
-        createdAt: new Date().toISOString()
-      }
-
-      // Salvar pedido no Supabase (se disponível)
-      if (supabase) {
-        try {
-          const { error } = await supabase
-            .from('orders')
-            .insert({
-              id: order.id,
-              user_id: order.userId,
-              items: order.items,
-              total: order.total,
-              status: order.status,
-              payment_method: order.paymentMethod,
-              pix_code: order.pixCode,
-              created_at: order.createdAt
-            })
-
-          if (error) {
-            console.error('Erro ao salvar pedido no Supabase:', error)
-            toast.error('Erro ao salvar pedido no servidor. Usando modo offline.')
-          } else {
-            console.log('Pedido salvo no Supabase com sucesso')
-          }
-        } catch (error) {
-          console.error('Erro ao salvar pedido no Supabase:', error)
-        }
-      }
-
-      // Sempre salvar no localStorage como backup
-      const existingOrders = JSON.parse(localStorage.getItem('cookitie_orders') || '[]')
-      existingOrders.push(order)
-      localStorage.setItem('cookitie_orders', JSON.stringify(existingOrders))
+        pixCode
+      })
 
       setPixCode(pixCode)
       setQrCodeDataURL(qrCodeDataURL)
@@ -188,29 +141,13 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
 
   const handlePaymentConfirm = async () => {
     try {
-      // Atualizar no Supabase (se disponível)
-      if (supabase) {
-        const { error } = await supabase
-          .from('orders')
-          .update({ 
-            status: 'paid',
-            updated_at: new Date().toISOString()
-          })
-          .eq('pix_code', pixCode)
-
-        if (error) {
-          console.error('Erro ao confirmar pagamento no Supabase:', error)
-        } else {
-          console.log('Pagamento confirmado no Supabase')
-        }
+      // Encontrar o pedido pelo código PIX
+      const allOrders = JSON.parse(localStorage.getItem('cookitie_orders') || '[]')
+      const order = allOrders.find((o: Order) => o.pixCode === pixCode)
+      
+      if (order) {
+        await updateOrderStatus(order.id, 'paid')
       }
-
-      // Atualizar localStorage como backup
-      const orders = JSON.parse(localStorage.getItem('cookitie_orders') || '[]')
-      const updatedOrders = orders.map((order: Order) => 
-        order.pixCode === pixCode ? { ...order, status: 'paid' } : order
-      )
-      localStorage.setItem('cookitie_orders', JSON.stringify(updatedOrders))
 
       clearCart()
       setStep('success')
