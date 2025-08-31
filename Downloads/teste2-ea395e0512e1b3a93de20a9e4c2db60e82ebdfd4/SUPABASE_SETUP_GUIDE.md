@@ -179,3 +179,4 @@ Após configurar o Supabase:
 
 Se precisar de ajuda, verifique os logs no console do navegador!
 
+
