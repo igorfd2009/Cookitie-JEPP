@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
 import { Header } from './components/Header'
@@ -6,6 +6,7 @@ import { Products } from './components/Products'
 import { Cart } from './components/Cart'
 import { Checkout } from './components/Checkout'
 import { MyOrders } from './components/MyOrders'
+import { Admin } from './components/Admin'
 import { AuthModal } from './components/AuthModal'
 import { Footer } from './components/Footer'
 import { DebugPanel } from './components/DebugPanel'
@@ -13,12 +14,24 @@ import { useAuth } from './contexts/AuthContext'
 import { Toaster } from 'sonner'
 import './styles/globals.css'
 
-type Page = 'products' | 'cart' | 'checkout' | 'orders'
+type Page = 'products' | 'cart' | 'checkout' | 'orders' | 'admin'
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>('products')
   const [showAuthModal, setShowAuthModal] = useState(false)
   const { isAuthenticated } = useAuth()
+
+  // Verificar se é rota de admin
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const isAdmin = urlParams.get('admin') === 'true' || 
+                   window.location.pathname.includes('/admin') ||
+                   window.location.hash.includes('admin')
+    
+    if (isAdmin) {
+      setCurrentPage('admin')
+    }
+  }, [])
 
   const handleGoToCheckout = () => {
     console.log('Tentando ir para checkout, autenticado:', isAuthenticated)
@@ -51,7 +64,9 @@ function AppContent() {
       case 'checkout':
         return <Checkout onOrderComplete={() => setCurrentPage('orders')} />
       case 'orders':
-        return <MyOrders />
+        return <MyOrders onBackToProducts={() => setCurrentPage('products')} />
+      case 'admin':
+        return <Admin onBackToProducts={() => setCurrentPage('products')} />
       default:
         return <Products />
     }
@@ -59,19 +74,21 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
-        currentPage={currentPage}
-        onNavigate={setCurrentPage}
-        onGoToCheckout={handleGoToCheckout}
-        onGoToOrders={handleGoToOrders}
-        onShowAuth={() => setShowAuthModal(true)}
-      />
+      {currentPage !== 'admin' && (
+        <Header 
+          currentPage={currentPage}
+          onNavigate={setCurrentPage}
+          onGoToCheckout={handleGoToCheckout}
+          onGoToOrders={handleGoToOrders}
+          onShowAuth={() => setShowAuthModal(true)}
+        />
+      )}
       
       <main className="container mx-auto px-4 py-8">
         {renderPage()}
       </main>
 
-      <Footer />
+      {currentPage !== 'admin' && <Footer />}
 
       <AuthModal 
         isOpen={showAuthModal}
