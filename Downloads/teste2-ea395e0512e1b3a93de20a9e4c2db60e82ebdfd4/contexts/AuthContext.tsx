@@ -242,22 +242,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   const signIn = async (email: string, password: string) => {
-    // Primeiro tentar login online (para contas criadas online)
+    // Primeiro verificar se a conta existe offline
+    console.log('Verificando se conta existe offline...')
+    const offlineResult = await offlineAuth.signIn(email, password)
+    
+    if (offlineResult.success) {
+      console.log('Conta encontrada offline, login realizado')
+      return offlineResult
+    }
+    
+    // Se não existe offline, tentar online
     if (supabaseAvailable) {
-      console.log('Tentando login online primeiro')
+      console.log('Conta não encontrada offline, tentando online')
       const onlineResult = await signInOnline(email, password)
       if (onlineResult.success) {
         return onlineResult
       }
-    }
-    
-    // Se não funcionou online, tentar offline
-    console.log('Tentando login offline')
-    const offlineResult = await offlineAuth.signIn(email, password)
-    
-    if (offlineResult.success) {
-      console.log('Login offline bem-sucedido')
-      return offlineResult
     }
     
     return { success: false, error: 'Credenciais inválidas' }
