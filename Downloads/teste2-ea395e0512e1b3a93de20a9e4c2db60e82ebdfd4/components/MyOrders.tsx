@@ -1,6 +1,7 @@
-import { Package, Clock, CheckCircle, XCircle, ArrowLeft, BarChart3 } from 'lucide-react'
+import { Package, Clock, CheckCircle, XCircle, ArrowLeft, BarChart3, RefreshCw } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useOrders, Order } from '../hooks/useOrders'
+import { SyncStatus } from './SyncStatus'
 
 interface MyOrdersProps {
   onBackToProducts: () => void
@@ -8,7 +9,7 @@ interface MyOrdersProps {
 
 export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
   const { isAuthenticated, loading: authLoading } = useAuth()
-  const { orders, loading, getOrderStats } = useOrders()
+  const { orders, loading, getOrderStats, syncOrders, syncing } = useOrders()
 
   const getStatusInfo = (status: Order['status']) => {
     switch (status) {
@@ -117,18 +118,31 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
           <h1 className="font-cookitie text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             📦 Meus Pedidos
           </h1>
-          <p className="text-gray-600">
-            {orders.length} {orders.length === 1 ? 'pedido encontrado' : 'pedidos encontrados'}
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-gray-600">
+              {orders.length} {orders.length === 1 ? 'pedido encontrado' : 'pedidos encontrados'}
+            </p>
+            <SyncStatus />
+          </div>
         </div>
-        <button
-          onClick={onBackToProducts}
-          className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-        >
-          <ArrowLeft size={16} />
-          <span className="hidden sm:inline">Voltar para Produtos</span>
-          <span className="sm:hidden">Voltar</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={syncOrders}
+            disabled={syncing}
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} />
+            <span className="hidden sm:inline">Sincronizar</span>
+          </button>
+          <button
+            onClick={onBackToProducts}
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            <ArrowLeft size={16} />
+            <span className="hidden sm:inline">Voltar para Produtos</span>
+            <span className="sm:hidden">Voltar</span>
+          </button>
+        </div>
       </div>
 
       {/* Estatísticas dos Pedidos */}
