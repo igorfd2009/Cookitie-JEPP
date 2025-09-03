@@ -1,0 +1,25 @@
+/// <reference path="../pb_data/types.d.ts" />
+migrate((db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("js4svdif0pl6b39")
+
+  // Abrir regras para ambiente de desenvolvimento (sem autenticação PocketBase)
+  collection.listRule = ""
+  collection.viewRule = ""
+  collection.createRule = ""
+  collection.updateRule = ""
+  // deleteRule permanece como está por segurança
+
+  return dao.saveCollection(collection)
+}, (db) => {
+  const dao = new Dao(db)
+  const collection = dao.findCollectionByNameOrId("js4svdif0pl6b39")
+
+  // Reverter para exigir autenticação
+  collection.listRule = "@request.auth.id != \"\"\n"
+  collection.viewRule = "@request.auth.id != \"\"\n"
+  collection.createRule = "@request.auth.id != \"\"\n"
+  collection.updateRule = "@request.auth.id != \"\"\n"
+
+  return dao.saveCollection(collection)
+})
