@@ -5,7 +5,6 @@ import { useCart } from '../contexts/CartContext'
 interface HeaderProps {
   currentPage: string
   onNavigate: (page: 'products' | 'cart' | 'checkout' | 'orders') => void
-  onGoToCheckout: () => void
   onGoToOrders: () => void
   onShowAuth: () => void
 }

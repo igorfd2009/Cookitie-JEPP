@@ -1,6 +1,5 @@
 import { Package, Clock, CheckCircle, XCircle, ArrowLeft, BarChart3, RefreshCw } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-// import { useOrders, Order } from '../hooks/useOrders'
 import { usePocketBaseOrders as useOrders, Order } from '../hooks/usePocketBaseOrders'
 import { SyncStatus } from './SyncStatus'
 
@@ -67,7 +66,7 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
   if (!isAuthenticated) {
     return (
       <div className="text-center py-16 px-4">
-        <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to.yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <Package size={40} className="text-blue-400" />
         </div>
         <h2 className="font-cookitie text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
@@ -86,12 +85,10 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
     )
   }
 
-
-
   if (orders.length === 0) {
     return (
       <div className="text-center py-16 px-4">
-        <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to.yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <Package size={40} className="text-blue-400" />
         </div>
         <h2 className="font-cookitie text-2xl sm:text-3xl font-bold text-gray-900 mb-3">

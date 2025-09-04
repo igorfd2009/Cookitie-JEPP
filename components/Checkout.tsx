@@ -2,15 +2,13 @@ import { useState } from 'react'
 import { CreditCard, Copy, Check, ArrowLeft, Heart } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
-import { usePocketBaseOrders as useOrders } from '../hooks/usePocketBaseOrders'
+import { usePocketBaseOrders as useOrders, Order } from '../hooks/usePocketBaseOrders'
 import { toast } from 'sonner'
 import QRCode from 'qrcode'
 
 interface CheckoutProps {
   onOrderComplete: () => void
 }
-
-import { Order } from '../hooks/usePocketBaseOrders'
 
 export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
   const { items, totalPrice, clearCart } = useCart()
@@ -108,7 +106,7 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
         width: 256,
       })
 
-      // Criar pedido usando o hook
+      // Criar pedido usando o hook (PocketBase-first)
       await createOrder({
         items: items.map(item => ({
           id: item.id,
@@ -354,7 +352,7 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
       </div>
 
       {/* Entrega */}
-      <div className="bg-gradient-to-r from-blue-50 to-yellow-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+      <div className="bg-gradient-to-r from-blue-50 to.yellow-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
         <h2 className="font-cookitie text-lg sm:text-xl font-bold text-gray-800 mb-3">
           🎉 Informações de Entrega
         </h2>

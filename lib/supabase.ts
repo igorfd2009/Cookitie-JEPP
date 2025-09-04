@@ -15,30 +15,7 @@ export const supabase = supabaseUrl && supabaseAnonKey
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,
-        storageKey: 'supabase-auth-token',
-        storage: {
-          getItem: (key) => {
-            try {
-              return localStorage.getItem(key)
-            } catch {
-              return null
-            }
-          },
-          setItem: (key, value) => {
-            try {
-              localStorage.setItem(key, value)
-            } catch {
-              // Ignore errors
-            }
-          },
-          removeItem: (key) => {
-            try {
-              localStorage.removeItem(key)
-            } catch {
-              // Ignore errors
-            }
-          }
-        }
+        storageKey: 'cookitie_supabase_auth'
       }
     })
   : null
@@ -51,9 +28,8 @@ export const isSupabaseAvailable = (): boolean => {
 // Função para testar conexão com Supabase
 export const testSupabaseConnection = async (): Promise<boolean> => {
   if (!supabase) return false
-  
   try {
-    const { error } = await supabase.from('reservations').select('count', { count: 'exact', head: true })
+    const { error } = await supabase.from('profiles').select('count', { count: 'exact', head: true })
     return !error
   } catch (error) {
     console.error('Erro ao testar conexão Supabase:', error)

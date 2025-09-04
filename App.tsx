@@ -6,7 +6,6 @@ import { Products } from './components/Products'
 import { Cart } from './components/Cart'
 import { Checkout } from './components/Checkout'
 import { MyOrders } from './components/MyOrders'
-import { Admin } from './components/Admin'
 import { AuthModal } from './components/AuthModal'
 import { Footer } from './components/Footer'
 import { useAuth } from './contexts/AuthContext'
@@ -34,24 +33,18 @@ function AppContent() {
   }, [])
 
   const handleGoToCheckout = () => {
-    console.log('Tentando ir para checkout, autenticado:', isAuthenticated)
     if (!isAuthenticated) {
-      console.log('Usuário não autenticado, abrindo modal')
       setShowAuthModal(true)
       return
     }
-    console.log('Navegando para checkout')
     setCurrentPage('checkout')
   }
 
   const handleGoToOrders = () => {
-    console.log('Tentando ir para pedidos, autenticado:', isAuthenticated)
     if (!isAuthenticated) {
-      console.log('Usuário não autenticado, abrindo modal')
       setShowAuthModal(true)
       return
     }
-    console.log('Navegando para pedidos')
     setCurrentPage('orders')
   }
 
@@ -66,7 +59,7 @@ function AppContent() {
       case 'orders':
         return <MyOrders onBackToProducts={() => setCurrentPage('products')} />
       case 'admin':
-        return <Admin onBackToProducts={() => setCurrentPage('products')} />
+        return <Products />
       default:
         return <Products />
     }
@@ -78,7 +71,6 @@ function AppContent() {
         <Header 
           currentPage={currentPage}
           onNavigate={setCurrentPage}
-          onGoToCheckout={handleGoToCheckout}
           onGoToOrders={handleGoToOrders}
           onShowAuth={() => setShowAuthModal(true)}
         />

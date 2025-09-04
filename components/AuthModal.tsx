@@ -44,13 +44,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       if (isLogin) {
         const result = await signIn(formData.email, formData.password)
         if (result.success) {
-          toast.success('Bem-vindo de volta! 🍪', {
-            style: {
-              background: 'linear-gradient(135deg, #e0f0ff 0%, #fff5b8 100%)',
-              border: '1px solid #b8e0ff',
-              color: '#374151'
-            }
-          })
+          toast.success('Bem-vindo de volta! 🍪')
           onClose()
           setFormData({ email: '', password: '', name: '', phone: '' })
         } else {
@@ -59,13 +53,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       } else {
         const result = await signUp(formData.email, formData.password, formData.name, formData.phone)
         if (result.success) {
-          toast.success('Conta criada com sucesso! Bem-vindo à Cookitie! 🎉', {
-            style: {
-              background: 'linear-gradient(135deg, #e0f0ff 0%, #fff5b8 100%)',
-              border: '1px solid #b8e0ff',
-              color: '#374151'
-            }
-          })
+          toast.success('Conta criada com sucesso! 🎉')
           onClose()
           setFormData({ email: '', password: '', name: '', phone: '' })
         } else {
@@ -91,7 +79,6 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="cookitie-card w-full max-w-md relative overflow-hidden">
-        {/* Elementos decorativos */}
         <div className="absolute top-0 right-0 w-20 h-20 cookitie-blob opacity-20"></div>
         <div className="absolute bottom-0 left-0 w-16 h-16 cookitie-blob-2 opacity-20"></div>
         
@@ -201,7 +188,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
             <div className="flex items-center justify-center text-xs text-gray-500 mt-3">
               <Heart size={12} className="mr-1" />
-              Seus dados ficam salvos localmente (modo offline)
+              Sua sessão é persistida com PocketBase.
             </div>
           </form>
         </div>

@@ -1,20 +1,19 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { User } from '@supabase/supabase-js'
-import { useOfflineAuth } from '../hooks/useOfflineAuth'
+import { pb } from '../lib/pocketbase'
 
 interface UserProfile {
   id: string
   email: string
   name?: string
   phone?: string
-  created_at: string
-  updated_at: string
+  created_at?: string
+  updated_at?: string
 }
 
 interface AuthContextType {
-  user: User | any | null
+  user: any | null
   profile: UserProfile | null
-  session: any | null
+  session: { token: string | null } | null
   loading: boolean
   isAuthenticated: boolean
   signUp: (email: string, password: string, name: string, phone?: string) => Promise<{ success: boolean; error?: string }>
@@ -38,129 +37,128 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<any | null>(pb.authStore.model)
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  
-  // Hook para autenticação offline
-  const offlineAuth = useOfflineAuth()
+  const [loading, setLoading] = useState(true)
 
-
+  const mapUserToProfile = (model: any | null): UserProfile | null => {
+    if (!model) return null
+    return {
+      id: model.id,
+      email: model.email,
+      name: model.name,
+      phone: (model as any).phone,
+      created_at: model?.created,
+      updated_at: model?.updated
+    }
+  }
 
   useEffect(() => {
-    // ✅ VERSÃO 100% OFFLINE
-    console.log('Inicializando sistema offline...')
+    // Inicialização: carregar sessão do pb.authStore (lib já tenta restaurar do localStorage)
+    setUser(pb.authStore.model)
+    setProfile(mapUserToProfile(pb.authStore.model))
+    setLoading(false)
+
+    // Listener de mudanças de auth (login/logout/refresh)
+    const unsub = pb.authStore.onChange(() => {
+      setUser(pb.authStore.model)
+      setProfile(mapUserToProfile(pb.authStore.model))
+    })
+
+    return () => {
+      // @ts-ignore - onChange retorna unsub em versões mais novas
+      if (typeof unsub === 'function') unsub()
+    }
   }, [])
 
   const signUp = async (email: string, password: string, name: string, phone?: string) => {
-    // ✅ VERSÃO 100% OFFLINE
-    console.log('Criando conta offline:', email)
-    
-    const result = await offlineAuth.signUp(email, password, name, phone)
-    
-    if (result.success && offlineAuth.user) {
-      // ✅ ATUALIZAR ESTADOS LOCAIS após signup offline
-      setProfile({
-        id: offlineAuth.user.id,
-        email: offlineAuth.user.email,
-        name: offlineAuth.user.name,
-        phone: offlineAuth.user.phone,
-        created_at: offlineAuth.user.created_at,
-        updated_at: offlineAuth.user.updated_at
+    try {
+      setLoading(true)
+
+      // Criar usuário na coleção de auth do PocketBase (users)
+      await pb.collection('users').create({
+        email,
+        emailVisibility: true,
+        password,
+        passwordConfirm: password,
+        name,
+        phone
       })
-      console.log('Estados locais atualizados após signup offline')
+
+      // Autenticar após criar
+      await pb.collection('users').authWithPassword(email, password)
+
+      setUser(pb.authStore.model)
+      setProfile(mapUserToProfile(pb.authStore.model))
+
+      return { success: true }
+    } catch (error: any) {
+      console.error('Erro no cadastro PocketBase:', error)
+      const msg = error?.message || 'Erro inesperado ao criar conta'
+      return { success: false, error: msg }
+    } finally {
+      setLoading(false)
     }
-    
-    return result
   }
 
   const signIn = async (email: string, password: string) => {
-    // ✅ VERSÃO 100% OFFLINE
-    console.log('Tentando login offline:', email)
-    
-    const result = await offlineAuth.signIn(email, password)
-    
-    if (result.success && offlineAuth.user) {
-      // ✅ ATUALIZAR ESTADOS LOCAIS após login offline
-      setProfile({
-        id: offlineAuth.user.id,
-        email: offlineAuth.user.email,
-        name: offlineAuth.user.name,
-        phone: offlineAuth.user.phone,
-        created_at: offlineAuth.user.created_at,
-        updated_at: offlineAuth.user.updated_at
-      })
-      console.log('Estados locais atualizados após login offline')
+    try {
+      setLoading(true)
+
+      await pb.collection('users').authWithPassword(email, password)
+
+      setUser(pb.authStore.model)
+      setProfile(mapUserToProfile(pb.authStore.model))
+
+      return { success: true }
+    } catch (error: any) {
+      console.error('Erro no login PocketBase:', error)
+      const msg = error?.message || 'Erro inesperado no login'
+      return { success: false, error: msg }
+    } finally {
+      setLoading(false)
     }
-    
-    return result
   }
 
-
-
   const signOut = async () => {
-    console.log('Fazendo logout offline...')
-    
-    // Limpar autenticação offline
     try {
-      await offlineAuth.signOut()
+      pb.authStore.clear()
+      setUser(null)
+      setProfile(null)
     } catch (error) {
-      console.error('Erro no logout offline:', error)
+      console.error('Erro no logout PocketBase:', error)
     }
-    
-    // Limpar localStorage
-    try {
-      localStorage.removeItem('cookitie_user')
-      localStorage.removeItem('cookitie_cart')
-      localStorage.removeItem('supabase-auth-token')
-    } catch (error) {
-      console.error('Erro ao limpar localStorage:', error)
-    }
-    
-    // Limpar estados locais
-    setProfile(null)
-    
-    console.log('Logout offline completo realizado')
   }
 
   const updateProfile = async (updates: Partial<UserProfile>) => {
-    // ✅ VERSÃO 100% OFFLINE
-    console.log('Atualizando perfil offline')
-    return await offlineAuth.updateProfile(updates)
-  }
+    try {
+      if (!user) return { success: false, error: 'Usuário não autenticado' }
+      const payload: any = {}
+      if (typeof updates.name !== 'undefined') payload.name = updates.name
+      if (typeof updates.phone !== 'undefined') payload.phone = updates.phone
 
-  // Garantir que profile sempre existe (offline)
-  const getCurrentProfile = (): UserProfile | null => {
-    if (profile) {
-      return profile
+      await pb.collection('users').update(user.id, payload)
+      // Atualizar estado local
+      const newModel = { ...pb.authStore.model, ...payload }
+      setUser(newModel)
+      setProfile(mapUserToProfile(newModel))
+      return { success: true }
+    } catch (error) {
+      console.error('Erro ao atualizar perfil PocketBase:', error)
+      return { success: false, error: 'Erro inesperado ao atualizar perfil' }
     }
-    
-    if (offlineAuth.user) {
-      return {
-        id: offlineAuth.user.id,
-        email: offlineAuth.user.email,
-        name: offlineAuth.user.name,
-        phone: offlineAuth.user.phone,
-        created_at: offlineAuth.user.created_at,
-        updated_at: offlineAuth.user.updated_at
-      }
-    }
-    
-    return null
   }
-
-  const isAuthenticated = Boolean(offlineAuth.user)
-  const isLoading = offlineAuth.loading
-  const currentProfile = getCurrentProfile()
 
   const value: AuthContextType = {
-    user: offlineAuth.user,
-    profile: currentProfile,
-    session: null, // Não usado no modo offline
-    loading: isLoading,
-    isAuthenticated,
+    user,
+    profile,
+    session: { token: pb.authStore.token },
+    loading,
+    isAuthenticated: Boolean(user && pb.authStore.isValid),
     signUp,
     signIn,
     signOut,
-    updateProfile,
+    updateProfile
   }
 
   return (
