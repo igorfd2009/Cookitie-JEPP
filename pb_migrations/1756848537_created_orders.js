@@ -1,4 +1,4 @@
-/// <reference path="../pb_data/types.d.ts" />
+// Reference removed to avoid PB parsing types.d.ts as migration
 migrate((db) => {
   const collection = new Collection({
     "id": "js4svdif0pl6b39",

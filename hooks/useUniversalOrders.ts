@@ -105,9 +105,11 @@ export const useUniversalOrders = () => {
   const pocketbaseOperations = {
     load: async () => {
       try {
-        const response = await fetch(`http://localhost:8090/api/collections/orders/records?filter=(userId='${user?.id}')`)
-        const data = await response.json()
-        return data.items || []
+        const { pb } = await import('../lib/pocketbase')
+        const records: any[] = await pb.collection('orders').getFullList({
+          filter: `(userId='${user?.id}')`
+        })
+        return records
       } catch (error) {
         console.error('❌ PocketBase não disponível, usando localStorage')
         return localStorageOperations.load()
@@ -116,12 +118,9 @@ export const useUniversalOrders = () => {
     
     create: async (orderData: Omit<Order, 'id' | 'createdAt' | 'userId'>) => {
       try {
-        const response = await fetch('http://localhost:8090/api/collections/orders/records', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...orderData, userId: user!.id })
-        })
-        return await response.json()
+        const { pb } = await import('../lib/pocketbase')
+        const created = await pb.collection('orders').create({ ...orderData, userId: user!.id })
+        return created
       } catch (error) {
         console.error('❌ Erro PocketBase, usando localStorage')
         return localStorageOperations.create(orderData)
@@ -130,11 +129,8 @@ export const useUniversalOrders = () => {
     
     updateStatus: async (orderId: string, status: Order['status']) => {
       try {
-        await fetch(`http://localhost:8090/api/collections/orders/records/${orderId}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status })
-        })
+        const { pb } = await import('../lib/pocketbase')
+        await pb.collection('orders').update(orderId, { status })
       } catch (error) {
         console.error('❌ Erro PocketBase, usando localStorage')
         return localStorageOperations.updateStatus(orderId, status)

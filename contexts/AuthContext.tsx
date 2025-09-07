@@ -105,13 +105,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setLoading(true)
 
-      await pb.collection('users').authWithPassword(email, password)
+      const identity = email
+      try {
+        // URL usada
+        // @ts-ignore
+        console.log('[PocketBase][login] Base URL:', (pb as any)?.baseUrl || 'desconhecida')
+      } catch (_) {}
+
+      try {
+        // Body enviado (senha mascarada)
+        console.log('[PocketBase][login] Request body:', { identity, passwordLength: password ? password.length : 0 })
+      } catch (_) {}
+
+      const result = await pb.collection('users').authWithPassword(identity, password)
+
+      try {
+        // Resposta de sucesso (sem expor token inteiro)
+        console.log('[PocketBase][login] Success:', {
+          recordId: pb?.authStore?.model?.id,
+          email: pb?.authStore?.model?.email,
+          tokenLength: pb?.authStore?.token ? pb.authStore.token.length : 0,
+          hasResult: Boolean(result)
+        })
+      } catch (_) {}
 
       setUser(pb.authStore.model)
       setProfile(mapUserToProfile(pb.authStore.model))
 
       return { success: true }
     } catch (error: any) {
+      try {
+        // Log detalhado de erro (inclui status e payload do PB)
+        console.error('[PocketBase][login] Error detail:', {
+          status: error?.status,
+          data: error?.data,
+          response: error?.response,
+          message: error?.message
+        })
+      } catch (_) {}
       console.error('Erro no login PocketBase:', error)
       const msg = error?.message || 'Erro inesperado no login'
       return { success: false, error: msg }

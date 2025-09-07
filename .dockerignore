@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.gitignore
+Dockerfile
+.dockerignore
+**/*.log
+pb_data
+pb_migrations/data.db
+pb_data/backups
+Downloads
+

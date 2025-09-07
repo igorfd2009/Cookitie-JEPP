@@ -1,5 +1,5 @@
 // Service Worker básico para Cookite
-const CACHE_NAME = 'cookite-v1';
+const CACHE_NAME = 'cookite-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -19,12 +19,17 @@ self.addEventListener('install', (event) => {
 
 // Interceptação de requisições
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Nunca interceptar chamadas para APIs (ex.: PocketBase)
+  if (url.pathname.startsWith('/api/') || url.href.includes('/api/')) {
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Retorna cache se disponível, senão faz fetch
-        return response || fetch(event.request);
-      })
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
   );
 });
 

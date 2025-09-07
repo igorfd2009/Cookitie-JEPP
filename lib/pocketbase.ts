@@ -1,9 +1,14 @@
 import PocketBase from 'pocketbase'
 
-const DEFAULT_URL = 'http://127.0.0.1:8090'
+const DEFAULT_URL = 'https://cookitie.fly.dev'
 const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || DEFAULT_URL
 
 export const pb = new PocketBase(POCKETBASE_URL)
+
+// Log da URL utilizada pelo PocketBase no frontend
+try {
+  console.log('[PocketBase] URL em uso:', POCKETBASE_URL)
+} catch (_) {}
 
 // Persistência simples em localStorage (token + model)
 const AUTH_STORAGE_KEY = 'cookitie_pb_auth'

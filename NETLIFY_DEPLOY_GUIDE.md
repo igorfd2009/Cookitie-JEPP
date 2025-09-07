@@ -30,6 +30,7 @@ Criado `.nvmrc` especificando Node.js 18.
 VITE_SUPABASE_URL=https://deeichvgibhpbrowhaiq.supabase.co
 VITE_SUPABASE_ANON_KEY=sua_chave_anonima_supabase_aqui
 VITE_RESEND_API_KEY=re_123456789...sua_chave_api_resend_aqui
+VITE_POCKETBASE_URL=https://api.seu-dominio.com
 ```
 
 ### **Environment Variables (OPCIONAIS):**
@@ -51,9 +52,19 @@ VITE_MERCHANT_CITY=SAO PAULO
 
 ### **2. Configurar Environment Variables:**
 - Site Settings → Environment Variables
-- Adicione todas as variáveis VITE_ necessárias
+- Adicione todas as variáveis VITE_ necessárias (incluindo `VITE_POCKETBASE_URL`)
 
-### **3. Configurar Domain:**
+### **3. Configurar PocketBase (no servidor):**
+- Defina `PB_ALLOWED_ORIGINS` com o domínio do seu site Netlify
+- Defina `PB_FORCE_HTTPS=true` se estiver atrás de proxy/CDN
+
+Exemplo (Docker/env):
+```env
+PB_ALLOWED_ORIGINS="https://seu-site.netlify.app"
+PB_FORCE_HTTPS="true"
+```
+
+### **4. Configurar Domain:**
 - Site Settings → Domain Management
 - Configure seu domínio personalizado
 

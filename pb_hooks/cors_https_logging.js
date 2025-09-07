@@ -27,14 +27,16 @@ onBeforeServe((e) => {
       // HTTPS redirect (quando atrás de proxy)
       if (FORCE_HTTPS) {
         const xfProto = c.request.headers.get("X-Forwarded-Proto")
-        if (xfProto && xfProto.toLowerCase() === "http") {
-          try {
-            const url = new URL(c.request.url)
+        try {
+          const url = new URL(c.request.url)
+          const alreadyHttps = url.protocol === "https:"
+          // Evita redirecionar se a URL já é https (ex.: through Cloudflare tunnel)
+          if (!alreadyHttps && xfProto && xfProto.toLowerCase() === "http") {
             url.protocol = "https:"
             return c.redirect(301, url.toString())
-          } catch (_) {
-            // ignore
           }
+        } catch (_) {
+          // ignore
         }
       }
 

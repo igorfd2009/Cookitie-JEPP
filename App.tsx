@@ -12,6 +12,7 @@ import { useAuth } from './contexts/AuthContext'
 import { Toaster } from 'sonner'
 import './styles/globals.css'
 import { StickyMobileCTA } from './components/StickyMobileCTA'
+import { Admin } from './components/Admin'
 
 type Page = 'products' | 'cart' | 'checkout' | 'orders' | 'admin'
 
@@ -59,7 +60,7 @@ function AppContent() {
       case 'orders':
         return <MyOrders onBackToProducts={() => setCurrentPage('products')} />
       case 'admin':
-        return <Products />
+        return <Admin onBackToProducts={() => setCurrentPage('products')} />
       default:
         return <Products />
     }

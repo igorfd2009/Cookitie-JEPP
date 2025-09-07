@@ -30,6 +30,8 @@
 - Admin: `http://localhost:8090/_/`
 - API: `http://localhost:8090/api/`
 
+> Produção: exponha via HTTPS e configure CORS e redirecionamento (veja abaixo).
+
 ### **3. Configurar Collections (1 minuto)**
 
 1. **Abra**: `http://localhost:8090/_/`
@@ -57,6 +59,21 @@
 ```bash
 npm install pocketbase
 ```
+
+## 🌐 CORS, HTTPS e Variáveis de Ambiente
+
+- No cliente (Vite/Netlify):
+```env
+VITE_POCKETBASE_URL=https://api.seu-dominio.com
+```
+
+- No servidor (PocketBase):
+```env
+PB_ALLOWED_ORIGINS="https://seu-site.netlify.app"
+PB_FORCE_HTTPS="true"
+```
+
+Os hooks em `pb_hooks/cors_https_logging.js` já adicionam CORS, redirecionam para HTTPS quando `PB_FORCE_HTTPS=true` e logam todas as requisições e eventos de autenticação.
 
 ## 🔧 **Código Super Simples**
 
