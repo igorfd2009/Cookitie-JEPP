@@ -109,7 +109,19 @@ export const useUniversalOrders = () => {
         const records: any[] = await pb.collection('orders').getFullList({
           filter: `(userId='${user?.id}')`
         })
-        return records
+        const mapRecordToOrder = (record: any): Order => ({
+          id: record.id,
+          userId: record.userId,
+          items: record.items,
+          total: record.total,
+          status: record.status,
+          paymentMethod: record.paymentMethod,
+          pixCode: record.pixCode,
+          pickupCode: record.pickupCode,
+          createdAt: record.created,
+          updatedAt: record.updated
+        })
+        return records.map(mapRecordToOrder)
       } catch (error) {
         console.error('❌ PocketBase não disponível, usando localStorage')
         return localStorageOperations.load()
@@ -119,8 +131,20 @@ export const useUniversalOrders = () => {
     create: async (orderData: Omit<Order, 'id' | 'createdAt' | 'userId'>) => {
       try {
         const { pb } = await import('../lib/pocketbase')
-        const created = await pb.collection('orders').create({ ...orderData, userId: user!.id })
-        return created
+        const created: any = await pb.collection('orders').create({ ...orderData, userId: user!.id })
+        const toOrder = (record: any): Order => ({
+          id: record.id,
+          userId: record.userId,
+          items: record.items,
+          total: record.total,
+          status: record.status,
+          paymentMethod: record.paymentMethod,
+          pixCode: record.pixCode,
+          pickupCode: record.pickupCode,
+          createdAt: record.created,
+          updatedAt: record.updated
+        })
+        return toOrder(created)
       } catch (error) {
         console.error('❌ Erro PocketBase, usando localStorage')
         return localStorageOperations.create(orderData)
