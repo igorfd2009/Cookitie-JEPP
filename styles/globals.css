@@ -2,42 +2,51 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Importar fontes do Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+/* Importar fontes do Google Fonts - Tipografia Moderna */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Fredoka:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Paleta Cookitie - Azul e Amarelo Pastel */
-  --cookitie-blue-50: #f0f8ff;
-  --cookitie-blue-100: #e0f0ff;
-  --cookitie-blue-200: #b8e0ff;
-  --cookitie-blue-300: #7cc8ff;
-  --cookitie-blue-400: #36a9ff;
-  --cookitie-blue-500: #0084ff;
-  --cookitie-blue-600: #0066cc;
-  --cookitie-blue-700: #004d99;
+  /* Paleta Cookitie - Azul e Amarelo Pastel Suaves */
+  --cookitie-blue-50: #f8fbff;
+  --cookitie-blue-100: #eef4ff;
+  --cookitie-blue-200: #d6e7ff;
+  --cookitie-blue-300: #a8cfff;
+  --cookitie-blue-400: #7bb3ff;
+  --cookitie-blue-500: #4d94ff;
+  --cookitie-blue-600: #2d7ae6;
+  --cookitie-blue-700: #1e5bb8;
+  --cookitie-blue-800: #16408a;
   
-  --cookitie-yellow-50: #fffef0;
-  --cookitie-yellow-100: #fffae0;
-  --cookitie-yellow-200: #fff5b8;
-  --cookitie-yellow-300: #ffec7c;
-  --cookitie-yellow-400: #ffe036;
-  --cookitie-yellow-500: #ffd700;
-  --cookitie-yellow-600: #e6c200;
-  --cookitie-yellow-700: #cc9900;
+  --cookitie-yellow-50: #fffef8;
+  --cookitie-yellow-100: #fffcee;
+  --cookitie-yellow-200: #fff7d6;
+  --cookitie-yellow-300: #ffefa8;
+  --cookitie-yellow-400: #ffe67b;
+  --cookitie-yellow-500: #ffdd4d;
+  --cookitie-yellow-600: #e6c72d;
+  --cookitie-yellow-700: #b89e1e;
+  --cookitie-yellow-800: #8a7516;
   
-  --cookitie-pink-50: #fef7f7;
-  --cookitie-pink-100: #fdeaea;
-  --cookitie-pink-200: #fbd4d4;
-  --cookitie-pink-300: #f8b4b4;
-  --cookitie-pink-400: #f48888;
-  --cookitie-pink-500: #ef4444;
+  --cookitie-pink-50: #fef8f8;
+  --cookitie-pink-100: #fdeeee;
+  --cookitie-pink-200: #fbd6d6;
+  --cookitie-pink-300: #f8a8a8;
+  --cookitie-pink-400: #f47b7b;
+  --cookitie-pink-500: #f04d4d;
   
-  --cookitie-green-50: #f0fdf4;
-  --cookitie-green-100: #dcfce7;
-  --cookitie-green-200: #bbf7d0;
-  --cookitie-green-300: #86efac;
-  --cookitie-green-400: #4ade80;
-  --cookitie-green-500: #22c55e;
+  --cookitie-green-50: #f8fef8;
+  --cookitie-green-100: #eefdee;
+  --cookitie-green-200: #d6fbd6;
+  --cookitie-green-300: #a8f8a8;
+  --cookitie-green-400: #7bf47b;
+  --cookitie-green-500: #4df04d;
+  
+  --cookitie-purple-50: #f8f6ff;
+  --cookitie-purple-100: #eeeaff;
+  --cookitie-purple-200: #d6d0ff;
+  --cookitie-purple-300: #a899ff;
+  --cookitie-purple-400: #7b62ff;
+  --cookitie-purple-500: #4d2bff;
 }
 
 * {
@@ -47,31 +56,90 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, var(--cookitie-blue-50) 0%, #ffffff 50%, var(--cookitie-yellow-50) 100%);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, var(--cookitie-blue-50) 0%, #ffffff 30%, var(--cookitie-yellow-50) 70%, var(--cookitie-purple-50) 100%);
   min-height: 100vh;
-  color: #374151;
+  color: #4a5568;
   line-height: 1.6;
+  font-weight: 400;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Tipografia */
+/* Tipografia Poppins */
 .font-cookitie {
-  font-family: 'Fredoka', cursive;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
-/* Elementos decorativos */
+.font-modern {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.font-display {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.font-light {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+
+.font-medium {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.font-semibold {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.font-bold {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.font-extrabold {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+/* Elementos decorativos suaves */
 .cookitie-blob {
-  background: linear-gradient(135deg, var(--cookitie-blue-200) 0%, var(--cookitie-yellow-200) 100%);
+  background: linear-gradient(135deg, var(--cookitie-blue-200) 0%, var(--cookitie-purple-200) 50%, var(--cookitie-yellow-200) 100%);
   border-radius: 50% 40% 60% 30%;
-  opacity: 0.1;
-  animation: float 6s ease-in-out infinite;
+  opacity: 0.06;
+  animation: float 8s ease-in-out infinite;
+  filter: blur(1px);
 }
 
 .cookitie-blob-2 {
-  background: linear-gradient(45deg, var(--cookitie-yellow-200) 0%, var(--cookitie-pink-200) 100%);
+  background: linear-gradient(45deg, var(--cookitie-yellow-200) 0%, var(--cookitie-pink-200) 50%, var(--cookitie-blue-200) 100%);
   border-radius: 40% 60% 30% 50%;
-  opacity: 0.08;
-  animation: float 8s ease-in-out infinite reverse;
+  opacity: 0.05;
+  animation: float 10s ease-in-out infinite reverse;
+  filter: blur(1px);
+}
+
+.cookitie-blob-3 {
+  background: linear-gradient(60deg, var(--cookitie-purple-200) 0%, var(--cookitie-blue-200) 50%, var(--cookitie-yellow-200) 100%);
+  border-radius: 30% 70% 50% 40%;
+  opacity: 0.04;
+  animation: float 12s ease-in-out infinite;
+  filter: blur(2px);
 }
 
 @keyframes float {
@@ -79,54 +147,75 @@ body {
   50% { transform: translateY(-20px) rotate(5deg); }
 }
 
-/* Botões personalizados */
+/* Botões personalizados com design suave */
 .btn-cookitie-primary {
-  background: linear-gradient(135deg, var(--cookitie-blue-400) 0%, var(--cookitie-blue-500) 100%);
+  background: linear-gradient(135deg, var(--cookitie-blue-400) 0%, var(--cookitie-blue-500) 50%, var(--cookitie-purple-400) 100%);
   border: none;
-  border-radius: 25px;
+  border-radius: 30px;
   color: white;
-  font-weight: 500;
-  padding: 12px 24px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 132, 255, 0.2);
-  font-family: 'Fredoka', cursive;
+  font-weight: 600;
+  padding: 14px 28px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(77, 148, 255, 0.15);
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
 }
 
 .btn-cookitie-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 132, 255, 0.3);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(77, 148, 255, 0.25);
+  background: linear-gradient(135deg, var(--cookitie-blue-500) 0%, var(--cookitie-purple-500) 50%, var(--cookitie-blue-600) 100%);
 }
 
 .btn-cookitie-secondary {
-  background: linear-gradient(135deg, var(--cookitie-yellow-400) 0%, var(--cookitie-yellow-500) 100%);
+  background: linear-gradient(135deg, var(--cookitie-yellow-400) 0%, var(--cookitie-yellow-500) 50%, var(--cookitie-pink-400) 100%);
   border: none;
-  border-radius: 25px;
-  color: #374151;
-  font-weight: 500;
-  padding: 12px 24px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
-  font-family: 'Fredoka', cursive;
+  border-radius: 30px;
+  color: #4a5568;
+  font-weight: 600;
+  padding: 14px 28px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(255, 221, 77, 0.15);
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
 }
 
 .btn-cookitie-secondary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(255, 221, 77, 0.25);
+  background: linear-gradient(135deg, var(--cookitie-yellow-500) 0%, var(--cookitie-pink-500) 50%, var(--cookitie-yellow-600) 100%);
 }
 
-/* Cards com efeito suave */
+/* Cards com efeito glassmorphism suave */
 .cookitie-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .cookitie-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.cookitie-card-premium {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+  backdrop-filter: blur(25px);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 28px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cookitie-card-premium:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
 }
 
 /* Elementos decorativos pequenos */
@@ -197,7 +286,8 @@ body {
   border: 2px solid var(--cookitie-blue-200);
   border-radius: 15px;
   padding: 12px 16px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
   transition: all 0.3s ease;
 }
 
@@ -225,15 +315,60 @@ body {
   background: linear-gradient(var(--cookitie-blue-400), var(--cookitie-blue-500));
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
+/* Responsividade melhorada */
+@media (max-width: 640px) {
   .btn-cookitie-primary,
   .btn-cookitie-secondary {
-    padding: 10px 20px;
-    font-size: 0.9rem;
+    padding: 10px 16px;
+    font-size: 0.875rem;
+    border-radius: 20px;
   }
   
   .cookitie-card {
-    border-radius: 15px;
+    border-radius: 16px;
+    padding: 12px;
+  }
+  
+  .cookitie-card-premium {
+    border-radius: 18px;
+    padding: 14px;
+  }
+  
+  /* Melhorar legibilidade em mobile */
+  body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Ajustar elementos decorativos para mobile */
+  .cookitie-blob,
+  .cookitie-blob-2,
+  .cookitie-blob-3 {
+    opacity: 0.03;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-cookitie-primary,
+  .btn-cookitie-secondary {
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    border-radius: 18px;
+  }
+  
+  .cookitie-card {
+    border-radius: 14px;
+    padding: 10px;
+  }
+  
+  .cookitie-card-premium {
+    border-radius: 16px;
+    padding: 12px;
+  }
+  
+  /* Espaçamentos menores em telas muito pequenas */
+  .container {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }

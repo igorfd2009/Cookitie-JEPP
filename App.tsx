@@ -33,6 +33,11 @@ function AppContent() {
     }
   }, [])
 
+  // Scroll para o topo quando mudar de página
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentPage])
+
   const handleGoToCheckout = () => {
     if (!isAuthenticated) {
       setShowAuthModal(true)

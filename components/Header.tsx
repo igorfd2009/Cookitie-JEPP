@@ -1,6 +1,7 @@
 import { ShoppingCart, Package } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
+import { Logo } from './Logo'
 
 interface HeaderProps {
   currentPage: string
@@ -14,11 +15,14 @@ export const Header = ({ currentPage, onNavigate, onGoToOrders, onShowAuth }: He
   const { totalItems } = useCart()
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-gray-100">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="container mx-auto px-3 py-3 flex items-center justify-between">
         {/* Logo / Marca */}
-        <button onClick={() => onNavigate('products')} className="font-cookitie text-lg sm:text-xl">
-          Cookitie
+        <button 
+          onClick={() => onNavigate('products')} 
+          className="hover:scale-105 transition-transform duration-200"
+        >
+          <Logo size="md" showText={true} />
         </button>
 
         {/* Ações principais (mobile-first) */}
