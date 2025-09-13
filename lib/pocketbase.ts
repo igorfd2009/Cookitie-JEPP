@@ -1,6 +1,6 @@
 import PocketBase from 'pocketbase'
 
-const DEFAULT_URL = 'https://cookitie.fly.dev'
+const DEFAULT_URL = 'http://localhost:8090'
 const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || DEFAULT_URL
 
 export const pb = new PocketBase(POCKETBASE_URL)
