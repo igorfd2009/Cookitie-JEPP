@@ -1,16 +1,18 @@
 import { useState } from 'react'
-import { CreditCard, Copy, Check, ArrowLeft, Heart } from 'lucide-react'
+import { CreditCard, Check, ArrowLeft } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
 import { usePocketBaseOrders as useOrders, Order } from '../hooks/usePocketBaseOrders'
 import { toast } from 'sonner'
 import QRCode from 'qrcode'
+import { CheckoutPage } from './CheckoutPage'
 
 interface CheckoutProps {
   onOrderComplete: () => void
+  onBackToCart?: () => void
 }
 
-export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
+export const Checkout = ({ onOrderComplete, onBackToCart }: CheckoutProps) => {
   const { items, totalPrice, clearCart } = useCart()
   const { user, profile } = useAuth()
   const { createOrder, updateOrderStatus } = useOrders()
@@ -115,7 +117,7 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
           quantity: item.quantity
         })),
         total: totalPrice,
-        status: 'paid', // TEMPORÁRIO: usando 'paid' até corrigir no admin panel
+        status: 'pending', // Status inicial do pedido
         paymentMethod: 'pix',
         pixCode
       })
@@ -178,29 +180,26 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
   if (step === 'success') {
     return (
       <div className="text-center py-16 space-y-6">
-        <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto">
-          <Check size={40} className="text-green-600" />
+        <div className="w-28 h-28 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto">
+          <Check size={56} className="text-green-600" />
         </div>
         <h2 className="font-cookitie text-3xl font-bold text-gray-900">
-          Pedido Confirmado! 🎉
+          Pagamento efetuado com sucesso!
         </h2>
-        <p className="text-lg text-gray-600 max-w-md mx-auto">
-          Seu pedido foi confirmado e será preparado com muito carinho pelos jovens da Cookitie para o evento JEPP.
+        <p className="text-2xl text-gray-600 max-w-xl mx-auto">
+          Seu pedido foi confirmado e poderá ser retirado no evento JEPP, na nossa doceria Cookittie!
         </p>
-        <div className="bg-gradient-to-r from-blue-50 to-yellow-50 rounded-2xl p-6 max-w-md mx-auto">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Heart className="text-red-400" size={20} />
-            <span className="font-cookitie font-bold text-gray-800">Obrigado pela confiança!</span>
-          </div>
-          <p className="text-sm text-gray-700">
-            Você acaba de apoiar jovens empreendedores em seu primeiro projeto empresarial! ✨
+        <div className="bg-gradient-to-r from-blue-50 to-yellow-50 rounded-2xl p-6 max-w-lg mx-auto">
+          <p className="text-lg text-gray-700 text-center">
+            Agradecemos a preferência e confiança!
           </p>
         </div>
         <button
           onClick={onOrderComplete}
-          className="btn-cookitie-primary py-3 px-8 font-cookitie text-lg"
+          className="py-3 px-8 font-cookitie text-lg text-white font-bold rounded-3xl"
+          style={{ backgroundColor: '#3480FE' }}
         >
-          Ver Meus Pedidos 📦
+          Ver Meus Pedidos
         </button>
       </div>
     )
@@ -208,36 +207,40 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
 
   if (step === 'payment') {
     return (
-      <div className="max-w-lg mx-auto space-y-4 sm:space-y-6 px-4">
+      <div className="max-w-md mx-auto space-y-6 sm:space-y-8 px-4 pt-6 sm:pt-8">
         <div className="text-center space-y-2">
-          <button
-            onClick={() => setStep('review')}
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors mb-3 sm:mb-4 text-sm"
-          >
-            <ArrowLeft size={14} />
-            <span>Voltar</span>
-          </button>
+          <div className="flex items-center justify-center gap-4 mb-6 sm:mb-8">
+            {onBackToCart && (
+              <button
+                onClick={onBackToCart}
+                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm"
+              >
+                <ArrowLeft size={14} />
+                <span>Voltar ao Carrinho</span>
+              </button>
+            )}
+          </div>
           <h2 className="font-cookitie text-2xl sm:text-3xl font-bold text-gray-900">
-            🍪 Pagamento PIX
+            Pagamento PIX
           </h2>
           <p className="text-sm sm:text-base text-gray-600 px-4">
             Escaneie o QR Code ou copie o código PIX para finalizar seu pedido
           </p>
         </div>
 
-        <div className="cookitie-card p-4 sm:p-6 lg:p-8 text-center space-y-4 sm:space-y-6">
+        <div className="p-4 sm:p-6 lg:p-8 text-center space-y-4 sm:space-y-6 rounded-2xl shadow-lg" style={{ backgroundColor: '#F4F4F4' }}>
           {/* QR Code */}
-          <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm mx-auto w-fit">
+          <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm mx-auto w-fit" style={{ backgroundColor: '#F4F4F4' }}>
             {qrCodeDataURL ? (
               <img 
                 src={qrCodeDataURL} 
                 alt="QR Code PIX" 
-                className="w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 mx-auto"
+                className="w-40 h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 mx-auto"
               />
             ) : (
-              <div className="w-48 h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="w-40 h-40 xs:w-48 xs:h-48 sm:w-56 sm:h-56 lg:w-64 lg:h-64 bg-gray-100 rounded-lg flex items-center justify-center">
                 <div className="text-center text-gray-500">
-                  <CreditCard size={32} className="sm:w-12 sm:h-12" />
+                  <CreditCard size={24} className="xs:w-8 xs:h-8 sm:w-12 sm:h-12" />
                   <p className="text-xs sm:text-sm mt-2">Gerando QR Code...</p>
                 </div>
               </div>
@@ -255,32 +258,39 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
             
             <button
               onClick={copyPixCode}
-              className="w-full btn-cookitie-secondary py-3 font-cookitie flex items-center justify-center gap-2 hover:scale-105 transition-transform text-sm sm:text-base"
+              className="w-full py-3 font-cookitie flex items-center justify-center hover:scale-105 transition-transform text-sm sm:text-base text-white font-bold rounded-3xl"
+              style={{ backgroundColor: '#FFD225' }}
             >
-              {copied ? <Check size={16} /> : <Copy size={16} />}
-              {copied ? '✅ Copiado!' : '📋 Copiar Código PIX'}
+              {copied ? 'Copiado!' : 'Copiar Código PIX'}
             </button>
           </div>
         </div>
 
-        {/* Resumo do Pagamento */}
-        <div className="bg-gradient-to-r from-blue-50 to-yellow-50 rounded-xl sm:rounded-2xl p-4 sm:p-6">
-          <h3 className="font-cookitie text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3 text-center">
-            💰 Total a Pagar
-          </h3>
+        {/* Card de Total a Pagar */}
+        <div className="rounded-2xl p-5 shadow-lg" style={{ backgroundColor: '#F4F4F4' }}>
+          {/* Título */}
+          <div className="flex items-center gap-3 mb-4">
+            <CreditCard size={20} className="text-black" />
+            <h2 className="text-xl font-bold text-black" style={{ fontFamily: 'Inter, sans-serif', fontWeight: '800' }}>
+              Total a pagar
+            </h2>
+          </div>
+
+          {/* Valor Total */}
           <div className="text-center">
-            <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent font-cookitie">
+            <p className="text-3xl font-bold text-blue-600 mb-4" style={{ fontFamily: 'Inter, sans-serif', fontWeight: '800' }}>
               R$ {totalPrice.toFixed(2)}
             </p>
-            <p className="text-xs sm:text-sm text-gray-700 mt-2">
-              Após o pagamento, confirme abaixo para finalizar seu pedido 🍪
+            <p className="text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+              Após o pagamento confirme abaixo para finalizar o seu pedido!
             </p>
           </div>
         </div>
 
         <button
           onClick={handlePaymentConfirm}
-          className="w-full btn-cookitie-primary py-3 sm:py-4 font-cookitie text-base sm:text-lg hover:scale-105 transition-transform"
+          className="w-full py-3 sm:py-4 font-cookitie text-base sm:text-lg hover:scale-105 transition-transform text-white font-bold rounded-3xl"
+          style={{ backgroundColor: '#3480FE' }}
         >
           ✅ Confirmar Pagamento
         </button>
@@ -292,9 +302,25 @@ export const Checkout = ({ onOrderComplete }: CheckoutProps) => {
     )
   }
 
+  // Se estiver na etapa de revisão, mostrar a nova página de checkout
+  if (step === 'review') {
+    return <CheckoutPage onGoToPayment={handleCreateOrder} onBackToCart={onBackToCart} />
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8 px-4">
       <div className="text-center">
+        <div className="flex items-center justify-center gap-4 mb-4">
+          {onBackToCart && (
+            <button
+              onClick={onBackToCart}
+              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors text-sm"
+            >
+              <ArrowLeft size={14} />
+              <span>Voltar ao Carrinho</span>
+            </button>
+          )}
+        </div>
         <h1 className="font-cookitie text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
           🛍️ Finalizar Pedido
         </h1>

@@ -2,19 +2,22 @@ import { useState, useEffect } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { CartProvider } from './contexts/CartContext'
 import { Header } from './components/Header'
+import { Hero } from './components/Hero'
 import { Products } from './components/Products'
+import { BottomSection } from './components/BottomSection'
 import { Cart } from './components/Cart'
 import { Checkout } from './components/Checkout'
 import { MyOrders } from './components/MyOrders'
 import { AuthModal } from './components/AuthModal'
 import { Footer } from './components/Footer'
+import { FlavorsPage } from './components/FlavorsPage'
 import { useAuth } from './contexts/AuthContext'
 import { Toaster } from 'sonner'
 import './styles/globals.css'
-import { StickyMobileCTA } from './components/StickyMobileCTA'
 import { Admin } from './components/Admin'
+import { CookitieBreadcrumb } from './components/CookitieBreadcrumb'
 
-type Page = 'products' | 'cart' | 'checkout' | 'orders' | 'admin'
+type Page = 'products' | 'cart' | 'checkout' | 'orders' | 'admin' | 'flavors'
 
 function AppContent() {
   const [currentPage, setCurrentPage] = useState<Page>('products')
@@ -57,39 +60,56 @@ function AppContent() {
   const renderPage = () => {
     switch (currentPage) {
       case 'products':
-        return <Products />
+        return (
+          <>
+            <Hero onGoToCheckout={handleGoToCheckout} />
+            <Products onNavigateToFlavors={() => setCurrentPage('flavors')} />
+            <BottomSection />
+          </>
+        )
       case 'cart':
-        return <Cart onGoToCheckout={handleGoToCheckout} />
+        return <Cart onGoToCheckout={handleGoToCheckout} onBackToProducts={() => setCurrentPage('products')} />
       case 'checkout':
-        return <Checkout onOrderComplete={() => setCurrentPage('orders')} />
+        return <Checkout onOrderComplete={() => setCurrentPage('orders')} onBackToCart={() => setCurrentPage('cart')} />
       case 'orders':
         return <MyOrders onBackToProducts={() => setCurrentPage('products')} />
+      case 'flavors':
+        return <FlavorsPage onBackToProducts={() => setCurrentPage('products')} />
       case 'admin':
         return <Admin onBackToProducts={() => setCurrentPage('products')} />
       default:
-        return <Products />
+        return (
+          <>
+            <Hero onGoToCheckout={handleGoToCheckout} />
+            <Products onNavigateToFlavors={() => setCurrentPage('flavors')} />
+            <BottomSection />
+          </>
+        )
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#FDFAF5' }}>
       {currentPage !== 'admin' && (
         <Header 
           currentPage={currentPage}
-          onNavigate={setCurrentPage}
+          onNavigate={(page) => setCurrentPage(page as Page)}
           onGoToOrders={handleGoToOrders}
           onShowAuth={() => setShowAuthModal(true)}
         />
       )}
       
-      <main className="container mx-auto px-4 py-8">
+      {/* Breadcrumb Navigation */}
+      {currentPage !== 'admin' && currentPage !== 'products' && (
+        <CookitieBreadcrumb currentPage={currentPage} onNavigate={setCurrentPage} />
+      )}
+      
+      <main>
         {renderPage()}
       </main>
 
-      {/* CTA móvel fixo para conversão em mobile */}
-      <StickyMobileCTA currentPage={currentPage} onGoToCheckout={handleGoToCheckout} />
 
-      {currentPage !== 'admin' && <Footer />}
+      {currentPage !== 'admin' && <Footer showFullContent={currentPage === 'products' || currentPage === 'flavors'} />}
 
       <AuthModal 
         isOpen={showAuthModal}

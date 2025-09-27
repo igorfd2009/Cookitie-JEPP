@@ -31,6 +31,7 @@ export const usePocketBaseOrders = () => {
   // Carregar pedidos do PocketBase
   const loadOrders = async () => {
     if (!user) {
+      console.log('📦 [DEBUG] Usuário não autenticado, limpando pedidos')
       setOrders([])
       setLoading(false)
       return
@@ -38,7 +39,10 @@ export const usePocketBaseOrders = () => {
 
     try {
       setLoading(true)
-      console.log('📦 Carregando pedidos do PocketBase...')
+      console.log('📦 [DEBUG] Carregando pedidos do PocketBase...')
+      console.log('📦 [DEBUG] Usuário ID:', user.id)
+      console.log('📦 [DEBUG] Token válido:', pb.authStore.isValid)
+      
       const records = await pb.collection('orders').getFullList({
         filter: `(userId='${user.id}')`,
         sort: '-created'
@@ -158,6 +162,21 @@ export const usePocketBaseOrders = () => {
         console.error('❌ [ERRO DETALHADO] Nome:', error.name)
         console.error('❌ [ERRO DETALHADO] Mensagem:', error.message)
         console.error('❌ [ERRO DETALHADO] Stack:', error.stack)
+      }
+      
+      // Log específico para erros de autenticação
+      if (error && typeof error === 'object' && 'status' in error) {
+        const statusError = error as any
+        if (statusError.status === 401) {
+          console.error('❌ [ERRO AUTH] Usuário não autenticado ou token inválido')
+          console.error('❌ [ERRO AUTH] Verifique se o usuário está logado')
+        } else if (statusError.status === 403) {
+          console.error('❌ [ERRO PERMISSÃO] Usuário não tem permissão para criar pedidos')
+          console.error('❌ [ERRO PERMISSÃO] Verifique as regras de acesso no PocketBase')
+        } else if (statusError.status === 400) {
+          console.error('❌ [ERRO VALIDAÇÃO] Dados inválidos enviados')
+          console.error('❌ [ERRO VALIDAÇÃO] Verifique o schema da collection orders')
+        }
       }
       
       throw error

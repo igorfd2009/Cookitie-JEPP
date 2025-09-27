@@ -164,7 +164,7 @@ export function HowItWorks() {
         </div>
 
         {/* Important Notes */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 mb-16">
+        <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 mb-16">
           {/* Discount Note */}
           <div className="group p-8 md:p-10 bg-gradient-to-br from-[var(--color-cookite-yellow)] via-yellow-200 to-yellow-100 rounded-3xl text-center shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-500 relative">
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>

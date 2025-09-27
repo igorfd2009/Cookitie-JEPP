@@ -85,8 +85,16 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         <div className="relative z-10">
           <div className="flex items-center justify-between p-6 border-b border-blue-100">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-200 to-yellow-200 rounded-xl flex items-center justify-center">
-                <span className="text-xl">🍪</span>
+              <div className="w-12 h-12 flex items-center justify-center">
+                <img 
+                  src="/imagens/logo-2.png" 
+                  alt="Cookittie Logo" 
+                  className="w-12 h-12 object-contain"
+                  onError={(e) => {
+                    console.log('Erro ao carregar logo-2.png');
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
               </div>
               <div>
                 <h2 className="font-cookitie text-xl font-bold text-gray-900">
