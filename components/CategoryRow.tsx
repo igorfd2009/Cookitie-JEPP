@@ -15,7 +15,7 @@ export const CategoryRow = ({
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{title}</h2>
       </div>
       <div className="flex gap-4 overflow-x-auto md:overflow-visible justify-start md:flex-nowrap">
-        {products.map((product) => (
+        {products.map((product, index) => (
           <div 
             key={product.id}
             className="flex-shrink-0 w-40 md:w-60 rounded-2xl overflow-hidden"
