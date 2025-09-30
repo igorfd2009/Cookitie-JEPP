@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useCart } from '../contexts/CartContext'
 import { CategoryRow } from './CategoryRow'
