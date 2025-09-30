@@ -116,10 +116,15 @@ export const Footer = ({ showFullContent = true }: FooterProps) => {
             </div>
             
             <div className="hidden md:flex items-center gap-4">
-              <button className="flex items-center gap-2 text-xs bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded transition-colors">
+              <a 
+                href="https://www.instagram.com/cookittie_/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-xs bg-gray-400 hover:bg-gray-500 text-white px-3 py-1 rounded transition-colors"
+              >
                 <Instagram size={12} />
                 Siga-nos
-              </button>
+              </a>
               <span className="text-xs text-white">
                 Feito com ❤️ em SP BR
               </span>
