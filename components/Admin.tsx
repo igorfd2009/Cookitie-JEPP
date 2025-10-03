@@ -24,6 +24,11 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
   const { orders, loading, syncing, updateOrderStatus, getOrderStats, refreshOrders } = useAdminOrders()
   const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null)
   const [filterStatus, setFilterStatus] = useState<AdminOrder['status'] | 'all'>('all')
+  const [isAdminAuthed, setIsAdminAuthed] = useState<boolean>(() => {
+    try { return localStorage.getItem('cookittie_admin_authed') === 'true' } catch { return false }
+  })
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   const stats = getOrderStats()
 
@@ -80,6 +85,67 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
     }
   }
 
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (email.trim() === 'cookittie@adm' && password === 'cokittie2025') {
+      try { localStorage.setItem('cookittie_admin_authed', 'true') } catch {}
+      setIsAdminAuthed(true)
+      return
+    }
+    try { toast.error('Credenciais inválidas') } catch {}
+  }
+
+  const handleAdminLogout = () => {
+    try { localStorage.removeItem('cookittie_admin_authed') } catch {}
+    setIsAdminAuthed(false)
+  }
+
+  if (!isAdminAuthed) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FDFAF5' }}>
+        <Card className="w-full max-w-md shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-center">Acesso do Administrador</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAdminLogin} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="cookittie@adm"
+                  className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="cokittie2025"
+                  className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  required
+                />
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <Button type="button" variant="outline" onClick={onBackToProducts}>
+                  Voltar
+                </Button>
+                <Button type="submit">
+                  Entrar
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -100,6 +166,13 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
                 Atualizar
+              </Button>
+              <Button
+                onClick={handleAdminLogout}
+                variant="outline"
+                size="sm"
+              >
+                Sair Admin
               </Button>
               <Button
                 onClick={onBackToProducts}
