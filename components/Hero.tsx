@@ -11,12 +11,12 @@ export function Hero({}: HeroProps) {
         <div className="flex flex-col items-center justify-center">
           
           {/* Gato mascote centralizado */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 px-4 sm:px-8">
                  <img 
                    src="/imagens/imagem-inicial.PNG" 
                    alt="Gato mascote Cookittie" 
                    className="object-contain sm:object-contain"
-                   style={{ width: '100%', height: 'auto', maxWidth: 'none', minHeight: '500px' }}
+                   style={{ width: '100%', height: 'auto', maxWidth: '1200px', minHeight: '500px' }}
                    onError={(e) => {
                      console.log('Erro ao carregar imagem-inicial.PNG');
                      e.currentTarget.style.display = 'none';
