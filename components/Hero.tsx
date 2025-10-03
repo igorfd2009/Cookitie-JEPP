@@ -6,7 +6,7 @@ interface HeroProps {
 export function Hero({}: HeroProps) {
 
   return (
-    <section className="relative px-4 overflow-hidden py-2 sm:py-16" style={{ backgroundColor: '#FDFAF5' }}>
+    <section className="relative px-4 overflow-hidden py-2 sm:pt-12 sm:pb-8 md:pt-16" style={{ backgroundColor: '#FDFAF5' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col items-center justify-center">
           
@@ -15,14 +15,7 @@ export function Hero({}: HeroProps) {
                  <img 
                    src="/imagens/imagem-inicial.PNG" 
                    alt="Gato mascote Cookittie" 
-                   className="object-contain sm:object-contain mx-auto"
-                   style={{ 
-                     width: '100%', 
-                     height: 'auto', 
-                     maxWidth: '1200px', 
-                     minHeight: '300px',
-                     maxHeight: '400px'
-                   }}
+                   className="w-full h-[340px] sm:h-[560px] lg:h-[640px] object-contain mx-auto"
                    onError={(e) => {
                      console.log('Erro ao carregar imagem-inicial.PNG');
                      e.currentTarget.style.display = 'none';
@@ -32,7 +25,7 @@ export function Hero({}: HeroProps) {
         </div>
 
         {/* Textos centralizados */}
-        <div className="text-center mt-2 sm:mt-12">
+        <div className="text-center mt-2 sm:mt-8">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-4">
             Bem-vindos ao Cookittie! Veja nossos produtos e aproveite os descontos!
           </h1>

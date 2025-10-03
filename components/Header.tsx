@@ -10,13 +10,19 @@ interface HeaderProps {
   onShowAuth: () => void
 }
 
-export const Header = ({ onNavigate, onShowAuth }: HeaderProps) => {
+export const Header = ({ currentPage, onNavigate, onShowAuth }: HeaderProps) => {
   const { user, profile, isAuthenticated, signOut } = useAuth()
   const { totalItems } = useCart()
   const { orders } = usePocketBaseOrders()
 
   return (
-    <header className="py-3 sm:py-4 flex items-center justify-between px-4 sm:px-6" style={{ backgroundColor: '#D1EAED', borderBottom: currentPage === 'products' ? 'none' : '3px solid #FDF1C3' }}>
+    <header 
+      className="py-3 sm:py-4 flex items-center justify-between px-4 sm:px-6" 
+      style={{ 
+        backgroundColor: '#D1EAED', 
+        borderBottom: currentPage === 'products' ? 'none' : '3px solid #FDF1C3'
+      }}
+    >
         {/* Logo Cookittie */}
         <button 
           onClick={() => onNavigate('products')} 
