@@ -6,7 +6,7 @@ interface HeroProps {
 export function Hero({}: HeroProps) {
 
   return (
-    <section className="relative px-4 overflow-hidden py-2 sm:py-8" style={{ backgroundColor: '#FDFAF5' }}>
+    <section className="relative px-4 overflow-hidden py-2 sm:py-16" style={{ backgroundColor: '#FDFAF5' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col items-center justify-center">
           
@@ -32,7 +32,7 @@ export function Hero({}: HeroProps) {
         </div>
 
         {/* Textos centralizados */}
-        <div className="text-center mt-2 sm:mt-8">
+        <div className="text-center mt-2 sm:mt-12">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-4">
             Bem-vindos ao Cookittie! Veja nossos produtos e aproveite os descontos!
           </h1>

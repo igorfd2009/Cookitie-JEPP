@@ -16,7 +16,7 @@ export const Header = ({ onNavigate, onShowAuth }: HeaderProps) => {
   const { orders } = usePocketBaseOrders()
 
   return (
-    <header className="py-3 sm:py-4 flex items-center justify-between px-4 sm:px-6" style={{ backgroundColor: '#D1EAED', borderBottom: '3px solid #FDF1C3' }}>
+    <header className="py-3 sm:py-4 flex items-center justify-between px-4 sm:px-6" style={{ backgroundColor: '#D1EAED', borderBottom: currentPage === 'products' ? 'none' : '3px solid #FDF1C3' }}>
         {/* Logo Cookittie */}
         <button 
           onClick={() => onNavigate('products')} 
