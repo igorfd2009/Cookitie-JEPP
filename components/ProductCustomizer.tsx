@@ -188,7 +188,7 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="text-2xl">{flavor.emoji}</div>
+                          {flavor.emoji && <div className="text-2xl">{flavor.emoji}</div>}
                           <div>
                             <h5 className="font-medium">{flavor.name}</h5>
                             <p className="text-sm text-gray-600">{flavor.description}</p>
@@ -234,8 +234,8 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
                       if (!flavor) return null
                       
                       return Array(qty).fill(0).map((_, index) => (
-                        <span key={`${flavorId}-${index}`} className="text-2xl">
-                          {flavor.emoji}
+                        <span key={`${flavorId}-${index}`} className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          {flavor.name}
                         </span>
                       ))
                     })}
@@ -260,7 +260,7 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
                       onClick={() => setSelectedFlavor(flavor.id)}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="text-2xl">{flavor.emoji}</div>
+                        {flavor.emoji && <div className="text-2xl">{flavor.emoji}</div>}
                         <div>
                           <h5 className="font-medium">{flavor.name}</h5>
                           <p className="text-sm text-gray-600">{flavor.description}</p>
