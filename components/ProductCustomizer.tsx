@@ -28,10 +28,10 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
   const [quantity, setQuantity] = useState(1)
   // Para espetinho de brigadeiro - controle de quantidades por sabor
   const [brigadeiroQuantities, setBrigadeiroQuantities] = useState<{ [key: string]: number }>({
-    classico: 1,
-    morango: 1,
-    coco: 1,
-    beijinho: 0
+    tradicional: 1,
+    pacoca: 1,
+    ninho: 1,
+    'beijinho-de-pe': 0
   })
 
   if (!isOpen) return null

@@ -18,28 +18,28 @@ const COOKITIE_PRODUCTS = [
     popular: true,
     flavors: [
       {
-        id: 'classico',
-        name: 'Clássico',
+        id: 'tradicional',
+        name: 'Tradicional',
         emoji: '🍫',
         description: 'Brigadeiro tradicional com granulado de chocolate'
       },
       {
-        id: 'morango',
-        name: 'Morango',
-        emoji: '🍓',
-        description: 'Brigadeiro com sabor de morango e granulado colorido'
+        id: 'pacoca',
+        name: 'Paçoca',
+        emoji: '🥜',
+        description: 'Brigadeiro com sabor de paçoca e amendoim'
       },
       {
-        id: 'coco',
-        name: 'Coco',
-        emoji: '🥥',
-        description: 'Brigadeiro com sabor de coco e coco ralado'
-      },
-      {
-        id: 'beijinho',
-        name: 'Beijinho',
+        id: 'ninho',
+        name: 'Ninho',
         emoji: '🤍',
-        description: 'Brigadeiro de coco com açúcar cristal'
+        description: 'Brigadeiro com leite ninho e coco ralado'
+      },
+      {
+        id: 'beijinho-de-pe',
+        name: 'Beijinho de Pé',
+        emoji: '🦶',
+        description: 'Brigadeiro de coco com formato especial'
       }
     ]
   },
