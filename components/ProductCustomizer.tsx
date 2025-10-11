@@ -150,11 +150,11 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
         <div className="p-6">
           {/* Imagem do produto */}
           <div className="flex justify-center mb-6">
-            <div className="w-32 h-32 rounded-full overflow-hidden">
+            <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-2xl overflow-hidden bg-gray-50 flex items-center justify-center p-2">
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             </div>
           </div>
@@ -185,34 +185,36 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
                         qty > 0 ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          {flavor.emoji && <div className="text-2xl">{flavor.emoji}</div>}
-                          <div>
-                            <h5 className="font-medium">{flavor.name}</h5>
-                            <p className="text-sm text-gray-600">{flavor.description}</p>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          {flavor.emoji && <div className="text-2xl flex-shrink-0">{flavor.emoji}</div>}
+                          <div className="min-w-0 flex-1">
+                            <h5 className="font-medium text-sm sm:text-base">{flavor.name}</h5>
+                            <p className="text-xs sm:text-sm text-gray-600 truncate">{flavor.description}</p>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <button
                             onClick={() => handleBrigadeiroQuantityChange(flavor.id, -1)}
                             disabled={qty === 0}
-                            className="p-1 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+                            style={{ minWidth: '40px', minHeight: '40px' }}
                           >
-                            <Minus size={16} />
+                            <Minus size={18} />
                           </button>
                           
-                          <span className="w-8 text-center font-semibold">
+                          <span className="w-10 text-center font-semibold text-lg">
                             {qty}
                           </span>
                           
                           <button
                             onClick={() => handleBrigadeiroQuantityChange(flavor.id, 1)}
                             disabled={getTotalBrigadeiros() >= 3}
-                            className="p-1 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+                            style={{ minWidth: '40px', minHeight: '40px' }}
                           >
-                            <Plus size={16} />
+                            <Plus size={18} />
                           </button>
                         </div>
                       </div>
@@ -279,19 +281,21 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
               <button
                 onClick={() => handleQuantityChange(-1)}
                 disabled={quantity <= 1}
-                className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-3 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+                style={{ minWidth: '48px', minHeight: '48px' }}
               >
-                <Minus size={20} />
+                <Minus size={24} />
               </button>
               
-              <span className="text-2xl font-bold w-8 text-center">{quantity}</span>
+              <span className="text-3xl font-bold w-12 text-center">{quantity}</span>
               
               <button
                 onClick={() => handleQuantityChange(1)}
                 disabled={quantity >= 10}
-                className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-3 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+                style={{ minWidth: '48px', minHeight: '48px' }}
               >
-                <Plus size={20} />
+                <Plus size={24} />
               </button>
             </div>
           </div>
