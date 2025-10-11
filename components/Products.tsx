@@ -10,7 +10,7 @@ const COOKITIE_PRODUCTS = [
     id: '1',
     name: 'Brigadeiro',
     price: 8.50,
-    image: '/imagens/imagens-produtos/Brigadeiro.webp',
+    image: '/imagens/imagens-produtos/espetinho de brogadeiro.jpg',
     description: 'Doce brasileiro tradicional coberto com granulado de chocolate, feito com muito amor!',
     emoji: '🍫',
     popular: true
@@ -28,7 +28,7 @@ const COOKITIE_PRODUCTS = [
     id: '3',
     name: 'Cookie',
     price: 8.50,
-    image: '/imagens/imagens-produtos/Cookie.webp',
+    image: '/imagens/imagens-produtos/cookie-padrao.jpg',
     description: 'Cookies crocantes por fora e macios por dentro, com gotas de chocolate, feitos com muito carinho.',
     emoji: '🍪',
     popular: false
@@ -37,7 +37,7 @@ const COOKITIE_PRODUCTS = [
     id: '4',
     name: 'Biscoito Amanteigado',
     price: 8.50,
-    image: '/imagens/imagens-produtos/Biscoito amanteigado.webp',
+    image: '/imagens/imagens-produtos/Bisc-amant-glace.jpeg',
     description: 'Biscoitos delicados em formatos variados (estrela, boneco, coração), derretendo na boca.',
     emoji: '🥨',
     popular: false
