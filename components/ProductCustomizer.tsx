@@ -38,7 +38,6 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
 
   // Se o produto tem sabores, usar o primeiro como padrão
   const hasFlavors = product.flavors && product.flavors.length > 0
-  const defaultFlavor = hasFlavors ? product.flavors[0].id : ''
   const isBrigadeiroEspetinho = product.id === '1' // ID do brigadeiro
 
   const handleAddToCart = () => {

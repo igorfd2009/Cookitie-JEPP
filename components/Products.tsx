@@ -1,5 +1,4 @@
 import { useCart } from '../contexts/CartContext'
-import { toast } from 'sonner'
 import { ProductCustomizer } from './ProductCustomizer'
 import { useState } from 'react'
 
@@ -114,7 +113,7 @@ const COOKITIE_PRODUCTS = [
   }
 ]
 
-export const Products = ({ onNavigateToFlavors }: ProductsProps) => {
+export const Products = ({}: ProductsProps) => {
   const { addItem } = useCart()
   const [showCustomizer, setShowCustomizer] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<typeof COOKITIE_PRODUCTS[0] | null>(null)
