@@ -42,21 +42,45 @@ export const useAdminOrders = () => {
       })
 
       console.log('📦 [ADMIN] Registros brutos encontrados:', records.length)
+      console.log('📦 [ADMIN] Exemplo de registro:', records[0])
 
-      const converted: AdminOrder[] = records.map((order: any) => ({
-        id: order.id,
-        userId: order.userId,
-        items: order.items || [],
-        total: order.total || 0,
-        status: order.status || 'pending',
-        paymentMethod: order.paymentMethod || 'pix',
-        pixCode: order.pixCode,
-        pickupCode: order.pickupCode,
-        created: order.created,
-        updated: order.updated,
-        // Tentar obter dados do usuário se expandido
-        userEmail: order.expand?.userId?.email || 'N/A',
-        userName: order.expand?.userId?.name || 'N/A'
+      // Processar cada pedido e buscar dados do usuário manualmente se necessário
+      const converted: AdminOrder[] = await Promise.all(records.map(async (order: any) => {
+        let userEmail = 'Email não disponível'
+        let userName = 'Cliente não identificado'
+
+        // Tentar obter dados do expand primeiro
+        if (order.expand?.userId) {
+          userEmail = order.expand.userId.email || userEmail
+          userName = order.expand.userId.name || userName
+          console.log('📦 [ADMIN] Dados do expand:', { userEmail, userName })
+        } else {
+          // Se expand não funcionou, buscar manualmente
+          try {
+            console.log('📦 [ADMIN] Buscando usuário manualmente:', order.userId)
+            const user = await pb.collection('users').getOne(order.userId)
+            userEmail = user.email || userEmail
+            userName = user.name || userName
+            console.log('📦 [ADMIN] Dados buscados manualmente:', { userEmail, userName })
+          } catch (error) {
+            console.warn('⚠️ [ADMIN] Não foi possível buscar dados do usuário:', order.userId, error)
+          }
+        }
+
+        return {
+          id: order.id,
+          userId: order.userId,
+          items: order.items || [],
+          total: order.total || 0,
+          status: order.status || 'pending',
+          paymentMethod: order.paymentMethod || 'pix',
+          pixCode: order.pixCode,
+          pickupCode: order.pickupCode,
+          created: order.created,
+          updated: order.updated,
+          userEmail,
+          userName
+        }
       }))
 
       setOrders(converted)
