@@ -9,13 +9,13 @@ export const BottomSection = () => {
                  <img 
                    src="/imagens/imagem-inicial-secundaria.webp" 
                    alt="Gato mascote Cookittie" 
-                   className="object-contain lg:scale-75"
+                   className="object-contain lg:scale-90"
                    style={{ 
                      width: '1214px', 
                      height: '740px', 
                      maxWidth: '100%', 
-                     maxHeight: '500px',
-                     transform: 'scale(1.0)',
+                     maxHeight: '600px',
+                     transform: 'scale(1.1)',
                      marginTop: '-50px',
                      marginBottom: '-50px'
                    }}
