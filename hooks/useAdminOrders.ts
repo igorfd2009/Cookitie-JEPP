@@ -44,8 +44,29 @@ export const useAdminOrders = () => {
       console.log('📦 [ADMIN] Registros brutos encontrados:', records.length)
       console.log('📦 [ADMIN] Exemplo de registro:', records[0])
 
-      // Processar cada pedido e buscar dados do usuário manualmente se necessário
-      const converted: AdminOrder[] = await Promise.all(records.map(async (order: any) => {
+      // Coletar IDs únicos de usuários
+      const userIds = [...new Set(records.map((order: any) => order.userId))]
+      console.log('📦 [ADMIN] IDs únicos de usuários:', userIds.length)
+
+      // Buscar todos os usuários de uma vez
+      const usersMap = new Map<string, any>()
+      
+      try {
+        // Buscar todos os usuários em uma única requisição
+        const users = await pb.collection('users').getFullList({
+          filter: userIds.map(id => `id="${id}"`).join(' || ')
+        })
+        
+        console.log('📦 [ADMIN] Usuários encontrados:', users.length)
+        users.forEach(user => {
+          usersMap.set(user.id, user)
+        })
+      } catch (error) {
+        console.warn('⚠️ [ADMIN] Erro ao buscar usuários em lote:', error)
+      }
+
+      // Processar cada pedido com os dados dos usuários já carregados
+      const converted: AdminOrder[] = records.map((order: any) => {
         let userEmail = 'Email não disponível'
         let userName = 'Cliente não identificado'
 
@@ -53,18 +74,15 @@ export const useAdminOrders = () => {
         if (order.expand?.userId) {
           userEmail = order.expand.userId.email || userEmail
           userName = order.expand.userId.name || userName
-          console.log('📦 [ADMIN] Dados do expand:', { userEmail, userName })
+          console.log('📦 [ADMIN] Dados do expand para pedido', order.id.slice(-8), ':', { userEmail, userName })
+        } else if (usersMap.has(order.userId)) {
+          // Usar dados do mapa de usuários
+          const user = usersMap.get(order.userId)
+          userEmail = user.email || userEmail
+          userName = user.name || userName
+          console.log('📦 [ADMIN] Dados do mapa para pedido', order.id.slice(-8), ':', { userEmail, userName })
         } else {
-          // Se expand não funcionou, buscar manualmente
-          try {
-            console.log('📦 [ADMIN] Buscando usuário manualmente:', order.userId)
-            const user = await pb.collection('users').getOne(order.userId)
-            userEmail = user.email || userEmail
-            userName = user.name || userName
-            console.log('📦 [ADMIN] Dados buscados manualmente:', { userEmail, userName })
-          } catch (error) {
-            console.warn('⚠️ [ADMIN] Não foi possível buscar dados do usuário:', order.userId, error)
-          }
+          console.warn('⚠️ [ADMIN] Usuário não encontrado para pedido:', order.id.slice(-8), 'userId:', order.userId)
         }
 
         return {
@@ -81,11 +99,11 @@ export const useAdminOrders = () => {
           userEmail,
           userName
         }
-      }))
+      })
 
       setOrders(converted)
       console.log('✅ [ADMIN] Pedidos carregados:', converted.length)
-      console.log('📋 [ADMIN] Detalhes dos pedidos:', converted)
+      console.log('📋 [ADMIN] Amostra de pedido processado:', converted[0])
     } catch (error) {
       console.error('❌ [ADMIN] Erro ao carregar pedidos:', error)
       setOrders([])
