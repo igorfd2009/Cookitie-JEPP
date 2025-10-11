@@ -1,5 +1,7 @@
 import { useCart } from '../contexts/CartContext'
 import { toast } from 'sonner'
+import { BrigadeiroCustomizer } from './BrigadeiroCustomizer'
+import { useState } from 'react'
 
 interface ProductsProps {
   onNavigateToFlavors?: () => void
@@ -46,6 +48,7 @@ const COOKITIE_PRODUCTS = [
 
 export const Products = ({ onNavigateToFlavors }: ProductsProps) => {
   const { addItem } = useCart()
+  const [showCustomizer, setShowCustomizer] = useState(false)
 
   const handleAddToCart = (product: typeof COOKITIE_PRODUCTS[0]) => {
     addItem({
@@ -62,6 +65,10 @@ export const Products = ({ onNavigateToFlavors }: ProductsProps) => {
         color: '#4a5568'
       }
     })
+  }
+
+  const handleCustomBrigadeiro = (customBrigadeiro: any) => {
+    addItem(customBrigadeiro)
   }
 
   return (
@@ -101,31 +108,58 @@ export const Products = ({ onNavigateToFlavors }: ProductsProps) => {
                        R$ {product.price.toFixed(2)}
                      </div>
                      
-                     {/* Botão Adicionar */}
-                     <button
-                       onClick={() => handleAddToCart(product)}
-                       className="w-full text-white flex items-center justify-center py-3 px-4 transition-all duration-300 ease-in-out touch-target"
-                       style={{ 
-                         backgroundColor: '#E4B7CB',
-                         borderRadius: '25px',
-                         fontFamily: 'Inter, sans-serif',
-                         fontWeight: '700',
-                         gap: '8px',
-                         letterSpacing: '0.5px',
-                         minHeight: '44px'
-                       }}
-                       onMouseEnter={(e) => {
-                         e.currentTarget.style.backgroundColor = '#D4A5B8';
-                         e.currentTarget.style.transform = 'translateY(-2px)';
-                       }}
-                       onMouseLeave={(e) => {
-                         e.currentTarget.style.backgroundColor = '#E4B7CB';
-                         e.currentTarget.style.transform = 'translateY(0)';
-                       }}
-                     >
-                       <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>+</span>
-                       Adicionar
-                     </button>
+                     {/* Botões */}
+                     <div className="space-y-2">
+                       {/* Botão Adicionar */}
+                       <button
+                         onClick={() => handleAddToCart(product)}
+                         className="w-full text-white flex items-center justify-center py-3 px-4 transition-all duration-300 ease-in-out touch-target"
+                         style={{ 
+                           backgroundColor: '#E4B7CB',
+                           borderRadius: '25px',
+                           fontFamily: 'Inter, sans-serif',
+                           fontWeight: '700',
+                           gap: '8px',
+                           letterSpacing: '0.5px',
+                           minHeight: '44px'
+                         }}
+                         onMouseEnter={(e) => {
+                           e.currentTarget.style.backgroundColor = '#D4A5B8';
+                           e.currentTarget.style.transform = 'translateY(-2px)';
+                         }}
+                         onMouseLeave={(e) => {
+                           e.currentTarget.style.backgroundColor = '#E4B7CB';
+                           e.currentTarget.style.transform = 'translateY(0)';
+                         }}
+                       >
+                         <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>+</span>
+                         Adicionar
+                       </button>
+                       
+                       {/* Botão Personalizar - apenas para Brigadeiro */}
+                       {product.id === '1' && (
+                         <button
+                           onClick={() => setShowCustomizer(true)}
+                           className="w-full text-gray-700 flex items-center justify-center py-2 px-4 transition-all duration-300 ease-in-out touch-target border-2 border-gray-300"
+                           style={{ 
+                             borderRadius: '25px',
+                             fontFamily: 'Inter, sans-serif',
+                             fontWeight: '600',
+                             minHeight: '40px'
+                           }}
+                           onMouseEnter={(e) => {
+                             e.currentTarget.style.backgroundColor = '#F0F0F0';
+                             e.currentTarget.style.transform = 'translateY(-1px)';
+                           }}
+                           onMouseLeave={(e) => {
+                             e.currentTarget.style.backgroundColor = 'transparent';
+                             e.currentTarget.style.transform = 'translateY(0)';
+                           }}
+                         >
+                           🎨 Personalizar
+                         </button>
+                       )}
+                     </div>
                    </div>
                  </div>
                ))}
@@ -190,6 +224,13 @@ export const Products = ({ onNavigateToFlavors }: ProductsProps) => {
           ))}
         </div>
       </div>
+      
+      {/* Modal de Personalização do Brigadeiro */}
+      <BrigadeiroCustomizer
+        isOpen={showCustomizer}
+        onClose={() => setShowCustomizer(false)}
+        onAddToCart={handleCustomBrigadeiro}
+      />
     </div>
   )
 }
