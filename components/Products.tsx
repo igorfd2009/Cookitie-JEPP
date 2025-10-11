@@ -204,19 +204,6 @@ export const Products = () => {
           product={selectedProduct}
         />
       )}
-      
-      {/* Imagem inicial secundária */}
-      <div className="flex justify-center mt-12 mb-8">
-        <img 
-          src="/imagens/imagem-inicial-secundaria.webp" 
-          alt="Cookittie - Delícias artesanais" 
-          className="w-full max-w-6xl h-auto object-contain rounded-lg shadow-lg"
-          onError={(e) => {
-            console.log('Erro ao carregar imagem-inicial-secundaria.webp');
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-      </div>
     </div>
   )
 }
