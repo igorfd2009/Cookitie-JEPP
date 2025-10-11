@@ -185,32 +185,32 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
                         qty > 0 ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           {flavor.emoji && <div className="text-2xl">{flavor.emoji}</div>}
-                          <div>
+                          <div className="flex-1">
                             <h5 className="font-medium">{flavor.name}</h5>
                             <p className="text-sm text-gray-600">{flavor.description}</p>
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <button
                             onClick={() => handleBrigadeiroQuantityChange(flavor.id, -1)}
                             disabled={qty === 0}
-                            className="p-1 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
                             <Minus size={16} />
                           </button>
                           
-                          <span className="w-8 text-center font-semibold">
+                          <span className="w-8 text-center font-semibold text-lg">
                             {qty}
                           </span>
                           
                           <button
                             onClick={() => handleBrigadeiroQuantityChange(flavor.id, 1)}
                             disabled={getTotalBrigadeiros() >= 3 || qty >= 3}
-                            className="p-1 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
                             <Plus size={16} />
                           </button>
