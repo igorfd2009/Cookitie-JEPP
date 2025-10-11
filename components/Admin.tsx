@@ -15,7 +15,6 @@ import {
   Package,
   Mail,
   User,
-  Phone,
   Calendar
 } from 'lucide-react'
 import { toast } from 'sonner'
