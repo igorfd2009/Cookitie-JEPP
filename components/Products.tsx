@@ -210,7 +210,7 @@ export const Products = () => {
         <img 
           src="/imagens/imagem-inicial-secundaria.webp" 
           alt="Cookittie - Delícias artesanais" 
-          className="w-full max-w-4xl h-auto object-contain rounded-lg shadow-lg"
+          className="w-full max-w-6xl h-auto object-contain rounded-lg shadow-lg"
           onError={(e) => {
             console.log('Erro ao carregar imagem-inicial-secundaria.webp');
             e.currentTarget.style.display = 'none';
