@@ -14,7 +14,7 @@ interface ProductCustomizerProps {
     description: string
     emoji: string
     category?: string
-    flavors?: Array<{
+    flavors: Array<{
       id: string
       name: string
       emoji: string
@@ -37,7 +37,7 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
   if (!isOpen) return null
 
   // Se o produto tem sabores, usar o primeiro como padrão
-  const hasFlavors = product.flavors && product.flavors.length > 0
+  const hasFlavors = product.flavors.length > 0
   const isBrigadeiroEspetinho = product.id === '1' // ID do brigadeiro
 
   const handleAddToCart = () => {
@@ -58,7 +58,7 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
         customFlavors: Object.entries(brigadeiroQuantities)
           .filter(([_, qty]) => qty > 0)
           .map(([flavorId, qty]) => {
-            const flavor = product.flavors?.find(f => f.id === flavorId)
+            const flavor = product.flavors.find(f => f.id === flavorId)
             return {
               id: flavorId,
               name: flavor?.name || '',
@@ -91,7 +91,7 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
     const customProduct = {
       id: `${product.id}-${selectedFlavor || 'default'}-${Date.now()}`,
       name: hasFlavors 
-        ? `${product.name} - ${product.flavors?.find(f => f.id === selectedFlavor)?.name || 'Sabor Selecionado'}`
+        ? `${product.name} - ${product.flavors.find(f => f.id === selectedFlavor)?.name || 'Sabor Selecionado'}`
         : product.name,
       price: product.price,
       image: product.image,
@@ -176,7 +176,7 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
               
               <h4 className="font-semibold mb-3">Escolha os sabores dos 3 brigadeiros:</h4>
               <div className="space-y-3">
-                {product.flavors?.map((flavor) => {
+                {product.flavors.map((flavor) => {
                   const qty = brigadeiroQuantities[flavor.id] || 0
                   return (
                     <div
@@ -229,7 +229,7 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
                     <span className="text-2xl">🍢</span>
                     {Object.entries(brigadeiroQuantities).map(([flavorId, qty]) => {
                       if (qty === 0) return null
-                      const flavor = product.flavors?.find(f => f.id === flavorId)
+                      const flavor = product.flavors.find(f => f.id === flavorId)
                       if (!flavor) return null
                       
                       return Array(qty).fill(0).map((_, index) => (
@@ -248,7 +248,7 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
               <div className="mb-6">
                 <h4 className="font-semibold mb-3">Escolha o sabor:</h4>
                 <div className="space-y-2">
-                  {product.flavors?.map((flavor) => (
+                  {product.flavors.map((flavor) => (
                     <div
                       key={flavor.id}
                       className={`border-2 rounded-lg p-3 cursor-pointer transition-all ${

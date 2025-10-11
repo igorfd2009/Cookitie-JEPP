@@ -2,10 +2,6 @@ import { useCart } from '../contexts/CartContext'
 import { ProductCustomizer } from './ProductCustomizer'
 import { useState } from 'react'
 
-interface ProductsProps {
-  onNavigateToFlavors?: () => void
-}
-
 const COOKITIE_PRODUCTS = [
   {
     id: '1',
@@ -113,7 +109,7 @@ const COOKITIE_PRODUCTS = [
   }
 ]
 
-export const Products = ({}: ProductsProps) => {
+export const Products = () => {
   const { addItem } = useCart()
   const [showCustomizer, setShowCustomizer] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<typeof COOKITIE_PRODUCTS[0] | null>(null)
