@@ -1,6 +1,6 @@
 import { useCart } from '../contexts/CartContext'
 import { toast } from 'sonner'
-import { BrigadeiroCustomizer } from './BrigadeiroCustomizer'
+import { ProductCustomizer } from './ProductCustomizer'
 import { useState } from 'react'
 
 interface ProductsProps {
@@ -15,7 +15,33 @@ const COOKITIE_PRODUCTS = [
     image: '/imagens/imagens-produtos/espetinho de brogadeiro.jpg',
     description: 'Doce brasileiro tradicional coberto com granulado de chocolate, feito com muito amor!',
     emoji: '🍫',
-    popular: true
+    popular: true,
+    flavors: [
+      {
+        id: 'classico',
+        name: 'Clássico',
+        emoji: '🍫',
+        description: 'Brigadeiro tradicional com granulado de chocolate'
+      },
+      {
+        id: 'morango',
+        name: 'Morango',
+        emoji: '🍓',
+        description: 'Brigadeiro com sabor de morango e granulado colorido'
+      },
+      {
+        id: 'coco',
+        name: 'Coco',
+        emoji: '🥥',
+        description: 'Brigadeiro com sabor de coco e coco ralado'
+      },
+      {
+        id: 'beijinho',
+        name: 'Beijinho',
+        emoji: '🤍',
+        description: 'Brigadeiro de coco com açúcar cristal'
+      }
+    ]
   },
   {
     id: '2',
@@ -24,7 +50,21 @@ const COOKITIE_PRODUCTS = [
     image: '/imagens/imagens-produtos/Palha italiana.webp',
     description: 'Doce tradicional brasileiro com biscoito triturado e chocolate cremoso, coberto com açúcar de confeiteiro.',
     emoji: '🍫',
-    popular: true
+    popular: true,
+    flavors: [
+      {
+        id: 'tradicional',
+        name: 'Tradicional',
+        emoji: '🍫',
+        description: 'Palha italiana clássica com chocolate e biscoito'
+      },
+      {
+        id: 'chocolate-branco',
+        name: 'Chocolate Branco',
+        emoji: '🤍',
+        description: 'Palha italiana com chocolate branco'
+      }
+    ]
   },
   {
     id: '3',
@@ -33,7 +73,27 @@ const COOKITIE_PRODUCTS = [
     image: '/imagens/imagens-produtos/cookie-padrao.jpg',
     description: 'Cookies crocantes por fora e macios por dentro, com gotas de chocolate, feitos com muito carinho.',
     emoji: '🍪',
-    popular: false
+    popular: false,
+    flavors: [
+      {
+        id: 'chocolate',
+        name: 'Chocolate',
+        emoji: '🍫',
+        description: 'Cookie com gotas de chocolate'
+      },
+      {
+        id: 'aveia-mel',
+        name: 'Aveia e Mel',
+        emoji: '🌾',
+        description: 'Cookie saudável com aveia e mel'
+      },
+      {
+        id: 'baunilha',
+        name: 'Baunilha',
+        emoji: '🤍',
+        description: 'Cookie clássico de baunilha'
+      }
+    ]
   },
   {
     id: '4',
@@ -42,33 +102,42 @@ const COOKITIE_PRODUCTS = [
     image: '/imagens/imagens-produtos/Bisc-amant-glace.jpeg',
     description: 'Biscoitos delicados em formatos variados (estrela, boneco, coração), derretendo na boca.',
     emoji: '🥨',
-    popular: false
+    popular: false,
+    flavors: [
+      {
+        id: 'estrela',
+        name: 'Estrela',
+        emoji: '⭐',
+        description: 'Biscoito em formato de estrela'
+      },
+      {
+        id: 'coracao',
+        name: 'Coração',
+        emoji: '❤️',
+        description: 'Biscoito em formato de coração'
+      },
+      {
+        id: 'boneco',
+        name: 'Boneco',
+        emoji: '🧸',
+        description: 'Biscoito em formato de boneco'
+      }
+    ]
   }
 ]
 
 export const Products = ({ onNavigateToFlavors }: ProductsProps) => {
   const { addItem } = useCart()
   const [showCustomizer, setShowCustomizer] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<typeof COOKITIE_PRODUCTS[0] | null>(null)
 
   const handleAddToCart = (product: typeof COOKITIE_PRODUCTS[0]) => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image
-    })
-    toast.success(`${product.name} adicionado ao carrinho! 🎉`, {
-      duration: 2000,
-      style: {
-        background: 'linear-gradient(135deg, #fdf1c3 0%, #d1eaed 100%)',
-        border: '1px solid #d1eaed',
-        color: '#4a5568'
-      }
-    })
+    setSelectedProduct(product)
+    setShowCustomizer(true)
   }
 
-  const handleCustomBrigadeiro = (customBrigadeiro: any) => {
-    addItem(customBrigadeiro)
+  const handleCustomProduct = (customProduct: any) => {
+    addItem(customProduct)
   }
 
   return (
@@ -108,129 +177,50 @@ export const Products = ({ onNavigateToFlavors }: ProductsProps) => {
                        R$ {product.price.toFixed(2)}
                      </div>
                      
-                     {/* Botões */}
-                     <div className="space-y-2">
-                       {/* Botão Adicionar */}
-                       <button
-                         onClick={() => handleAddToCart(product)}
-                         className="w-full text-white flex items-center justify-center py-3 px-4 transition-all duration-300 ease-in-out touch-target"
-                         style={{ 
-                           backgroundColor: '#E4B7CB',
-                           borderRadius: '25px',
-                           fontFamily: 'Inter, sans-serif',
-                           fontWeight: '700',
-                           gap: '8px',
-                           letterSpacing: '0.5px',
-                           minHeight: '44px'
-                         }}
-                         onMouseEnter={(e) => {
-                           e.currentTarget.style.backgroundColor = '#D4A5B8';
-                           e.currentTarget.style.transform = 'translateY(-2px)';
-                         }}
-                         onMouseLeave={(e) => {
-                           e.currentTarget.style.backgroundColor = '#E4B7CB';
-                           e.currentTarget.style.transform = 'translateY(0)';
-                         }}
-                       >
-                         <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>+</span>
-                         Adicionar
-                       </button>
-                       
-                       {/* Botão Personalizar - apenas para Brigadeiro */}
-                       {product.id === '1' && (
-                         <button
-                           onClick={() => setShowCustomizer(true)}
-                           className="w-full text-gray-700 flex items-center justify-center py-2 px-4 transition-all duration-300 ease-in-out touch-target border-2 border-gray-300"
-                           style={{ 
-                             borderRadius: '25px',
-                             fontFamily: 'Inter, sans-serif',
-                             fontWeight: '600',
-                             minHeight: '40px'
-                           }}
-                           onMouseEnter={(e) => {
-                             e.currentTarget.style.backgroundColor = '#F0F0F0';
-                             e.currentTarget.style.transform = 'translateY(-1px)';
-                           }}
-                           onMouseLeave={(e) => {
-                             e.currentTarget.style.backgroundColor = 'transparent';
-                             e.currentTarget.style.transform = 'translateY(0)';
-                           }}
-                         >
-                           🎨 Personalizar
-                         </button>
-                       )}
-                     </div>
+                     {/* Botão Adicionar */}
+                     <button
+                       onClick={() => handleAddToCart(product)}
+                       className="w-full text-white flex items-center justify-center py-3 px-4 transition-all duration-300 ease-in-out touch-target"
+                       style={{ 
+                         backgroundColor: '#E4B7CB',
+                         borderRadius: '25px',
+                         fontFamily: 'Inter, sans-serif',
+                         fontWeight: '700',
+                         gap: '8px',
+                         letterSpacing: '0.5px',
+                         minHeight: '44px'
+                       }}
+                       onMouseEnter={(e) => {
+                         e.currentTarget.style.backgroundColor = '#D4A5B8';
+                         e.currentTarget.style.transform = 'translateY(-2px)';
+                       }}
+                       onMouseLeave={(e) => {
+                         e.currentTarget.style.backgroundColor = '#E4B7CB';
+                         e.currentTarget.style.transform = 'translateY(0)';
+                       }}
+                     >
+                       <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>+</span>
+                       Adicionar
+                     </button>
                    </div>
                  </div>
                ))}
              </div>
         
-        {/* Botão "Ver mais sabores" de largura total - apenas em mobile */}
-        <div className="mt-8 lg:hidden">
-          <button 
-            onClick={onNavigateToFlavors}
-            className="w-full text-black py-3 px-12 transition-all duration-300 ease-in-out touch-target"
-            style={{
-              backgroundColor: '#F4F4F4',
-              borderRadius: '20px',
-              boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.1)',
-              fontWeight: 'bold',
-              fontSize: '18px',
-              minHeight: '44px'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#E8E8E8';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0px 6px 8px rgba(0, 0, 0, 0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#F4F4F4';
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.1)';
-            }}
-          >
-            Ver mais sabores
-          </button>
-        </div>
-
-        {/* Botões "Ver mais sabores" abaixo de cada produto - apenas em desktop */}
-        <div className="hidden lg:grid grid-cols-4 gap-8 mt-4">
-          {COOKITIE_PRODUCTS.map((product) => (
-            <button 
-              key={`more-${product.id}`}
-              onClick={onNavigateToFlavors}
-              className="text-black py-3 px-4 transition-all duration-300 ease-in-out touch-target"
-              style={{
-                backgroundColor: '#F4F4F4',
-                borderRadius: '20px',
-                boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.1)',
-                fontWeight: 'bold',
-                fontSize: '18px',
-                minHeight: '44px'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#E8E8E8';
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0px 6px 8px rgba(0, 0, 0, 0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#F4F4F4';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0px 4px 4px rgba(0, 0, 0, 0.1)';
-              }}
-            >
-              Ver mais sabores
-            </button>
-          ))}
-        </div>
       </div>
       
-      {/* Modal de Personalização do Brigadeiro */}
-      <BrigadeiroCustomizer
-        isOpen={showCustomizer}
-        onClose={() => setShowCustomizer(false)}
-        onAddToCart={handleCustomBrigadeiro}
-      />
+      {/* Modal de Personalização de Produtos */}
+      {selectedProduct && (
+        <ProductCustomizer
+          isOpen={showCustomizer}
+          onClose={() => {
+            setShowCustomizer(false)
+            setSelectedProduct(null)
+          }}
+          onAddToCart={handleCustomProduct}
+          product={selectedProduct}
+        />
+      )}
     </div>
   )
 }
