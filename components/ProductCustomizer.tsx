@@ -31,7 +31,7 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
     tradicional: 1,
     pacoca: 1,
     ninho: 1,
-    'beijinho-de-pe': 0
+    'bicho-de-pe': 0
   })
 
   if (!isOpen) return null

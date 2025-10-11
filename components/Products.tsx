@@ -36,8 +36,8 @@ const COOKITIE_PRODUCTS = [
         description: 'Brigadeiro com leite ninho e coco ralado'
       },
       {
-        id: 'beijinho-de-pe',
-        name: 'Beijinho de Pé',
+        id: 'bicho-de-pe',
+        name: 'Bicho de Pé',
         emoji: '',
         description: 'Brigadeiro de coco com formato especial'
       }
@@ -55,13 +55,13 @@ const COOKITIE_PRODUCTS = [
       {
         id: 'tradicional',
         name: 'Tradicional',
-        emoji: '🍫',
+        emoji: '',
         description: 'Palha italiana clássica com chocolate e biscoito'
       },
       {
         id: 'chocolate-branco',
         name: 'Chocolate Branco',
-        emoji: '🤍',
+        emoji: '',
         description: 'Palha italiana com chocolate branco'
       }
     ]
@@ -78,19 +78,19 @@ const COOKITIE_PRODUCTS = [
       {
         id: 'chocolate',
         name: 'Chocolate',
-        emoji: '🍫',
+        emoji: '',
         description: 'Cookie com gotas de chocolate'
       },
       {
         id: 'aveia-mel',
         name: 'Aveia e Mel',
-        emoji: '🌾',
+        emoji: '',
         description: 'Cookie saudável com aveia e mel'
       },
       {
         id: 'baunilha',
         name: 'Baunilha',
-        emoji: '🤍',
+        emoji: '',
         description: 'Cookie clássico de baunilha'
       }
     ]
@@ -107,19 +107,19 @@ const COOKITIE_PRODUCTS = [
       {
         id: 'estrela',
         name: 'Estrela',
-        emoji: '⭐',
+        emoji: '',
         description: 'Biscoito em formato de estrela'
       },
       {
         id: 'coracao',
         name: 'Coração',
-        emoji: '❤️',
+        emoji: '',
         description: 'Biscoito em formato de coração'
       },
       {
         id: 'boneco',
         name: 'Boneco',
-        emoji: '🧸',
+        emoji: '',
         description: 'Biscoito em formato de boneco'
       }
     ]
