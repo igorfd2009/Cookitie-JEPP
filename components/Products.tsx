@@ -127,9 +127,9 @@ export const Products = () => {
     <div className="py-8 px-4 lg:py-16" style={{ backgroundColor: '#FDFAF5' }}>
       <div className="max-w-6xl mx-auto">
              {/* Grid de Produtos */}
-             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 place-items-center">
+             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
                {COOKITIE_PRODUCTS.map((product) => (
-                 <div key={product.id} className="rounded-2xl overflow-hidden w-full" style={{
+                 <div key={product.id} className="rounded-2xl overflow-hidden" style={{
                    backgroundColor: '#F4F4F4',
                    boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.2)'
                  }}>
