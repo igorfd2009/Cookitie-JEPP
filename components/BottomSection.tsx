@@ -1,6 +1,6 @@
 export const BottomSection = () => {
   return (
-    <section className="relative px-4 overflow-hidden py-1 lg:py-16" style={{ backgroundColor: '#FDFAF5' }}>
+    <section className="relative px-4 overflow-hidden py-1 lg:py-16 pb-4 lg:pb-16" style={{ backgroundColor: '#FDFAF5' }}>
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
           
@@ -17,7 +17,7 @@ export const BottomSection = () => {
                      maxHeight: '600px',
                      transform: 'scale(1.1)',
                      marginTop: '-50px',
-                     marginBottom: '-50px'
+                     marginBottom: '-30px'
                    }}
                    onError={(e) => {
                      console.log('Erro ao carregar imagem-inicial-secundaria.webp');
