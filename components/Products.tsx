@@ -57,12 +57,6 @@ const COOKITIE_PRODUCTS = [
         name: 'Tradicional',
         emoji: '',
         description: 'Palha italiana clássica com chocolate e biscoito'
-      },
-      {
-        id: 'chocolate-branco',
-        name: 'Chocolate Branco',
-        emoji: '',
-        description: 'Palha italiana com chocolate branco'
       }
     ]
   },
@@ -76,22 +70,22 @@ const COOKITIE_PRODUCTS = [
     popular: false,
     flavors: [
       {
-        id: 'chocolate',
-        name: 'Chocolate',
+        id: 'mms',
+        name: 'Com M&Ms',
         emoji: '',
-        description: 'Cookie com gotas de chocolate'
+        description: 'Cookie com M&Ms coloridos'
       },
       {
-        id: 'aveia-mel',
-        name: 'Aveia e Mel',
+        id: 'tradicional',
+        name: 'Tradicional',
         emoji: '',
-        description: 'Cookie saudável com aveia e mel'
+        description: 'Cookie clássico com gotas de chocolate'
       },
       {
-        id: 'baunilha',
-        name: 'Baunilha',
+        id: 'meio-amargo',
+        name: 'Meio Amargo',
         emoji: '',
-        description: 'Cookie clássico de baunilha'
+        description: 'Cookie com chocolate meio amargo'
       }
     ]
   },
@@ -105,22 +99,16 @@ const COOKITIE_PRODUCTS = [
     popular: false,
     flavors: [
       {
-        id: 'estrela',
-        name: 'Estrela',
+        id: 'tradicional-glace',
+        name: 'Tradicional (com glacê)',
         emoji: '',
-        description: 'Biscoito em formato de estrela'
+        description: 'Biscoito amanteigado com cobertura de glacê'
       },
       {
-        id: 'coracao',
-        name: 'Coração',
+        id: 'chocolate',
+        name: 'Com Chocolate',
         emoji: '',
-        description: 'Biscoito em formato de coração'
-      },
-      {
-        id: 'boneco',
-        name: 'Boneco',
-        emoji: '',
-        description: 'Biscoito em formato de boneco'
+        description: 'Biscoito amanteigado com cobertura de chocolate'
       }
     ]
   }
