@@ -4,45 +4,6 @@ import { useState } from 'react'
 
 const COOKITIE_PRODUCTS = [
   {
-    id: '1',
-    name: 'Espetinho de Brigadeiro',
-    price: 0, // Preço será calculado com base nos sabores escolhidos
-    image: '/imagens/imagens-produtos/espetinho de brogadeiro.jpg',
-    description: 'Monte seu espetinho com 3 brigadeiros! Escolha entre nossos deliciosos sabores.',
-    emoji: '🍫',
-    popular: true,
-    flavors: [
-      {
-        id: 'tradicional',
-        name: 'Tradicional',
-        emoji: '',
-        description: 'Brigadeiro tradicional com granulado de chocolate',
-        price: 2.00
-      },
-      {
-        id: 'bicho-de-pe',
-        name: 'Bicho de Pé',
-        emoji: '',
-        description: 'Brigadeiro de coco com formato especial',
-        price: 2.50
-      },
-      {
-        id: 'ninho',
-        name: 'Ninho',
-        emoji: '',
-        description: 'Brigadeiro com leite ninho e coco ralado',
-        price: 3.00
-      },
-      {
-        id: 'pacoca',
-        name: 'Paçoca',
-        emoji: '',
-        description: 'Brigadeiro com sabor de paçoca e amendoim',
-        price: 3.00
-      }
-    ]
-  },
-  {
     id: '2',
     name: 'Palha Italiana',
     price: 7.00,
@@ -89,6 +50,45 @@ const COOKITIE_PRODUCTS = [
         emoji: '',
         description: 'Cookie com chocolate meio amargo',
         price: 9.00
+      }
+    ]
+  },
+  {
+    id: '1',
+    name: 'Espetinho de Brigadeiro',
+    price: 0, // Preço será calculado com base nos sabores escolhidos
+    image: '/imagens/imagens-produtos/espetinho de brogadeiro.jpg',
+    description: 'Monte seu espetinho com 3 brigadeiros! Escolha entre nossos deliciosos sabores.',
+    emoji: '🍫',
+    popular: true,
+    flavors: [
+      {
+        id: 'tradicional',
+        name: 'Tradicional',
+        emoji: '',
+        description: 'Brigadeiro tradicional com granulado de chocolate',
+        price: 2.00
+      },
+      {
+        id: 'bicho-de-pe',
+        name: 'Bicho de Pé',
+        emoji: '',
+        description: 'Brigadeiro de coco com formato especial',
+        price: 2.50
+      },
+      {
+        id: 'ninho',
+        name: 'Ninho',
+        emoji: '',
+        description: 'Brigadeiro com leite ninho e coco ralado',
+        price: 3.00
+      },
+      {
+        id: 'pacoca',
+        name: 'Paçoca',
+        emoji: '',
+        description: 'Brigadeiro com sabor de paçoca e amendoim',
+        price: 3.00
       }
     ]
   },
