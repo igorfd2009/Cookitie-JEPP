@@ -47,9 +47,8 @@ export const useAdminOrders = () => {
       // Buscar todos os pedidos sem filtro de usuário
       const records = await pb.collection('orders').getFullList({
         sort: '-created',
-        expand: 'userId' // Expandir dados do usuário se possível
-      }, {
-        signal: abortControllerRef.current.signal
+        expand: 'userId', // Expandir dados do usuário se possível
+        $autoCancel: false
       })
 
       console.log('📦 [ADMIN] Registros brutos encontrados:', records.length)

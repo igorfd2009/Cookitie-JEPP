@@ -54,9 +54,8 @@ export const usePocketBaseOrders = () => {
       
       const records = await pb.collection('orders').getFullList({
         filter: `(userId='${user.id}')`,
-        sort: '-created'
-      }, {
-        signal: abortControllerRef.current.signal
+        sort: '-created',
+        $autoCancel: false
       })
 
       const converted: Order[] = records.map((order: any) => ({
