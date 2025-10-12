@@ -168,7 +168,7 @@ export const Products = () => {
                      
                      <div className="text-2xl mb-4" style={{ color: '#A27CBD', fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>
                        {product.id === '1' ? (
-                         <span className="text-base">A partir de R$ 6,00</span>
+                         <span className="text-sm sm:text-base">De R$ 6,00 a R$ 9,00</span>
                        ) : (
                          <>R$ {product.price.toFixed(2)}</>
                        )}
