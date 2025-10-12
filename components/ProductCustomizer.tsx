@@ -312,17 +312,17 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
               <button
                 onClick={() => handleQuantityChange(-1)}
                 disabled={quantity <= 1}
-                className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Minus size={20} />
               </button>
               
-              <span className="text-2xl font-bold w-8 text-center">{quantity}</span>
+              <span className="text-2xl font-bold w-12 text-center">{quantity}</span>
               
               <button
                 onClick={() => handleQuantityChange(1)}
                 disabled={quantity >= 10}
-                className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Plus size={20} />
               </button>
