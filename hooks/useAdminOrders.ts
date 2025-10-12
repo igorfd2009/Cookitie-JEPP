@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { pb } from '../lib/pocketbase'
 
 export interface AdminOrderItem {
@@ -28,9 +28,18 @@ export const useAdminOrders = () => {
   const [orders, setOrders] = useState<AdminOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   // Carregar TODOS os pedidos (admin)
   const loadAllOrders = async () => {
+    // Cancelar requisição anterior se existir
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    // Criar novo AbortController
+    abortControllerRef.current = new AbortController()
+
     try {
       setLoading(true)
       console.log('📦 [ADMIN] Carregando todos os pedidos do PocketBase...')
@@ -39,6 +48,8 @@ export const useAdminOrders = () => {
       const records = await pb.collection('orders').getFullList({
         sort: '-created',
         expand: 'userId' // Expandir dados do usuário se possível
+      }, {
+        signal: abortControllerRef.current.signal
       })
 
       console.log('📦 [ADMIN] Registros brutos encontrados:', records.length)
@@ -105,6 +116,11 @@ export const useAdminOrders = () => {
       console.log('✅ [ADMIN] Pedidos carregados:', converted.length)
       console.log('📋 [ADMIN] Amostra de pedido processado:', converted[0])
     } catch (error) {
+      // Ignorar erros de cancelamento
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('📦 [ADMIN] Requisição cancelada')
+        return
+      }
       console.error('❌ [ADMIN] Erro ao carregar pedidos:', error)
       setOrders([])
     } finally {
@@ -175,7 +191,13 @@ export const useAdminOrders = () => {
       loadAllOrders()
     }, 10000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      // Cancelar requisição pendente ao desmontar
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
   }, [])
 
   return {

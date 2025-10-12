@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { pb } from '../lib/pocketbase'
 
@@ -27,6 +27,7 @@ export const usePocketBaseOrders = () => {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   // Carregar pedidos do PocketBase
   const loadOrders = async () => {
@@ -37,6 +38,14 @@ export const usePocketBaseOrders = () => {
       return
     }
 
+    // Cancelar requisição anterior se existir
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    // Criar novo AbortController
+    abortControllerRef.current = new AbortController()
+
     try {
       setLoading(true)
       console.log('📦 [DEBUG] Carregando pedidos do PocketBase...')
@@ -46,6 +55,8 @@ export const usePocketBaseOrders = () => {
       const records = await pb.collection('orders').getFullList({
         filter: `(userId='${user.id}')`,
         sort: '-created'
+      }, {
+        signal: abortControllerRef.current.signal
       })
 
       const converted: Order[] = records.map((order: any) => ({
@@ -64,6 +75,11 @@ export const usePocketBaseOrders = () => {
       setOrders(converted)
       console.log('✅ Pedidos carregados do PocketBase:', converted.length)
     } catch (error) {
+      // Ignorar erros de cancelamento
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('📦 [DEBUG] Requisição cancelada')
+        return
+      }
       console.error('❌ Erro ao carregar do PocketBase:', error)
       setOrders([])
     } finally {
@@ -241,7 +257,13 @@ export const usePocketBaseOrders = () => {
       loadOrders()
     }, 30000)
 
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      // Cancelar requisição pendente ao desmontar
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
   }, [user])
 
   return {
