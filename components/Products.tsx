@@ -25,7 +25,7 @@ const COOKITIE_PRODUCTS = [
     id: '3',
     name: 'Cookie',
     price: 8.50, // Preço base (tradicional)
-    image: '/imagens/imagens-produtos/cookie-padrao.jpg',
+    image: '/imagens/imagens-produtos/cookie-2.jpeg',
     description: 'Cookies crocantes por fora e macios por dentro, com gotas de chocolate, feitos com muito carinho.',
     emoji: '🍪',
     popular: false,
@@ -168,7 +168,7 @@ export const Products = () => {
                      
                      <div className="text-2xl mb-4" style={{ color: '#A27CBD', fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>
                        {product.id === '1' ? (
-                         <span className="text-sm sm:text-base">De R$ 6,00 a R$ 9,00</span>
+                         <span className="text-base">A partir de R$ 6,00</span>
                        ) : (
                          <>R$ {product.price.toFixed(2)}</>
                        )}
