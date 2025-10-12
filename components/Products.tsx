@@ -57,7 +57,7 @@ const COOKITIE_PRODUCTS = [
     id: '1',
     name: 'Espetinho de Brigadeiro',
     price: 0, // Preço será calculado com base nos sabores escolhidos
-    image: '/imagens/imagens-produtos/espetinho de brogadeiro.jpg',
+    image: '/imagens/imagens-produtos/espetinho-de-brigadeiro-2.jpeg',
     description: 'Monte seu espetinho com 3 brigadeiros! Escolha entre nossos deliciosos sabores.',
     emoji: '🍫',
     popular: true,
