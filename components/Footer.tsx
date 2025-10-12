@@ -49,12 +49,12 @@ export const Footer = ({ showFullContent = true }: FooterProps) => {
                 
                 <div className="space-y-3">
                   <div className="flex items-center justify-center lg:justify-start gap-3 text-black">
-                    <Instagram size={16} />
+                    <Instagram size={16} className="flex-shrink-0" />
                     <span className="text-sm">@Cookittie_</span>
                   </div>
                   
-                  <div className="flex items-center justify-center lg:justify-start gap-3 text-black">
-                    <MapPin size={16} />
+                  <div className="flex items-start justify-center lg:justify-start gap-3 text-black">
+                    <MapPin size={16} className="flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Rua Amália Pessoa de Vasconcelos, 70, Colégio Alicerce</span>
                   </div>
                 </div>
@@ -93,11 +93,11 @@ export const Footer = ({ showFullContent = true }: FooterProps) => {
                 <h4 className="text-base font-bold text-black mb-2">Fale Conosco</h4>
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-center md:justify-end gap-2 text-black">
-                    <Instagram size={16} />
+                    <Instagram size={16} className="flex-shrink-0" />
                     <span className="text-sm">@Cookittie_</span>
                   </div>
-                  <div className="flex items-center justify-center md:justify-end gap-2 text-black">
-                    <MapPin size={16} />
+                  <div className="flex items-start justify-center md:justify-end gap-2 text-black">
+                    <MapPin size={16} className="flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Rua Amália Pessoa de Vasconcelos, 70, Colégio Alicerce</span>
                   </div>
                 </div>
