@@ -26,9 +26,9 @@ export function Hero({}: HeroProps) {
 
         {/* Textos centralizados */}
         <div className="text-center mt-2 sm:mt-8">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-4">
-            Bem-vindos ao Cookittie! Veja nossos produtos e aproveite os descontos!
-          </h1>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-4">
+                  Bem-vindos ao Cookittie! Veja nossos deliciosos produtos!
+                </h1>
 
           {/* Barra decorativa em gradiente */}
           <div 

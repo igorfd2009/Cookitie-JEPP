@@ -41,13 +41,6 @@ export function HowItWorks() {
 
   const benefits = [
     {
-      icon: Gift,
-      title: "20% de Desconto",
-      description: "Reservas até 10/09/2025",
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-100"
-    },
-    {
       icon: Zap,
       title: "Pagamento Instantâneo",
       description: "PIX em segundos",
@@ -60,6 +53,13 @@ export function HowItWorks() {
       description: "Status em tempo real",
       color: "text-blue-600",
       bgColor: "bg-blue-100"
+    },
+    {
+      icon: Gift,
+      title: "Produtos Artesanais",
+      description: "Feitos com carinho",
+      color: "text-purple-600",
+      bgColor: "bg-purple-100"
     }
   ];
 
@@ -164,29 +164,9 @@ export function HowItWorks() {
         </div>
 
         {/* Important Notes */}
-        <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 mb-16">
-          {/* Discount Note */}
-          <div className="group p-8 md:p-10 bg-gradient-to-br from-[var(--color-cookite-yellow)] via-yellow-200 to-yellow-100 rounded-3xl text-center shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-500 relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-            
-            <div className="relative">
-              <div className="flex flex-col md:flex-row items-center justify-center gap-3 mb-6">
-                <div className="w-16 h-16 bg-white/90 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Gift className="text-gray-800 w-8 h-8" />
-                </div>
-                <h3 className="text-gray-800 text-2xl md:text-3xl font-bold leading-tight">Desconto Especial</h3>
-              </div>
-              <p className="text-gray-800 text-lg md:text-xl lg:text-2xl leading-relaxed font-semibold mb-4">
-                <strong>Reservas feitas até 10/09/2025 recebem 20% de desconto automático!</strong>
-              </p>
-              <p className="text-gray-700 text-base md:text-lg">
-                Aproveite o preço especial e garanta seus doces com antecedência.
-              </p>
-            </div>
-          </div>
-
+        <div className="mb-16">
           {/* Payment Note */}
-          <div className="group p-8 md:p-10 bg-gradient-to-br from-[var(--color-cookite-blue)] via-blue-200 to-blue-100 rounded-3xl text-center shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-500 relative">
+          <div className="group p-8 md:p-10 bg-gradient-to-br from-[var(--color-cookite-blue)] via-blue-200 to-blue-100 rounded-3xl text-center shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-500 relative max-w-3xl mx-auto">
             <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
             
             <div className="relative">

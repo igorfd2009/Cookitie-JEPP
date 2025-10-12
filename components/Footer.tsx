@@ -65,7 +65,7 @@ export const Footer = ({ showFullContent = true }: FooterProps) => {
                 <h4 className="text-lg font-bold text-black">Sobre o Evento</h4>
                 
                 <p className="text-sm text-black leading-relaxed">
-                  ✨ Jovens Empreendedores Primeiros Passos é um programa que incentiva e inspira o espírito empreendedor em estudantes do ensino fundamental e médio. Nosso evento será realizado em 25/10, em uma edição única e especial. Não deixe passar essa oportunidade: garanta seus produtos antecipadamente e aproveite descontos exclusivos de até 15%!
+                  ✨ Jovens Empreendedores Primeiros Passos é um programa que incentiva e inspira o espírito empreendedor em estudantes do ensino fundamental e médio. Nosso evento será realizado em 25/10, em uma edição única e especial. Não deixe passar essa oportunidade: garanta seus produtos antecipadamente!
                 </p>
               </div>
             </div>
