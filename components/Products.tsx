@@ -5,10 +5,10 @@ import { useState } from 'react'
 const COOKITIE_PRODUCTS = [
   {
     id: '1',
-    name: 'Brigadeiro',
-    price: 8.50,
+    name: 'Espetinho de Brigadeiro',
+    price: 0, // Preço será calculado com base nos sabores escolhidos
     image: '/imagens/imagens-produtos/espetinho de brogadeiro.jpg',
-    description: 'Doce brasileiro tradicional coberto com granulado de chocolate, feito com muito amor!',
+    description: 'Monte seu espetinho com 3 brigadeiros! Escolha entre nossos deliciosos sabores.',
     emoji: '🍫',
     popular: true,
     flavors: [
@@ -16,32 +16,36 @@ const COOKITIE_PRODUCTS = [
         id: 'tradicional',
         name: 'Tradicional',
         emoji: '',
-        description: 'Brigadeiro tradicional com granulado de chocolate'
-      },
-      {
-        id: 'pacoca',
-        name: 'Paçoca',
-        emoji: '',
-        description: 'Brigadeiro com sabor de paçoca e amendoim'
-      },
-      {
-        id: 'ninho',
-        name: 'Ninho',
-        emoji: '',
-        description: 'Brigadeiro com leite ninho e coco ralado'
+        description: 'Brigadeiro tradicional com granulado de chocolate',
+        price: 2.00
       },
       {
         id: 'bicho-de-pe',
         name: 'Bicho de Pé',
         emoji: '',
-        description: 'Brigadeiro de coco com formato especial'
+        description: 'Brigadeiro de coco com formato especial',
+        price: 2.50
+      },
+      {
+        id: 'ninho',
+        name: 'Ninho',
+        emoji: '',
+        description: 'Brigadeiro com leite ninho e coco ralado',
+        price: 3.00
+      },
+      {
+        id: 'pacoca',
+        name: 'Paçoca',
+        emoji: '',
+        description: 'Brigadeiro com sabor de paçoca e amendoim',
+        price: 3.00
       }
     ]
   },
   {
     id: '2',
     name: 'Palha Italiana',
-    price: 8.50,
+    price: 7.00,
     image: '/imagens/imagens-produtos/Palha italiana.webp',
     description: 'Doce tradicional brasileiro com biscoito triturado e chocolate cremoso, coberto com açúcar de confeiteiro.',
     emoji: '🍫',
@@ -51,43 +55,47 @@ const COOKITIE_PRODUCTS = [
         id: 'tradicional',
         name: 'Tradicional',
         emoji: '',
-        description: 'Palha italiana clássica com chocolate e biscoito'
+        description: 'Palha italiana clássica com chocolate e biscoito',
+        price: 7.00
       }
     ]
   },
   {
     id: '3',
     name: 'Cookie',
-    price: 8.50,
+    price: 8.50, // Preço base (tradicional)
     image: '/imagens/imagens-produtos/cookie-padrao.jpg',
     description: 'Cookies crocantes por fora e macios por dentro, com gotas de chocolate, feitos com muito carinho.',
     emoji: '🍪',
     popular: false,
     flavors: [
       {
-        id: 'mms',
-        name: 'Com M&Ms',
-        emoji: '',
-        description: 'Cookie com M&Ms coloridos'
-      },
-      {
         id: 'tradicional',
         name: 'Tradicional',
         emoji: '',
-        description: 'Cookie clássico com gotas de chocolate'
+        description: 'Cookie clássico com gotas de chocolate',
+        price: 8.50
+      },
+      {
+        id: 'mms',
+        name: 'Com M&Ms',
+        emoji: '',
+        description: 'Cookie com M&Ms coloridos',
+        price: 9.00
       },
       {
         id: 'meio-amargo',
         name: 'Meio Amargo',
         emoji: '',
-        description: 'Cookie com chocolate meio amargo'
+        description: 'Cookie com chocolate meio amargo',
+        price: 9.00
       }
     ]
   },
   {
     id: '4',
     name: 'Biscoito Amanteigado',
-    price: 8.50,
+    price: 7.50,
     image: '/imagens/imagens-produtos/Bisc-amant-glace.jpeg',
     description: 'Biscoitos delicados em formatos variados (estrela, boneco, coração), derretendo na boca.',
     emoji: '🥨',
@@ -97,13 +105,15 @@ const COOKITIE_PRODUCTS = [
         id: 'tradicional-glace',
         name: 'Tradicional (com glacê)',
         emoji: '',
-        description: 'Biscoito amanteigado com cobertura de glacê'
+        description: 'Biscoito amanteigado com cobertura de glacê',
+        price: 7.50
       },
       {
         id: 'chocolate',
         name: 'Com Chocolate',
         emoji: '',
-        description: 'Biscoito amanteigado com cobertura de chocolate'
+        description: 'Biscoito amanteigado com cobertura de chocolate',
+        price: 7.50
       }
     ]
   }
@@ -157,7 +167,11 @@ export const Products = () => {
                      </h3>
                      
                      <div className="text-2xl mb-4" style={{ color: '#A27CBD', fontFamily: 'Inter, sans-serif', fontWeight: '700' }}>
-                       R$ {product.price.toFixed(2)}
+                       {product.id === '1' ? (
+                         <span className="text-base">A partir de R$ 6,00</span>
+                       ) : (
+                         <>R$ {product.price.toFixed(2)}</>
+                       )}
                      </div>
                      
                      {/* Botão Adicionar */}

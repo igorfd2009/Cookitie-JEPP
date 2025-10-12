@@ -19,6 +19,7 @@ interface ProductCustomizerProps {
       name: string
       emoji: string
       description: string
+      price?: number
     }>
   }
 }
@@ -49,10 +50,12 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
         return
       }
 
+      const espetinhoPrice = calculateBrigadeiroPrice()
+
       const customProduct = {
         id: `espetinho-custom-${Date.now()}`,
         name: 'Espetinho de Brigadeiro Personalizado',
-        price: product.price,
+        price: espetinhoPrice,
         image: product.image,
         quantity: quantity,
         customFlavors: Object.entries(brigadeiroQuantities)
@@ -63,7 +66,8 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
               id: flavorId,
               name: flavor?.name || '',
               emoji: flavor?.emoji || '',
-              quantity: qty
+              quantity: qty,
+              price: flavor?.price || 0
             }
           })
       }
@@ -88,12 +92,16 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
       return
     }
 
+    // Obter o preço correto do sabor selecionado
+    const selectedFlavorData = product.flavors.find(f => f.id === selectedFlavor)
+    const productPrice = selectedFlavorData?.price || product.price
+
     const customProduct = {
       id: `${product.id}-${selectedFlavor || 'default'}-${Date.now()}`,
       name: hasFlavors 
-        ? `${product.name} - ${product.flavors.find(f => f.id === selectedFlavor)?.name || 'Sabor Selecionado'}`
+        ? `${product.name} - ${selectedFlavorData?.name || 'Sabor Selecionado'}`
         : product.name,
-      price: product.price,
+      price: productPrice,
       image: product.image,
       quantity: quantity,
       customFlavor: hasFlavors ? selectedFlavor : null
@@ -130,6 +138,17 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
 
   const getTotalBrigadeiros = () => {
     return Object.values(brigadeiroQuantities).reduce((sum, qty) => sum + qty, 0)
+  }
+
+  const calculateBrigadeiroPrice = () => {
+    let total = 0
+    Object.entries(brigadeiroQuantities).forEach(([flavorId, qty]) => {
+      const flavor = product.flavors.find(f => f.id === flavorId)
+      if (flavor && flavor.price) {
+        total += flavor.price * qty
+      }
+    })
+    return total
   }
 
   return (
@@ -189,7 +208,14 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
                         <div className="flex items-center gap-3 flex-1">
                           {flavor.emoji && <div className="text-2xl">{flavor.emoji}</div>}
                           <div className="flex-1">
-                            <h5 className="font-medium">{flavor.name}</h5>
+                            <div className="flex items-center justify-between">
+                              <h5 className="font-medium">{flavor.name}</h5>
+                              {flavor.price && (
+                                <span className="text-sm font-semibold text-green-600">
+                                  R$ {flavor.price.toFixed(2)}
+                                </span>
+                              )}
+                            </div>
                             <p className="text-sm text-gray-600">{flavor.description}</p>
                           </div>
                         </div>
@@ -260,8 +286,15 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
                     >
                       <div className="flex items-center gap-3">
                         {flavor.emoji && <div className="text-2xl">{flavor.emoji}</div>}
-                        <div>
-                          <h5 className="font-medium">{flavor.name}</h5>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h5 className="font-medium">{flavor.name}</h5>
+                            {flavor.price && (
+                              <span className="text-sm font-semibold text-green-600">
+                                R$ {flavor.price.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-sm text-gray-600">{flavor.description}</p>
                         </div>
                       </div>
@@ -299,11 +332,26 @@ export const ProductCustomizer = ({ isOpen, onClose, onAddToCart, product }: Pro
           {/* Preço Total */}
           <div className="text-center mb-6">
             <div className="text-3xl font-bold" style={{ color: '#A27CBD' }}>
-              R$ {(product.price * quantity).toFixed(2)}
+              {isBrigadeiroEspetinho ? (
+                <>R$ {(calculateBrigadeiroPrice() * quantity).toFixed(2)}</>
+              ) : (
+                <>R$ {(() => {
+                  const selectedFlavorData = product.flavors.find(f => f.id === selectedFlavor)
+                  const unitPrice = selectedFlavorData?.price || product.price
+                  return (unitPrice * quantity).toFixed(2)
+                })()}</>
+              )}
             </div>
             {quantity > 1 && (
               <div className="text-sm text-gray-500">
-                R$ {product.price.toFixed(2)} cada
+                {isBrigadeiroEspetinho ? (
+                  <>R$ {calculateBrigadeiroPrice().toFixed(2)} cada</>
+                ) : (
+                  <>R$ {(() => {
+                    const selectedFlavorData = product.flavors.find(f => f.id === selectedFlavor)
+                    return (selectedFlavorData?.price || product.price).toFixed(2)
+                  })()} cada</>
+                )}
               </div>
             )}
           </div>
