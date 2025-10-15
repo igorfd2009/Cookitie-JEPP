@@ -7,6 +7,14 @@ export interface OrderItem {
   name: string
   price: number
   quantity: number
+  customFlavors?: Array<{
+    id: string
+    name: string
+    emoji: string
+    quantity: number
+    price: number
+  }> | null
+  customFlavor?: string | null
 }
 
 export interface Order {
