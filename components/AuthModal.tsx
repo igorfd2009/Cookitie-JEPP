@@ -6,9 +6,10 @@ import { toast } from 'sonner'
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
+  onAdminLogin?: () => void
 }
 
-export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
+export const AuthModal = ({ isOpen, onClose, onAdminLogin }: AuthModalProps) => {
   const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -44,9 +45,42 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       if (isLogin) {
         const result = await signIn(formData.email, formData.password)
         if (result.success) {
-          toast.success('Bem-vindo de volta! 🍪')
-          onClose()
-          setFormData({ email: '', password: '', name: '', phone: '' })
+          // Verificar se é admin (case-insensitive e trim)
+          const emailLower = formData.email.toLowerCase().trim()
+          console.log('🔍 [AUTH] Verificando se é admin...')
+          console.log('🔍 [AUTH] Email digitado:', formData.email)
+          console.log('🔍 [AUTH] Email normalizado:', emailLower)
+          console.log('🔍 [AUTH] Comparando com: admin@cookittie.com')
+          console.log('🔍 [AUTH] É admin?', emailLower === 'admin@cookittie.com')
+          
+          if (emailLower === 'admin@cookittie.com') {
+            console.log('✅ [AUTH] É ADMIN! Redirecionando para painel...')
+            toast.success('Bem-vindo, Admin! 👑', {
+              duration: 3000,
+              icon: '👑'
+            })
+            setFormData({ email: '', password: '', name: '', phone: '' })
+            
+            // Redirecionar para painel admin
+            if (onAdminLogin) {
+              console.log('📍 [AUTH] Chamando onAdminLogin...')
+              onAdminLogin()
+              console.log('✅ [AUTH] onAdminLogin chamado com sucesso!')
+            } else {
+              console.error('❌ [AUTH] ERRO: onAdminLogin não existe!')
+            }
+            
+            // Fechar modal após redirecionar
+            setTimeout(() => {
+              console.log('🚪 [AUTH] Fechando modal...')
+              onClose()
+            }, 200)
+          } else {
+            console.log('ℹ️ [AUTH] Usuário normal - mantendo na página principal')
+            toast.success('Bem-vindo de volta! 🍪')
+            onClose()
+            setFormData({ email: '', password: '', name: '', phone: '' })
+          }
         } else {
           toast.error(result.error || 'Erro no login')
         }

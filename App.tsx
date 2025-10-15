@@ -93,7 +93,10 @@ function AppContent() {
       {currentPage !== 'admin' && (
         <Header 
           currentPage={currentPage}
-          onNavigate={(page) => setCurrentPage(page as Page)}
+          onNavigate={(page) => {
+            console.log('🔄 [HEADER] Navegando para:', page)
+            setCurrentPage(page as Page)
+          }}
           onGoToOrders={handleGoToOrders}
           onShowAuth={() => setShowAuthModal(true)}
         />
@@ -114,6 +117,12 @@ function AppContent() {
       <AuthModal 
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
+        onAdminLogin={() => {
+          console.log('🎯 App.tsx: Recebeu chamada onAdminLogin!')
+          console.log('🎯 Mudando página para: admin')
+          setCurrentPage('admin')
+          console.log('🎯 Página alterada!')
+        }}
       />
 
       <Toaster position="top-right" />

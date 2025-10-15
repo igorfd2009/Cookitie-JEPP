@@ -1,11 +1,11 @@
-import { ShoppingCart, Package } from 'lucide-react'
+import { ShoppingCart, Package, Settings } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import { usePocketBaseOrders } from '../hooks/usePocketBaseOrders'
 
 interface HeaderProps {
   currentPage: string
-  onNavigate: (page: 'products' | 'cart' | 'checkout' | 'orders' | 'flavors') => void
+  onNavigate: (page: 'products' | 'cart' | 'checkout' | 'orders' | 'flavors' | 'admin') => void
   onGoToOrders: () => void
   onShowAuth: () => void
 }
@@ -14,6 +14,9 @@ export const Header = ({ currentPage, onNavigate, onShowAuth }: HeaderProps) => 
   const { user, profile, isAuthenticated, signOut } = useAuth()
   const { totalItems } = useCart()
   const { orders } = usePocketBaseOrders()
+  
+  // Verificar se é admin
+  const isAdmin = user?.email?.toLowerCase().trim() === 'admin@cookittie.com'
 
   return (
     <header 
@@ -42,8 +45,22 @@ export const Header = ({ currentPage, onNavigate, onShowAuth }: HeaderProps) => 
 
         {/* Ações do lado direito */}
         <div className="flex items-center gap-2 sm:gap-4">
-          {/* Meus Pedidos - só aparece se o usuário tiver pedidos */}
-          {isAuthenticated && orders.length > 0 && (
+          {/* Painel Admin - só aparece para admin */}
+          {isAuthenticated && isAdmin && (
+            <button 
+              onClick={() => onNavigate('admin')} 
+              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white bg-purple-600 hover:bg-purple-700 transition-all duration-300 ease-in-out touch-target px-2 sm:px-3 py-2 rounded-lg shadow-md"
+              style={{ minHeight: '44px' }}
+              title="Acessar Painel Admin"
+            >
+              <Settings size={14} className="sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Painel Admin</span>
+              <span className="sm:hidden">Admin</span>
+            </button>
+          )}
+          
+          {/* Meus Pedidos - só aparece se o usuário tiver pedidos e NÃO for admin */}
+          {isAuthenticated && !isAdmin && orders.length > 0 && (
             <button 
               onClick={() => onNavigate('orders')} 
               className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-700 hover:text-blue-600 transition-all duration-300 ease-in-out touch-target px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100"
