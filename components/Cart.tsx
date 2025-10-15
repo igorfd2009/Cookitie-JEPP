@@ -90,6 +90,18 @@ export const Cart = ({ onGoToCheckout }: CartProps) => {
                   {/* Nome do produto */}
                   <h3 className="text-lg sm:text-xl font-semibold text-gray-900 truncate" style={{ fontFamily: 'Inter, sans-serif' }}>{item.name}</h3>
                   
+                  {/* Sabores do Espetinho */}
+                  {(item as any).customFlavors && (item as any).customFlavors.length > 0 && (
+                    <div className="text-xs text-purple-600 space-y-0.5 mt-1">
+                      <p className="font-semibold">🎨 Sabores:</p>
+                      {(item as any).customFlavors.map((flavor: any, idx: number) => (
+                        <p key={idx} className="text-gray-600">
+                          {flavor.emoji} {flavor.quantity}x {flavor.name}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                  
                   {/* Preço em azul */}
                   <p className="text-blue-600 font-bold text-base sm:text-lg" style={{ fontFamily: 'Inter, sans-serif', fontWeight: '800' }}>
                     R$ {item.price.toFixed(2)}

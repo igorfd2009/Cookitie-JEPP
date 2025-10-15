@@ -114,7 +114,9 @@ export const Checkout = ({ onOrderComplete, onBackToCart }: CheckoutProps) => {
           id: item.id,
           name: item.name,
           price: item.price,
-          quantity: item.quantity
+          quantity: item.quantity,
+          ...(((item as any).customFlavors) && { customFlavors: (item as any).customFlavors }),
+          ...(((item as any).customFlavor) && { customFlavor: (item as any).customFlavor })
         })),
         total: totalPrice,
         status: 'pending', // Status inicial do pedido
@@ -333,17 +335,31 @@ export const Checkout = ({ onOrderComplete, onBackToCart }: CheckoutProps) => {
         
         <div className="space-y-3">
           {items.map((item) => (
-            <div key={item.id} className="flex justify-between items-center py-2 sm:py-3 border-b border-blue-100 last:border-b-0">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
-                <div className="min-w-0">
-                  <span className="font-medium text-gray-900 text-sm sm:text-base block">{item.name}</span>
-                  <span className="text-blue-600 text-xs sm:text-sm">x{item.quantity}</span>
+            <div key={item.id} className="py-2 sm:py-3 border-b border-blue-100 last:border-b-0">
+              <div className="flex justify-between items-start">
+                <div className="flex items-start gap-2 sm:gap-3 flex-1">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0 mt-1"></div>
+                  <div className="min-w-0 flex-1">
+                    <span className="font-medium text-gray-900 text-sm sm:text-base block">{item.name}</span>
+                    <span className="text-blue-600 text-xs sm:text-sm">x{item.quantity}</span>
+                    
+                    {/* Sabores do Espetinho */}
+                    {(item as any).customFlavors && (item as any).customFlavors.length > 0 && (
+                      <div className="text-xs text-purple-600 space-y-0.5 mt-1">
+                        <p className="font-semibold">🎨 Sabores:</p>
+                        {(item as any).customFlavors.map((flavor: any, idx: number) => (
+                          <p key={idx} className="text-gray-600">
+                            {flavor.emoji} {flavor.quantity}x {flavor.name}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
+                <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0 ml-2">
+                  R$ {(item.price * item.quantity).toFixed(2)}
+                </span>
               </div>
-              <span className="font-bold text-gray-900 text-sm sm:text-base flex-shrink-0">
-                R$ {(item.price * item.quantity).toFixed(2)}
-              </span>
             </div>
           ))}
         </div>
