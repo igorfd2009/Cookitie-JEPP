@@ -50,6 +50,23 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
 
   const stats = getOrderStats()
 
+  // Criar mapa de códigos de pedido simplificados
+  const orderCodesMap = useMemo(() => {
+    const map = new Map<string, string>()
+    const sortedOrders = [...orders].sort((a, b) => 
+      new Date(a.created).getTime() - new Date(b.created).getTime()
+    )
+    sortedOrders.forEach((order, index) => {
+      map.set(order.id, `#${String(index + 1).padStart(4, '0')}`)
+    })
+    return map
+  }, [orders])
+
+  // Função para obter código simplificado do pedido
+  const getOrderCode = (orderId: string) => {
+    return orderCodesMap.get(orderId) || `#${orderId.slice(-4)}`
+  }
+
   // Agrupar pedidos por cliente
   const clientsData = useMemo(() => {
     const clientsMap = new Map<string, ClientData>()
@@ -154,9 +171,9 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
 
   // Exportar dados para CSV
   const exportToCSV = () => {
-    const headers = ['ID Pedido', 'Cliente', 'Email', 'Total', 'Status', 'Data', 'Código Retirada']
+    const headers = ['Código Pedido', 'Cliente', 'Email', 'Total', 'Status', 'Data', 'Código Retirada']
     const rows = filteredOrders.map(order => [
-      order.id,
+      getOrderCode(order.id),
       order.userName || '',
       order.userEmail || '',
       order.total.toFixed(2),
@@ -368,16 +385,28 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
                       <div key={order.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-lg mb-2">Pedido #{order.id.slice(-8)}</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <User className="h-4 w-4 flex-shrink-0" />
-                                <span className="font-medium">{order.userName || 'Cliente não identificado'}</span>
+                            <h3 className="font-semibold text-lg mb-2 text-purple-600">Pedido {getOrderCode(order.id)}</h3>
+                            <div className="space-y-2">
+                              <div className="bg-blue-50 p-2 rounded-lg">
+                                <div className="flex items-center gap-2 text-sm">
+                                  <User className="h-4 w-4 flex-shrink-0 text-blue-600" />
+                                  <div className="flex-1">
+                                    <p className="text-xs text-gray-500">Cliente</p>
+                                    <p className="font-semibold text-gray-900">{order.userName || 'Cliente não identificado'}</p>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <Mail className="h-4 w-4 flex-shrink-0" />
-                                <span className="truncate">{order.userEmail || 'Email não disponível'}</span>
+                              <div className="bg-green-50 p-2 rounded-lg">
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Mail className="h-4 w-4 flex-shrink-0 text-green-600" />
+                                  <div className="flex-1">
+                                    <p className="text-xs text-gray-500">Email</p>
+                                    <p className="font-medium text-gray-900 break-all">{order.userEmail || 'Email não disponível'}</p>
+                                  </div>
+                                </div>
                               </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                               <div className="flex items-center gap-2 text-sm text-gray-600">
                                 <Calendar className="h-4 w-4 flex-shrink-0" />
                                 <span>{formatDate(order.created)}</span>
@@ -592,7 +621,7 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
             <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle>Detalhes do Pedido #{selectedOrder.id.slice(-8)}</CardTitle>
+                  <CardTitle className="text-purple-600">Detalhes do Pedido {getOrderCode(selectedOrder.id)}</CardTitle>
                   <Button
                     variant="outline"
                     onClick={() => setSelectedOrder(null)}
@@ -859,7 +888,7 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
                         <div key={order.id} className="border rounded-lg p-4 bg-white hover:bg-gray-50">
                           <div className="flex justify-between items-start mb-2">
                             <div>
-                              <p className="font-semibold">Pedido #{order.id.slice(-8)}</p>
+                              <p className="font-semibold text-purple-600">Pedido {getOrderCode(order.id)}</p>
                               <p className="text-sm text-gray-500">{formatDate(order.created)}</p>
                             </div>
                             <div className="flex items-center gap-2">
