@@ -23,7 +23,7 @@ export interface Order {
 }
 
 export const usePocketBaseOrders = () => {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
