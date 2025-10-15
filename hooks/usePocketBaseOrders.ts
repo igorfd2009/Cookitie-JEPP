@@ -23,7 +23,8 @@ export interface Order {
 }
 
 export const usePocketBaseOrders = () => {
-  const { user, profile } = useAuth()
+  const { user } = useAuth()
+  // const { user, profile } = useAuth() // profile será usado após adicionar campos no PocketBase
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
@@ -156,6 +157,8 @@ export const usePocketBaseOrders = () => {
         // Veja o arquivo POCKETBASE_ORDERS_CONFIG.md para instruções completas
         
         // ⚠️ DESCOMENTE APÓS ADICIONAR OS CAMPOS NO POCKETBASE:
+        // Passo 1: Descomente a linha 27 para usar profile: const { user, profile } = useAuth()
+        // Passo 2: Descomente as linhas abaixo:
         // if (user.name || profile?.name) {
         //   pocketBaseData.userName = (user.name || profile?.name || '').trim()
         // }
