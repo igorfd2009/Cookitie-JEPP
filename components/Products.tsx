@@ -24,7 +24,7 @@ const COOKITIE_PRODUCTS = [
   {
     id: '3',
     name: 'Cookie',
-    price: 8.50, // Preço base (tradicional)
+    price: 9.00, // Preço base (tradicional)
     image: '/imagens/imagens-produtos/cookie-2.jpeg',
     description: 'Cookies crocantes por fora e macios por dentro, com gotas de chocolate, feitos com muito carinho.',
     emoji: '🍪',
@@ -35,21 +35,21 @@ const COOKITIE_PRODUCTS = [
         name: 'Tradicional',
         emoji: '',
         description: 'Cookie clássico com gotas de chocolate',
-        price: 8.50
+        price: 9.00
       },
       {
         id: 'mms',
         name: 'Com M&Ms',
         emoji: '',
         description: 'Cookie com M&Ms coloridos',
-        price: 9.00
+        price: 10.00
       },
       {
         id: 'meio-amargo',
         name: 'Meio Amargo',
         emoji: '',
         description: 'Cookie com chocolate meio amargo',
-        price: 9.00
+        price: 10.00
       }
     ]
   },
@@ -95,7 +95,7 @@ const COOKITIE_PRODUCTS = [
   {
     id: '4',
     name: 'Biscoito Amanteigado',
-    price: 7.50,
+    price: 6.00,
     image: '/imagens/imagens-produtos/Bisc-amant-glace.jpeg',
     description: 'Biscoitos delicados em formatos variados (estrela, boneco, coração), derretendo na boca.',
     emoji: '🥨',
@@ -106,14 +106,14 @@ const COOKITIE_PRODUCTS = [
         name: 'Tradicional (com glacê)',
         emoji: '',
         description: 'Biscoito amanteigado com cobertura de glacê',
-        price: 7.50
+        price: 6.00
       },
       {
         id: 'chocolate',
         name: 'Com Chocolate',
         emoji: '',
         description: 'Biscoito amanteigado com cobertura de chocolate',
-        price: 7.50
+        price: 6.00
       }
     ]
   }
