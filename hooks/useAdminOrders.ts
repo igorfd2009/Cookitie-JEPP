@@ -80,19 +80,42 @@ export const useAdminOrders = () => {
         let userEmail = 'Email não disponível'
         let userName = 'Cliente não identificado'
 
-        // Tentar obter dados do expand primeiro
-        if (order.expand?.userId) {
-          userEmail = order.expand.userId.email || userEmail
-          userName = order.expand.userId.name || userName
-          console.log('📦 [ADMIN] Dados do expand para pedido', order.id.slice(-8), ':', { userEmail, userName })
-        } else if (usersMap.has(order.userId)) {
-          // Usar dados do mapa de usuários
+        // 🎯 PRIORIDADE 1: Dados salvos diretamente no pedido (mais confiável)
+        if (order.userName && order.userName.trim()) {
+          userName = order.userName
+          console.log('✅ [ADMIN] Nome do cliente obtido diretamente do pedido')
+        }
+        
+        if (order.userEmail && order.userEmail.trim()) {
+          userEmail = order.userEmail
+          console.log('✅ [ADMIN] Email do cliente obtido diretamente do pedido')
+        }
+
+        // 🎯 PRIORIDADE 2: Tentar obter dados do expand se não tiver no pedido
+        if ((userName === 'Cliente não identificado' || userEmail === 'Email não disponível') && order.expand?.userId) {
+          if (userName === 'Cliente não identificado') {
+            userName = order.expand.userId.name || userName
+          }
+          if (userEmail === 'Email não disponível') {
+            userEmail = order.expand.userId.email || userEmail
+          }
+          console.log('📦 [ADMIN] Dados complementados do expand para pedido', order.id.slice(-8))
+        }
+        
+        // 🎯 PRIORIDADE 3: Usar dados do mapa de usuários como fallback
+        if ((userName === 'Cliente não identificado' || userEmail === 'Email não disponível') && usersMap.has(order.userId)) {
           const user = usersMap.get(order.userId)
-          userEmail = user.email || userEmail
-          userName = user.name || userName
-          console.log('📦 [ADMIN] Dados do mapa para pedido', order.id.slice(-8), ':', { userEmail, userName })
-        } else {
-          console.warn('⚠️ [ADMIN] Usuário não encontrado para pedido:', order.id.slice(-8), 'userId:', order.userId)
+          if (userName === 'Cliente não identificado') {
+            userName = user.name || userName
+          }
+          if (userEmail === 'Email não disponível') {
+            userEmail = user.email || userEmail
+          }
+          console.log('📦 [ADMIN] Dados complementados do mapa para pedido', order.id.slice(-8))
+        }
+        
+        if (userName === 'Cliente não identificado' || userEmail === 'Email não disponível') {
+          console.warn('⚠️ [ADMIN] Dados incompletos para pedido:', order.id.slice(-8), 'userId:', order.userId)
         }
 
         return {

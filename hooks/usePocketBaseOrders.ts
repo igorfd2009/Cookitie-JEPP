@@ -151,6 +151,19 @@ export const usePocketBaseOrders = () => {
           paymentMethod: String(orderData.paymentMethod)
         }
 
+        // ✅ Adicionar dados do cliente (se os campos existirem no schema)
+        if (user.name || profile?.name) {
+          pocketBaseData.userName = (user.name || profile?.name || '').trim()
+        }
+        
+        if (user.email || profile?.email) {
+          pocketBaseData.userEmail = (user.email || profile?.email || '').trim()
+        }
+        
+        if (profile?.phone) {
+          pocketBaseData.userPhone = profile.phone.trim()
+        }
+
         // ✅ Adicionar campos opcionais apenas se existirem e forem válidos
         if (orderData.pixCode && typeof orderData.pixCode === 'string' && orderData.pixCode.trim()) {
           pocketBaseData.pixCode = orderData.pixCode.trim()
