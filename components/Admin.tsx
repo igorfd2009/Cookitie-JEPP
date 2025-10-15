@@ -436,11 +436,35 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t">
                           <div>
                             <p className="text-sm font-medium mb-2">Itens do Pedido:</p>
-                            <div className="space-y-1 bg-gray-50 p-3 rounded-lg">
-                              {order.items.map((item, idx) => (
-                                <div key={idx} className="flex justify-between text-sm">
-                                  <span className="text-gray-700">• {item.name} <span className="font-medium">({item.quantity}x)</span></span>
-                                  <span className="font-semibold">{formatCurrency(item.price * item.quantity)}</span>
+                            <div className="space-y-2 bg-gray-50 p-3 rounded-lg">
+                              {order.items.map((item: any, idx) => (
+                                <div key={idx} className="border-l-2 border-purple-400 pl-2">
+                                  <div className="flex justify-between text-sm">
+                                    <span className="text-gray-700 font-medium">{item.name}</span>
+                                    <span className="font-semibold text-green-600">{formatCurrency(item.price * item.quantity)}</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500">Quantidade: {item.quantity}x</div>
+                                  
+                                  {/* Mostrar sabores personalizados (espetinho) */}
+                                  {item.customFlavors && item.customFlavors.length > 0 && (
+                                    <div className="mt-1 pl-2 space-y-1">
+                                      <p className="text-xs font-semibold text-purple-600">🎨 Sabores escolhidos:</p>
+                                      {item.customFlavors.map((flavor: any, fIdx: number) => (
+                                        <div key={fIdx} className="text-xs text-gray-600 flex items-center gap-1">
+                                          <span>{flavor.emoji || '•'}</span>
+                                          <span className="font-medium">{flavor.quantity}x {flavor.name}</span>
+                                          <span className="text-gray-400">({formatCurrency(flavor.price)} cada)</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                  
+                                  {/* Mostrar sabor único (cookies, biscoitos) */}
+                                  {item.customFlavor && (
+                                    <div className="mt-1 text-xs text-purple-600">
+                                      🎨 Sabor: {item.customFlavor}
+                                    </div>
+                                  )}
                                 </div>
                               ))}
                             </div>
@@ -668,17 +692,55 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
                     <ShoppingCart className="h-5 w-5 text-purple-600" />
                     Itens do Pedido
                   </h4>
-                  <div className="space-y-2">
-                    {selectedOrder.items.map((item, index) => (
-                      <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border">
-                        <div>
-                          <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-gray-500">Quantidade: {item.quantity}x</p>
+                  <div className="space-y-3">
+                    {selectedOrder.items.map((item: any, index) => (
+                      <div key={index} className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border-2 border-purple-200">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
+                            <p className="font-semibold text-lg text-gray-900">{item.name}</p>
+                            <p className="text-sm text-gray-600 mt-1">Quantidade: <span className="font-medium">{item.quantity}x</span></p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-xl text-green-600">{formatCurrency(item.price * item.quantity)}</p>
+                            <p className="text-xs text-gray-500">{formatCurrency(item.price)} cada</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold text-green-600">{formatCurrency(item.price * item.quantity)}</p>
-                          <p className="text-xs text-gray-500">{formatCurrency(item.price)} cada</p>
-                        </div>
+                        
+                        {/* Detalhes de Sabores Personalizados (Espetinho) */}
+                        {item.customFlavors && item.customFlavors.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-purple-200 bg-white/50 rounded p-2">
+                            <p className="text-sm font-semibold text-purple-700 mb-2 flex items-center gap-1">
+                              🎨 Composição do Espetinho:
+                            </p>
+                            <div className="space-y-1.5 pl-2">
+                              {item.customFlavors.map((flavor: any, fIdx: number) => (
+                                <div key={fIdx} className="flex items-center justify-between text-sm bg-white rounded px-2 py-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-lg">{flavor.emoji || '🍫'}</span>
+                                    <span className="font-medium text-gray-700">
+                                      {flavor.quantity}x {flavor.name}
+                                    </span>
+                                  </div>
+                                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                                    {formatCurrency(flavor.price)} cada
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="mt-2 text-xs text-gray-500 text-center italic">
+                              💡 Total: {item.customFlavors.reduce((sum: number, f: any) => sum + f.quantity, 0)} brigadeiros
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Sabor Único (Cookies, Biscoitos) */}
+                        {item.customFlavor && (
+                          <div className="mt-2 pt-2 border-t border-purple-200">
+                            <p className="text-sm text-purple-700 font-medium">
+                              🎨 Sabor selecionado: <span className="font-semibold">{item.customFlavor}</span>
+                            </p>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
