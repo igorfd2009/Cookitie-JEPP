@@ -100,7 +100,7 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
              <div key={order.id} className="p-4 sm:p-6 rounded-2xl shadow-lg" style={{ backgroundColor: '#F4F4F4' }}>
               <div className="mb-4">
                 <h3 className="font-cookitie text-xl sm:text-2xl font-bold text-gray-900">
-                  Pedido #{String(orders.indexOf(order) + 1).padStart(4, '0')}
+                  Pedido #{String(new Date(order.created).getTime()).slice(-6)}#{String(orders.indexOf(order) + 1).padStart(2, '0')}
                 </h3>
                 <p className="text-sm text-gray-500">
                   {new Date(order.created).toLocaleDateString('pt-BR', {

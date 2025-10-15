@@ -164,22 +164,13 @@ export const usePocketBaseOrders = () => {
           paymentMethod: String(orderData.paymentMethod)
         }
 
-        // 📝 NOTA: Os campos userName, userEmail e userPhone foram comentados temporariamente
-        // Para usá-los, você precisa adicionar esses campos na collection 'orders' no PocketBase
-        // Veja o arquivo POCKETBASE_ORDERS_CONFIG.md para instruções completas
-        
-        // ⚠️ DESCOMENTE APÓS ADICIONAR OS CAMPOS NO POCKETBASE:
-        // Passo 1: Descomente a linha 27 para usar profile: const { user, profile } = useAuth()
-        // Passo 2: Descomente as linhas abaixo:
-        // if (user.name || profile?.name) {
-        //   pocketBaseData.userName = (user.name || profile?.name || '').trim()
-        // }
-        // if (user.email || profile?.email) {
-        //   pocketBaseData.userEmail = (user.email || profile?.email || '').trim()
-        // }
-        // if (profile?.phone) {
-        //   pocketBaseData.userPhone = profile.phone.trim()
-        // }
+        // ✅ Salvar dados do cliente diretamente no pedido
+        if (user.name && user.name.trim()) {
+          pocketBaseData.userName = user.name.trim()
+        }
+        if (user.email && user.email.trim()) {
+          pocketBaseData.userEmail = user.email.trim()
+        }
 
         // ✅ Adicionar campos opcionais apenas se existirem e forem válidos
         if (orderData.pixCode && typeof orderData.pixCode === 'string' && orderData.pixCode.trim()) {

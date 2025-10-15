@@ -50,14 +50,17 @@ export const Admin = ({ onBackToProducts }: AdminProps) => {
 
   const stats = getOrderStats()
 
-  // Criar mapa de códigos de pedido simplificados
+  // Criar mapa de códigos de pedido únicos baseados no timestamp
   const orderCodesMap = useMemo(() => {
     const map = new Map<string, string>()
     const sortedOrders = [...orders].sort((a, b) => 
       new Date(a.created).getTime() - new Date(b.created).getTime()
     )
     sortedOrders.forEach((order, index) => {
-      map.set(order.id, `#${String(index + 1).padStart(4, '0')}`)
+      // Usar timestamp + índice para garantir unicidade
+      const timestamp = new Date(order.created).getTime()
+      const uniqueCode = `#${String(timestamp).slice(-6)}${String(index + 1).padStart(2, '0')}`
+      map.set(order.id, uniqueCode)
     })
     return map
   }, [orders])
