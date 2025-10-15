@@ -100,7 +100,7 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
              <div key={order.id} className="p-4 sm:p-6 rounded-2xl shadow-lg" style={{ backgroundColor: '#F4F4F4' }}>
               <div className="mb-4">
                 <h3 className="font-cookitie text-xl sm:text-2xl font-bold text-gray-900">
-                  Pedido #{order.id.slice(-8).toUpperCase()}
+                  Pedido #{String(orders.indexOf(order) + 1).padStart(4, '0')}
                 </h3>
                 <p className="text-sm text-gray-500">
                   {new Date(order.created).toLocaleDateString('pt-BR', {
@@ -114,32 +114,16 @@ export const MyOrders = ({ onBackToProducts }: MyOrdersProps) => {
               </div>
 
               <div className="grid gap-2 mb-4">
-                {order.items.map((item: any, index) => (
-                  <div key={index} className="py-2 border-b border-gray-100 last:border-b-0">
-                    <div className="grid grid-cols-1 xs:grid-cols-[1fr_auto] gap-2">
-                      <div className="flex items-start gap-2 min-w-0">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0 mt-1"></div>
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm sm:text-base font-medium block">{item.name}</span>
-                          <span className="text-blue-600 text-sm">x{item.quantity}</span>
-                          
-                          {/* Sabores do Espetinho */}
-                          {item.customFlavors && item.customFlavors.length > 0 && (
-                            <div className="text-xs text-purple-600 space-y-0.5 mt-1">
-                              <p className="font-semibold">🎨 Sabores:</p>
-                              {item.customFlavors.map((flavor: any, idx: number) => (
-                                <p key={idx} className="text-gray-600">
-                                  {flavor.emoji} {flavor.quantity}x {flavor.name}
-                                </p>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <span className="font-bold text-sm sm:text-base text-right xs:text-left">
-                        R$ {(item.price * item.quantity).toFixed(2)}
-                      </span>
+                {order.items.map((item, index) => (
+                  <div key={index} className="grid grid-cols-1 xs:grid-cols-[1fr_auto] gap-2 py-2 border-b border-gray-100 last:border-b-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                      <span className="text-sm sm:text-base font-medium truncate">{item.name}</span>
+                      <span className="text-blue-600 text-sm flex-shrink-0">x{item.quantity}</span>
                     </div>
+                    <span className="font-bold text-sm sm:text-base text-right xs:text-left">
+                      R$ {(item.price * item.quantity).toFixed(2)}
+                    </span>
                   </div>
                 ))}
               </div>

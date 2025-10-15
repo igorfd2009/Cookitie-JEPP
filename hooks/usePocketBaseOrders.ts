@@ -145,7 +145,11 @@ export const usePocketBaseOrders = () => {
             id: String(item.id),
             name: String(item.name),
             price: Number(item.price),
-            quantity: Number(item.quantity)
+            quantity: Number(item.quantity),
+            // ✅ Salvar sabores personalizados (espetinho)
+            customFlavors: item.customFlavors || null,
+            // ✅ Salvar sabor único (cookies, biscoitos)
+            customFlavor: item.customFlavor || null
           })),
           total: Number(orderData.total),
           status: status,
