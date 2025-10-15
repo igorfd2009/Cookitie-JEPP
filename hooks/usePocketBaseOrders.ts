@@ -154,9 +154,9 @@ export const usePocketBaseOrders = () => {
             name: String(item.name),
             price: Number(item.price),
             quantity: Number(item.quantity),
-            // ✅ Salvar sabores personalizados (espetinho)
+            // Salvar sabores personalizados (espetinho)
             customFlavors: item.customFlavors || null,
-            // ✅ Salvar sabor único (cookies, biscoitos)
+            // Salvar sabor unico (cookies, biscoitos)
             customFlavor: item.customFlavor || null
           })),
           total: Number(orderData.total),
@@ -164,15 +164,24 @@ export const usePocketBaseOrders = () => {
           paymentMethod: String(orderData.paymentMethod)
         }
 
-        // ✅ Salvar dados do cliente diretamente no pedido
-        if (user.name && user.name.trim()) {
-          pocketBaseData.userName = user.name.trim()
-        }
-        if (user.email && user.email.trim()) {
-          pocketBaseData.userEmail = user.email.trim()
-        }
+        // NOTA: Os campos userName, userEmail e userPhone foram comentados temporariamente
+        // Para usa-los, voce precisa adicionar esses campos na collection 'orders' no PocketBase
+        // Veja o arquivo POCKETBASE_ORDERS_CONFIG.md para instrucoes completas
+        
+        // DESCOMENTE APOS ADICIONAR OS CAMPOS NO POCKETBASE:
+        // Passo 1: Descomente a linha 27 para usar profile: const { user, profile } = useAuth()
+        // Passo 2: Descomente as linhas abaixo:
+        // if (user.name || profile?.name) {
+        //   pocketBaseData.userName = (user.name || profile?.name || '').trim()
+        // }
+        // if (user.email || profile?.email) {
+        //   pocketBaseData.userEmail = (user.email || profile?.email || '').trim()
+        // }
+        // if (profile?.phone) {
+        //   pocketBaseData.userPhone = profile.phone.trim()
+        // }
 
-        // ✅ Adicionar campos opcionais apenas se existirem e forem válidos
+        // Adicionar campos opcionais apenas se existirem e forem validos
         if (orderData.pixCode && typeof orderData.pixCode === 'string' && orderData.pixCode.trim()) {
           pocketBaseData.pixCode = orderData.pixCode.trim()
         }
@@ -181,37 +190,37 @@ export const usePocketBaseOrders = () => {
           pocketBaseData.pickupCode = orderData.pickupCode.trim()
         }
 
-        console.log('📦 [ENVIO] Dados finais para PocketBase:', JSON.stringify(pocketBaseData, null, 2))
+        console.log('[ENVIO] Dados finais para PocketBase:', JSON.stringify(pocketBaseData, null, 2))
 
-        // 🚀 ENVIAR PARA POCKETBASE via SDK
+        // ENVIAR PARA POCKETBASE via SDK
         const newOrder = await pb.collection('orders').create(pocketBaseData)
-        console.log('✅ [SUCESSO] Pedido criado no PocketBase:', newOrder.id, newOrder)
+        console.log('[SUCESSO] Pedido criado no PocketBase:', newOrder.id, newOrder)
         
-        // 🔄 Recarregar pedidos
+        // Recarregar pedidos
         await loadOrders()
         return newOrder
     } catch (error) {
-      console.error('❌ [ERRO GERAL] Falha ao criar pedido:', error)
+      console.error('[ERRO GERAL] Falha ao criar pedido:', error)
       
       // Log detalhado do erro para debug
       if (error instanceof Error) {
-        console.error('❌ [ERRO DETALHADO] Nome:', error.name)
-        console.error('❌ [ERRO DETALHADO] Mensagem:', error.message)
-        console.error('❌ [ERRO DETALHADO] Stack:', error.stack)
+        console.error('[ERRO DETALHADO] Nome:', error.name)
+        console.error('[ERRO DETALHADO] Mensagem:', error.message)
+        console.error('[ERRO DETALHADO] Stack:', error.stack)
       }
       
-      // Log específico para erros de autenticação
+      // Log especifico para erros de autenticacao
       if (error && typeof error === 'object' && 'status' in error) {
         const statusError = error as any
         if (statusError.status === 401) {
-          console.error('❌ [ERRO AUTH] Usuário não autenticado ou token inválido')
-          console.error('❌ [ERRO AUTH] Verifique se o usuário está logado')
+          console.error('[ERRO AUTH] Usuario nao autenticado ou token invalido')
+          console.error('[ERRO AUTH] Verifique se o usuario esta logado')
         } else if (statusError.status === 403) {
-          console.error('❌ [ERRO PERMISSÃO] Usuário não tem permissão para criar pedidos')
-          console.error('❌ [ERRO PERMISSÃO] Verifique as regras de acesso no PocketBase')
+          console.error('[ERRO PERMISSAO] Usuario nao tem permissao para criar pedidos')
+          console.error('[ERRO PERMISSAO] Verifique as regras de acesso no PocketBase')
         } else if (statusError.status === 400) {
-          console.error('❌ [ERRO VALIDAÇÃO] Dados inválidos enviados')
-          console.error('❌ [ERRO VALIDAÇÃO] Verifique o schema da collection orders')
+          console.error('[ERRO VALIDACAO] Dados invalidos enviados')
+          console.error('[ERRO VALIDACAO] Verifique o schema da collection orders')
         }
       }
       
@@ -225,16 +234,16 @@ export const usePocketBaseOrders = () => {
   const updateOrderStatus = async (orderId: string, status: Order['status']) => {
     try {
       setSyncing(true)
-      console.log('📦 Atualizando status do pedido...')
+      console.log('Atualizando status do pedido...')
 
       // Atualizar no PocketBase via SDK
       await pb.collection('orders').update(orderId, { status })
-      console.log('✅ Status atualizado no PocketBase')
+      console.log('Status atualizado no PocketBase')
       
       // Recarregar pedidos
       await loadOrders()
     } catch (error) {
-      console.error('❌ Erro ao atualizar status:', error)
+      console.error('Erro ao atualizar status:', error)
       throw error
     } finally {
       setSyncing(false)
@@ -267,19 +276,19 @@ export const usePocketBaseOrders = () => {
     }
   }
 
-  // Configurar sincronização automática
+  // Configurar sincronizacao automatica
   useEffect(() => {
     loadOrders()
     
     // Sincronizar a cada 30 segundos
     const interval = setInterval(() => {
-      console.log('🔄 Sincronização automática...')
+      console.log('Sincronizacao automatica...')
       loadOrders()
     }, 30000)
 
     return () => {
       clearInterval(interval)
-      // Cancelar requisição pendente ao desmontar
+      // Cancelar requisicao pendente ao desmontar
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
