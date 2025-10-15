@@ -19,8 +19,6 @@ import {
   Calendar,
   Search,
   Download,
-  Phone,
-  MapPin,
   CreditCard,
   TrendingUp,
   Filter,
